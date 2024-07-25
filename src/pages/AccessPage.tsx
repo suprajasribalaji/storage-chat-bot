@@ -6,16 +6,16 @@ import { HomeFilled, LoginOutlined } from "@ant-design/icons"
 
 const AccessPage = () => {
     return (
-        <LoginPage>
-            <LoginPageBackground1>
-                <LoginPageBackground2>
-                    <LoginPageContent>
-                        <LoginPageTitle>
+        <StyledAccessPage>
+            <AccessPageBackground1>
+                <AccessPageBackground2>
+                    <AccessPageContent>
+                        <AccessPageTitle>
                             <StyledTitle>Tidy Spaces, Tidy Minds - Where Your Belongings</StyledTitle>
-                        </LoginPageTitle>
-                        <LoginPageSubtitle>
+                        </AccessPageTitle>
+                        <AccessPageSubtitle>
                             <StyledSubtitle>Safeguard and organized for clutter free Spaces</StyledSubtitle>
-                        </LoginPageSubtitle>
+                        </AccessPageSubtitle>
                         <StyledGetStartedButton>
                             <StyledGSButton>Get Started</StyledGSButton>
                         </StyledGetStartedButton>
@@ -32,22 +32,22 @@ const AccessPage = () => {
                                 <StyledJoinNowButton type="link">Join Now</StyledJoinNowButton>
                             </JoinNowButtonDiv>
                         </JoinNow>
-                    </LoginPageContent>
-                </LoginPageBackground2>
-            </LoginPageBackground1>
-        </LoginPage>
+                    </AccessPageContent>
+                </AccessPageBackground2>
+            </AccessPageBackground1>
+        </StyledAccessPage>
     )
 }
 
 export default AccessPage
 
-const LoginPage = styled.div`
+const StyledAccessPage = styled.div`
     width: 100%;
     height: 100vh;
     font-family: "Poppins", sans-serif;
 `;
 
-const LoginPageBackground1 = styled.div`
+const AccessPageBackground1 = styled.div`
     background-image: url(${BackgroundImage});
     background-size: cover;
     background-position: center;
@@ -57,7 +57,7 @@ const LoginPageBackground1 = styled.div`
     align-items: center;
 `;
 
-const LoginPageBackground2 = styled.div`
+const AccessPageBackground2 = styled.div`
     width: 30%;
     height: 80vh;
     border-radius: 10px;
@@ -67,7 +67,7 @@ const LoginPageBackground2 = styled.div`
     align-items: center;
 `;
 
-const LoginPageContent = styled.div`
+const AccessPageContent = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -76,7 +76,7 @@ const LoginPageContent = styled.div`
     width: 100%;
 `;
 
-const LoginPageTitle = styled.div`
+const AccessPageTitle = styled.div`
     width: 60%;
     margin-top: -5%;
 `;
@@ -88,7 +88,7 @@ const StyledTitle = styled(Title)`
     color: #1D1D1F;
 `;
 
-const LoginPageSubtitle = styled.div`
+const AccessPageSubtitle = styled.div`
     margin-top: 1%;
     margin-bottom: 6%;
 `;
