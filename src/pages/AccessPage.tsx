@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import BackgroundImage from "../assets/images/login.jpg"
+import BackgroundImage from "../assets/images/AccessPageBackground.jpg"
 import Title from "antd/es/typography/Title"
 import { Button, Divider } from "antd"
 import { HomeFilled, LoginOutlined } from "@ant-design/icons"
