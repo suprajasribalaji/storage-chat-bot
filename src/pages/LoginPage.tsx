@@ -1,9 +1,10 @@
 import styled from "styled-components";
 import BackgroundImage from "../assets/images/LoginPageBackground.jpg";
-import { ColorBlack, ColorGray } from "../assets/themes/color";
+import { ColorBlack, ColorBlue, ColorGray, ColorRed, ColorWhite } from "../assets/themes/color";
 import Title from "antd/es/typography/Title";
 import type { FormProps } from 'antd';
 import { Button, Checkbox, Divider, Form, Input } from 'antd';
+import { GoogleOutlined, FacebookOutlined, XOutlined } from "@ant-design/icons";
 
 type FieldType = {
     email?: string;
@@ -45,7 +46,7 @@ const LoginPage = () => {
                         name="email"
                         rules={[{ required: true, message: 'Please input your email!' }]}
                       >
-                        <Input placeholder="example@gmail.com" style={{ height: '5.2vh', width: '96%' }}/>
+                        <Input placeholder="example@gmail.com" style={{ height: '5.2vh', width: '96%', border: 'none' }}/>
                       </Form.Item>
 
                       <Form.Item<FieldType>
@@ -53,7 +54,7 @@ const LoginPage = () => {
                         name="password"
                         rules={[{ required: true, message: 'Please input your password!' }]}
                       >
-                        <Input.Password placeholder="****************" style={{ height: '5.2vh', width: '96%' }}/>
+                        <Input.Password placeholder="****************" style={{ height: '5.2vh', width: '96%', border: 'none' }}/>
                       </Form.Item>
 
                       <Form.Item<FieldType>
@@ -61,8 +62,13 @@ const LoginPage = () => {
                         valuePropName="checked"
                       >
                         <RememberForgotContainer>
-                          <Checkbox>Remember me</Checkbox>
-                          <Button type="link">Retrieve forgotten password</Button>
+                          <RememberMeCheckboxContainer>
+                            <StyledCheckbox />
+                            <RememberMe>
+                              Remember me
+                            </RememberMe>
+                          </RememberMeCheckboxContainer>                        
+                          <RememberForgotPasswordButton type="link">Retrieve forgotten password</RememberForgotPasswordButton>
                         </RememberForgotContainer>
                       </Form.Item>
 
@@ -79,9 +85,9 @@ const LoginPage = () => {
                       </StyledDivider>
 
                       <LoginButtonGroups>
-                        <StyledThirdPartyLoginButton>G</StyledThirdPartyLoginButton>
-                        <StyledThirdPartyLoginButton>f</StyledThirdPartyLoginButton>
-                        <StyledThirdPartyLoginButton>X</StyledThirdPartyLoginButton>
+                        <StyledGoogleButton icon={<GoogleOutlined />} />
+                        <StyledFacebookButton icon={<FacebookOutlined />}/>
+                        <StyledTwitterButton icon={<XOutlined />}/>
                       </LoginButtonGroups>
 
                       <NewAccount>
@@ -89,7 +95,7 @@ const LoginPage = () => {
                           Create a new account.
                         </CreateNewAccount>
                         <SignupButton>
-                          <Button type="link">Sign up</Button>
+                          <StyledSignupButton type="link">Sign up</StyledSignupButton>
                         </SignupButton>
                       </NewAccount>
                     </Form>
@@ -132,6 +138,7 @@ const LoginPageContent = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    color: ${ColorBlack.charcoalBlack};
 `;
 
 const LoginPageTitle = styled.div`
@@ -142,7 +149,6 @@ const StyledTitle = styled(Title)`
     font-size: 3.5rem !important;
     font-weight: 700 !important;
     margin-top: 2%;
-    color: ${ColorBlack.charcoalBlack};
 `;
 
 const LoginPageSubtitle = styled.div`
@@ -169,6 +175,49 @@ const RememberForgotContainer = styled.div`
   margin-left: 2%;
 `;
 
+const RememberMeCheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const StyledCheckbox = styled(Checkbox)`
+  .ant-checkbox-inner {
+    border-color: ${ColorBlack.black};
+    background-color: ${ColorWhite.white};
+  }
+
+  .ant-checkbox-checked .ant-checkbox-inner {
+    border-color: ${ColorRed.candleAppleRed};
+    background-color: ${ColorWhite.white};
+  }
+
+  .ant-checkbox-checked .ant-checkbox-inner::after {
+    border-color: ${ColorRed.candleAppleRed};
+  }
+
+  &&&:hover .ant-checkbox-inner,
+  &&&:focus .ant-checkbox-inner {
+    border-color: ${ColorBlack.black};
+    background-color: ${ColorWhite.white};
+  }
+
+  &&&:hover .ant-checkbox-checked .ant-checkbox-inner,
+  &&&:focus .ant-checkbox-checked .ant-checkbox-inner {
+    border-color: ${ColorRed.candleAppleRed};
+    background-color: ${ColorWhite.white};
+  }
+`;
+
+const RememberMe = styled.div`
+  color: ${ColorBlack.charcoalBlack};
+  margin-left: 5px;
+`;
+
+const RememberForgotPasswordButton = styled(Button)`
+  color: ${ColorBlack.richBlack};
+  border: none;
+`;
+
 const StyledDivider = styled.div`
   width: 100%;
   margin-top: -6%;
@@ -182,6 +231,13 @@ const StyledAccessButton = styled(Button)`
   width: 95%;
   height: 5.5vh;
   border-radius: 12px;
+  background-color: ${ColorRed.candleAppleRed};
+  border: none;
+  font-weight: bold;
+  &&&:hover {
+    background-color: ${ColorWhite.white};
+    color: ${ColorRed.candleAppleRed};
+  }
 `;
 
 const LoginButtonGroups = styled.div`
@@ -192,9 +248,48 @@ const LoginButtonGroups = styled.div`
 `;
 
 const StyledThirdPartyLoginButton = styled(Button)`
-  width: 29%;
-  height: 5.8vh;
-  border-radius: 14px;
+  .anticon {
+    color: ${ColorWhite.white};
+  }
+
+  &&&:hover, &&&:focus {
+    background-color: ${ColorWhite.white};
+  } 
+
+  &&& {
+    width: 27%;
+    height: 5.8vh;
+    border-radius: 14px;
+    border: none;
+    font-weight: bold;
+  }
+`;
+
+const StyledGoogleButton = styled(StyledThirdPartyLoginButton)`
+  background-color: ${ColorRed.tomatoRed};
+  &&&:hover, &&&:focus {
+    .anticon {
+        color: ${ColorRed.tomatoRed};
+    }
+  } 
+`;
+
+const StyledFacebookButton = styled(StyledThirdPartyLoginButton)`
+  background-color: ${ColorBlue.denimBlue};
+  &&&:hover, &&&:focus {
+    .anticon {
+        color: ${ColorBlue.denimBlue};
+    }
+  }
+`;
+
+const StyledTwitterButton = styled(StyledThirdPartyLoginButton)`
+  background-color: ${ColorBlack.black};
+  &&&:hover, &&&:focus {
+    .anticon {
+        color: ${ColorBlack.black};
+    }
+  }
 `;
 
 const NewAccount = styled.div`
@@ -206,6 +301,17 @@ const NewAccount = styled.div`
   margin-top: 6%;
 `;
 
-const SignupButton = styled.div``;
-
 const CreateNewAccount = styled.div``;
+
+const SignupButton = styled.div`
+  margin-left: -2%;
+`;
+
+const StyledSignupButton = styled(Button)`
+  color: rgba(93, 93, 91);
+  font-size: 100%;
+  font-weight: bold;
+  &&&:hover {
+    color: ${ColorGray.semiAshGray};
+  }
+`;
