@@ -3,6 +3,7 @@ export const ColorBlack = {
     richBlack: '#030303',
     charcoalBlack: '#1D1D1F',
     semiTransparentBlack: '#00000080',
+    lightSemiTransparentBlack: '#00000066',
 }
 
 export const ColorWhite = {
