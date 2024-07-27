@@ -3,6 +3,7 @@ import BackgroundImage from "../assets/images/AccessPageBackground.jpg"
 import Title from "antd/es/typography/Title"
 import { Button, Divider } from "antd"
 import { HomeFilled, LoginOutlined } from "@ant-design/icons"
+import { ColorBlack, ColorGray, ColorWhite } from "../assets/themes/color"
 
 const AccessPage = () => {
     return (
@@ -61,7 +62,7 @@ const AccessPageBackground2 = styled.div`
     width: 30%;
     height: 80vh;
     border-radius: 10px;
-    background-color: #f0f0f0;
+    background-color: ${ColorGray.lightGray};
     display: flex;
     justify-content: center;
     align-items: center;
@@ -85,7 +86,7 @@ const StyledTitle = styled(Title)`
     font-size: 2.5rem !important;
     font-weight: 800 !important;
     margin-top: 2%;
-    color: #1D1D1F;
+    color: ${ColorBlack.charcoalBlack};
 `;
 
 const AccessPageSubtitle = styled.div`
@@ -95,7 +96,7 @@ const AccessPageSubtitle = styled.div`
 
 const StyledSubtitle = styled.div`
     font-size: 0.9rem;
-    color: #5D5D5B;
+    color: ${ColorGray.ashGray};
 `;
 
 const StyledGetStartedButton = styled.div`
@@ -107,19 +108,19 @@ const StyledGSButton = styled(Button)`
     width: 302%;
     height: 6.5vh;
     border-radius: 14px;
-    background-color: #000000;
-    color: #FFFFFF;
+    background-color: ${ColorBlack.black};
+    color: ${ColorWhite.white};
     font-weight: bold;
     border: none;
 
     &&&:hover, &&&:focus {
-        color: #FFFFFF;
-        background-color: #000000;
+        color: ${ColorWhite.white};
+        background-color: ${ColorBlack.black};
     }
 `;
 
 const StyledDivider = styled(Divider)`
-    color: #1D1D1F !important;
+    color: ${ColorBlack.charcoalBlack} !important;
 `;
 
 const StyledButtonsGroup = styled.div`
@@ -132,16 +133,16 @@ const StyledLoginHomeButton = styled(Button)`
     height: 5.5vh;
     width: 5rem !important;
     border-radius: 10px;
-    background-color: #000000;
+    background-color: ${ColorBlack.black};
     border: none;
     .anticon {
-        color: #FFFFFF;
+        color: ${ColorWhite.white};
     }
 
     &&&:hover, &&&:focus {
-        background-color: #FFFFFF;
+        background-color: ${ColorWhite.white};
         .anticon {
-            color: #000000;
+            color: ${ColorBlack.black};
         }
     }
 `;
@@ -155,7 +156,7 @@ const JoinNow = styled.div`
 
 const NewToOurPlatform = styled.div`
     margin-left: 5.5rem;
-    color: #1D1D1F;
+    color: ${ColorBlack.charcoalBlack};
 `;
 
 const JoinNowButtonDiv = styled.div`
@@ -164,11 +165,11 @@ const JoinNowButtonDiv = styled.div`
 
 const StyledJoinNowButton = styled(Button)`
     font-size: 90%;
-    color: #1D1D1F;
+    color: ${ColorBlack.charcoalBlack};
     font-weight: 800;
     border: none;
 
     &&&:hover, &&&:focus {
-        color: #00000080;
+        color: ${ColorBlack.semiTransparentBlack};
     }
 `;

@@ -1,8 +1,8 @@
-import AccessPage from "./pages/AccessPage"
+import LoginPage from "./pages/LoginPage"
 
 function App() {
   return (
-    <AccessPage />
+    <LoginPage />    
   )
 }
 
