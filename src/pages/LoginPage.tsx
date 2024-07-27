@@ -5,6 +5,8 @@ import Title from "antd/es/typography/Title";
 import type { FormProps } from 'antd';
 import { Button, Checkbox, Divider, Form, Input } from 'antd';
 import { GoogleOutlined, FacebookOutlined, XOutlined } from "@ant-design/icons";
+import { useState } from "react";
+import RetrieveForgottenPasswordModal from "../components/modal/RetrieveForgottenPasswordModal";
 
 type FieldType = {
     email?: string;
@@ -21,6 +23,12 @@ const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
 };
   
 const LoginPage = () => {
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+    const handleRetrieveForgottenPassword = () => {
+      setIsModalOpen(true);
+    }
+
     return (
         <StyledLoginPage>
             <LoginPageBackground1 />
@@ -68,9 +76,17 @@ const LoginPage = () => {
                               Remember me
                             </RememberMe>
                           </RememberMeCheckboxContainer>                        
-                          <RememberForgotPasswordButton type="link">Retrieve forgotten password</RememberForgotPasswordButton>
+                          <RememberForgotPasswordButton type="link" onClick={handleRetrieveForgottenPassword}>Retrieve forgotten password</RememberForgotPasswordButton>
                         </RememberForgotContainer>
                       </Form.Item>
+
+                      {
+                          isModalOpen && 
+                          <RetrieveForgottenPasswordModal
+                            isModalOpen={isModalOpen}
+                            setIsModalOpen={setIsModalOpen}
+                          />
+                      }
 
                       <Form.Item>
                         <AccessButton>
@@ -216,6 +232,9 @@ const RememberMe = styled.div`
 const RememberForgotPasswordButton = styled(Button)`
   color: ${ColorBlack.richBlack};
   border: none;
+  &&&:hover {
+    color: ${ColorBlack.semiTransparentBlack};
+  }
 `;
 
 const StyledDivider = styled.div`
