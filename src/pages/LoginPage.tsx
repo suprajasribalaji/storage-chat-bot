@@ -4,7 +4,9 @@ import { ColorBlack, ColorBlue, ColorGray, ColorRed, ColorWhite } from "../asset
 import Title from "antd/es/typography/Title";
 import type { FormProps } from 'antd';
 import { Button, Checkbox, Divider, Form, Input } from 'antd';
-import { GoogleOutlined, FacebookOutlined, XOutlined } from "@ant-design/icons";
+import { GoogleOutlined } from "@ant-design/icons";
+import { FaFacebookF } from "react-icons/fa";
+import { IoLogoMicrosoft } from "react-icons/io5";
 import { useState } from "react";
 import RetrieveForgottenPasswordModal from "../components/modal/RetrieveForgottenPasswordModal";
 
@@ -115,8 +117,8 @@ const LoginPage = () => {
 
                       <LoginButtonGroups>
                         <StyledGoogleButton icon={<GoogleOutlined />} />
-                        <StyledFacebookButton icon={<FacebookOutlined />}/>
-                        <StyledTwitterButton icon={<XOutlined />}/>
+                        <StyledFacebookButton icon={<FaFacebookF />}/>
+                        <StyledMicrosoftButton icon={<IoLogoMicrosoft />}/>
                       </LoginButtonGroups>
 
                       <NewAccount>
@@ -275,13 +277,6 @@ const StyledAccessButton = styled(Button)`
   }
 `;
 
-const LoginButtonGroups = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 6%;
-  margin-top: -1.5%;
-`;
-
 const StyledThirdPartyLoginButton = styled(Button)`
   .anticon {
     color: ${ColorWhite.white};
@@ -289,6 +284,9 @@ const StyledThirdPartyLoginButton = styled(Button)`
 
   &&&:hover, &&&:focus {
     background-color: ${ColorWhite.white};
+    .anticon {
+      color: inherit;
+    }
   } 
 
   &&& {
@@ -311,20 +309,28 @@ const StyledGoogleButton = styled(StyledThirdPartyLoginButton)`
 
 const StyledFacebookButton = styled(StyledThirdPartyLoginButton)`
   background-color: ${ColorBlue.denimBlue};
+  color: ${ColorWhite.white};
+
   &&&:hover, &&&:focus {
-    .anticon {
-        color: ${ColorBlue.denimBlue};
-    }
+    background-color: ${ColorWhite.white};
+    color: ${ColorBlue.denimBlue};
   }
 `;
 
-const StyledTwitterButton = styled(StyledThirdPartyLoginButton)`
+const StyledMicrosoftButton = styled(StyledThirdPartyLoginButton)`
   background-color: ${ColorBlack.black};
+  color: ${ColorWhite.white};
   &&&:hover, &&&:focus {
-    .anticon {
-        color: ${ColorBlack.black};
-    }
+    background-color: ${ColorWhite.white};
+    color: ${ColorBlack.black};  
   }
+`;
+
+const LoginButtonGroups = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 6%;
+  margin-top: -1.5%;
 `;
 
 const NewAccount = styled.div`
