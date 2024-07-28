@@ -9,6 +9,7 @@ import { FaFacebookF } from "react-icons/fa";
 import { IoLogoMicrosoft } from "react-icons/io5";
 import { useState } from "react";
 import RetrieveForgottenPasswordModal from "../components/modal/RetrieveForgottenPasswordModal";
+import { useNavigate } from "react-router-dom";
 
 type FieldType = {
     email?: string;
@@ -39,10 +40,19 @@ const getPasswordValidationRules = () => {
 };
 
 const LoginPage = () => {
+    const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
     const handleRetrieveForgottenPassword = () => {
       setIsModalOpen(true);
+    }
+
+    const handleAccessButton = () => {
+      
+    }
+
+    const handleSignupButtton = () => {
+      navigate("/signup")
     }
 
     return (
@@ -105,7 +115,7 @@ const LoginPage = () => {
 
                       <Form.Item>
                         <AccessButton>
-                          <StyledAccessButton type="primary" htmlType="submit">
+                          <StyledAccessButton type="primary" onClick={handleAccessButton}>
                             Access
                           </StyledAccessButton>
                         </AccessButton>
@@ -126,7 +136,7 @@ const LoginPage = () => {
                           Create a new account.
                         </CreateNewAccount>
                         <SignupButton>
-                          <StyledSignupButton type="link">Sign up</StyledSignupButton>
+                          <StyledSignupButton onClick={handleSignupButtton} type="link">Sign up</StyledSignupButton>
                         </SignupButton>
                       </NewAccount>
                   </LoginPageForm>
