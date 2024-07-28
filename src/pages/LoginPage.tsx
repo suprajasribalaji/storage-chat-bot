@@ -22,6 +22,20 @@ const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
     console.log('Failed:', errorInfo);
 };
   
+const getEmailValidationRules = () => {
+  return [
+      { required: true, message: 'Please input your email!' },
+      { pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Please enter a valid email address!' },
+  ];
+};
+
+const getPasswordValidationRules = () => {
+  return [
+      { required: true, message: 'Please input your password!' },
+      { pattern: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/, message: 'Password must be min 8 and max 16 valid characters! Includes at least one uppercase letter, one lowercase letter, one digit, and one special character' },
+  ];
+};
+
 const LoginPage = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -40,19 +54,18 @@ const LoginPage = () => {
                     <LoginPageSubtitle>
                         <StyledSubtitle>Safeguard and organized for clutter free Spaces</StyledSubtitle>
                     </LoginPageSubtitle>
-                    <LoginPageForm>
-                      <Form
+                    <LoginPageForm                      
                       name="login-form"
                       layout="vertical"
                       initialValues={{ remember: true }}
-                      onFinish={onFinish}
-                      onFinishFailed={onFinishFailed}
+                      onFinish={onFinish as any}
+                      onFinishFailed={onFinishFailed as any}
                       autoComplete="off"
                     >
                       <Form.Item<FieldType>
                         label="Enter your room's email"
                         name="email"
-                        rules={[{ required: true, message: 'Please input your email!' }]}
+                        rules={getEmailValidationRules()}
                       >
                         <Input placeholder="example@gmail.com" style={{ height: '5.2vh', width: '96%', border: 'none' }}/>
                       </Form.Item>
@@ -60,7 +73,7 @@ const LoginPage = () => {
                       <Form.Item<FieldType>
                         label="Enter your storage password"
                         name="password"
-                        rules={[{ required: true, message: 'Please input your password!' }]}
+                        rules={getPasswordValidationRules()}
                       >
                         <Input.Password placeholder="****************" style={{ height: '5.2vh', width: '96%', border: 'none' }}/>
                       </Form.Item>
@@ -114,7 +127,6 @@ const LoginPage = () => {
                           <StyledSignupButton type="link">Sign up</StyledSignupButton>
                         </SignupButton>
                       </NewAccount>
-                    </Form>
                   </LoginPageForm>
                 </LoginPageContent>
             </LoginPageBackground2>
@@ -178,8 +190,12 @@ const StyledSubtitle = styled.div`
     color: ${ColorGray.ashGray};
 `;
 
-const LoginPageForm = styled.div`
+const LoginPageForm = styled(Form)`
   width: 84%;
+  .ant-form-item-explain-error {
+    text-align: left;
+    margin-left: 2%;
+  }
 `;
 
 const RememberForgotContainer = styled.div`
