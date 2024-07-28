@@ -20,6 +20,20 @@ const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
     console.log('Failed:', errorInfo);
 };
 
+const getEmailValidationRules = () => {
+    return [
+        { required: true, message: 'Please input your email!' },
+        { pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Please enter a valid email address!' },
+    ];
+};
+
+const getPasswordValidationRules = () => {
+    return [
+        { required: true, message: 'Please input your password!' },
+        { pattern: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/, message: 'Password must be min 8 and max 16 valid characters! Includes at least one uppercase letter, one lowercase letter, one digit, and one special character' },
+    ];
+};
+
 const SignupPage = () => {
     return (
         <StyledSigupPage>
@@ -36,14 +50,14 @@ const SignupPage = () => {
                             name="login-form"
                             layout="vertical"
                             initialValues={{ remember: true }}
-                            onFinish={onFinish}
-                            onFinishFailed={onFinishFailed}
+                            onFinish={onFinish as any}
+                            onFinishFailed={onFinishFailed as any}
                             autoComplete="off"
                         >
                             <Form.Item
                                 label="Create your room's email"
                                 name="email"
-                                rules={[{ required: true, message: 'Please input your email!' }]}
+                                rules={getEmailValidationRules()}
                             >
                                 <Input placeholder="example@gmail.com" style={{ height: '5.2vh', width: '100%', border: 'none' }}/>
                             </Form.Item>
@@ -51,7 +65,7 @@ const SignupPage = () => {
                             <Form.Item
                                 label="Create your storage password"
                                 name="password"
-                                rules={[{ required: true, message: 'Please input your password!' }]}
+                                rules={getPasswordValidationRules()}
                                 style={{ marginTop: '-3%' }}
                             >
                                 <Input.Password placeholder="****************" style={{ height: '6vh', width: '100%', border: 'none' }}/>
@@ -73,7 +87,7 @@ const SignupPage = () => {
                                             if (!value || getFieldValue('password') === value) {
                                                 return Promise.resolve();
                                             }
-                                            return Promise.reject(new Error('The new password that you entered do not match!'));
+                                            return Promise.reject(new Error('The passwords you entered do not match!'));
                                         },
                                     }),
                                 ]}
