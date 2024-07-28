@@ -4,7 +4,9 @@ import { ColorBlack, ColorBlue, ColorRed, ColorWhite } from "../assets/themes/co
 import Title from "antd/es/typography/Title";
 import type { FormProps } from 'antd';
 import { Button, Divider, Form, Input } from 'antd';
-import { GoogleOutlined, FacebookOutlined, XOutlined } from "@ant-design/icons";
+import { GoogleOutlined } from "@ant-design/icons";
+import { FaFacebookF } from "react-icons/fa";
+import { IoLogoMicrosoft } from "react-icons/io5";
 
 type FieldType = {
     email?: string;
@@ -109,8 +111,8 @@ const SignupPage = () => {
 
                             <SignupButtonGroups>
                                 <StyledGoogleButton icon={<GoogleOutlined />} />
-                                <StyledFacebookButton icon={<FacebookOutlined />} />
-                                <StyledTwitterButton icon={<XOutlined />} />
+                                <StyledFacebookButton icon={<FaFacebookF />} />
+                                <StyledMicrosoftButton icon={<IoLogoMicrosoft />} />
                             </SignupButtonGroups>
                         </StyledSignupPageForm>
                     </StyledForm>
@@ -267,18 +269,20 @@ const StyledGoogleButton = styled(StyledThirdPartySignupButton)`
 
 const StyledFacebookButton = styled(StyledThirdPartySignupButton)`
     background-color: ${ColorBlue.denimBlue};
+    color: ${ColorWhite.white};
+
     &&&:hover, &&&:focus {
-        .anticon {
-            color: ${ColorBlue.denimBlue};
-        }
+        background-color: ${ColorWhite.white};
+        color: ${ColorBlue.denimBlue};
     }
 `;
 
-const StyledTwitterButton = styled(StyledThirdPartySignupButton)`
+const StyledMicrosoftButton = styled(StyledThirdPartySignupButton)`
     background-color: ${ColorBlack.black};
+    color: ${ColorWhite.white};
+
     &&&:hover, &&&:focus {
-        .anticon {
-            color: ${ColorBlack.black};
-        }
+        background-color: ${ColorWhite.white};
+        color: ${ColorBlack.black};
     }
 `;
