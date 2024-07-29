@@ -4,7 +4,11 @@ import { ColorBlack, ColorBlue, ColorGray, ColorRed, ColorWhite } from "../asset
 import Title from "antd/es/typography/Title";
 import type { FormProps } from 'antd';
 import { Button, Checkbox, Divider, Form, Input } from 'antd';
-import { GoogleOutlined, FacebookOutlined, XOutlined } from "@ant-design/icons";
+import { GoogleOutlined } from "@ant-design/icons";
+import { FaFacebookF } from "react-icons/fa";
+import { IoLogoMicrosoft } from "react-icons/io5";
+import { useState } from "react";
+import RetrieveForgottenPasswordModal from "../components/modal/RetrieveForgottenPasswordModal";
 
 type FieldType = {
     email?: string;
@@ -20,7 +24,27 @@ const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
     console.log('Failed:', errorInfo);
 };
   
+const getEmailValidationRules = () => {
+  return [
+      { required: true, message: 'Please input your email!' },
+      { pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Please enter a valid email address!' },
+  ];
+};
+
+const getPasswordValidationRules = () => {
+  return [
+      { required: true, message: 'Please input your password!' },
+      { pattern: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/, message: 'Password must be min 8 and max 16 valid characters! Includes at least one uppercase letter, one lowercase letter, one digit, and one special character' },
+  ];
+};
+
 const LoginPage = () => {
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+    const handleRetrieveForgottenPassword = () => {
+      setIsModalOpen(true);
+    }
+
     return (
         <StyledLoginPage>
             <LoginPageBackground1 />
@@ -32,19 +56,18 @@ const LoginPage = () => {
                     <LoginPageSubtitle>
                         <StyledSubtitle>Safeguard and organized for clutter free Spaces</StyledSubtitle>
                     </LoginPageSubtitle>
-                    <LoginPageForm>
-                      <Form
+                    <LoginPageForm                      
                       name="login-form"
                       layout="vertical"
                       initialValues={{ remember: true }}
-                      onFinish={onFinish}
-                      onFinishFailed={onFinishFailed}
+                      onFinish={onFinish as any}
+                      onFinishFailed={onFinishFailed as any}
                       autoComplete="off"
                     >
                       <Form.Item<FieldType>
                         label="Enter your room's email"
                         name="email"
-                        rules={[{ required: true, message: 'Please input your email!' }]}
+                        rules={getEmailValidationRules()}
                       >
                         <Input placeholder="example@gmail.com" style={{ height: '5.2vh', width: '96%', border: 'none' }}/>
                       </Form.Item>
@@ -52,7 +75,7 @@ const LoginPage = () => {
                       <Form.Item<FieldType>
                         label="Enter your storage password"
                         name="password"
-                        rules={[{ required: true, message: 'Please input your password!' }]}
+                        rules={getPasswordValidationRules()}
                       >
                         <Input.Password placeholder="****************" style={{ height: '5.2vh', width: '96%', border: 'none' }}/>
                       </Form.Item>
@@ -68,9 +91,17 @@ const LoginPage = () => {
                               Remember me
                             </RememberMe>
                           </RememberMeCheckboxContainer>                        
-                          <RememberForgotPasswordButton type="link">Retrieve forgotten password</RememberForgotPasswordButton>
+                          <RememberForgotPasswordButton type="link" onClick={handleRetrieveForgottenPassword}>Retrieve forgotten password</RememberForgotPasswordButton>
                         </RememberForgotContainer>
                       </Form.Item>
+
+                      {
+                          isModalOpen && 
+                          <RetrieveForgottenPasswordModal
+                            isModalOpen={isModalOpen}
+                            setIsModalOpen={setIsModalOpen}
+                          />
+                      }
 
                       <Form.Item>
                         <AccessButton>
@@ -86,8 +117,8 @@ const LoginPage = () => {
 
                       <LoginButtonGroups>
                         <StyledGoogleButton icon={<GoogleOutlined />} />
-                        <StyledFacebookButton icon={<FacebookOutlined />}/>
-                        <StyledTwitterButton icon={<XOutlined />}/>
+                        <StyledFacebookButton icon={<FaFacebookF />}/>
+                        <StyledMicrosoftButton icon={<IoLogoMicrosoft />}/>
                       </LoginButtonGroups>
 
                       <NewAccount>
@@ -98,7 +129,6 @@ const LoginPage = () => {
                           <StyledSignupButton type="link">Sign up</StyledSignupButton>
                         </SignupButton>
                       </NewAccount>
-                    </Form>
                   </LoginPageForm>
                 </LoginPageContent>
             </LoginPageBackground2>
@@ -162,8 +192,12 @@ const StyledSubtitle = styled.div`
     color: ${ColorGray.ashGray};
 `;
 
-const LoginPageForm = styled.div`
+const LoginPageForm = styled(Form)`
   width: 84%;
+  .ant-form-item-explain-error {
+    text-align: left;
+    margin-left: 2%;
+  }
 `;
 
 const RememberForgotContainer = styled.div`
@@ -187,12 +221,12 @@ const StyledCheckbox = styled(Checkbox)`
   }
 
   .ant-checkbox-checked .ant-checkbox-inner {
-    border-color: ${ColorRed.candleAppleRed};
+    border-color: ${ColorBlack.raisinBlack};
     background-color: ${ColorWhite.white};
   }
 
   .ant-checkbox-checked .ant-checkbox-inner::after {
-    border-color: ${ColorRed.candleAppleRed};
+    border-color: ${ColorBlack.raisinBlack};
   }
 
   &&&:hover .ant-checkbox-inner,
@@ -203,7 +237,7 @@ const StyledCheckbox = styled(Checkbox)`
 
   &&&:hover .ant-checkbox-checked .ant-checkbox-inner,
   &&&:focus .ant-checkbox-checked .ant-checkbox-inner {
-    border-color: ${ColorRed.candleAppleRed};
+    border-color: ${ColorBlack.raisinBlack};
     background-color: ${ColorWhite.white};
   }
 `;
@@ -216,6 +250,9 @@ const RememberMe = styled.div`
 const RememberForgotPasswordButton = styled(Button)`
   color: ${ColorBlack.richBlack};
   border: none;
+  &&&:hover {
+    color: ${ColorBlack.semiTransparentBlack};
+  }
 `;
 
 const StyledDivider = styled.div`
@@ -231,20 +268,13 @@ const StyledAccessButton = styled(Button)`
   width: 95%;
   height: 5.5vh;
   border-radius: 12px;
-  background-color: ${ColorRed.candleAppleRed};
+  background-color: ${ColorBlack.raisinBlack};
   border: none;
   font-weight: bold;
   &&&:hover {
     background-color: ${ColorWhite.white};
-    color: ${ColorRed.candleAppleRed};
+    color: ${ColorBlack.raisinBlack};
   }
-`;
-
-const LoginButtonGroups = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 6%;
-  margin-top: -1.5%;
 `;
 
 const StyledThirdPartyLoginButton = styled(Button)`
@@ -254,6 +284,9 @@ const StyledThirdPartyLoginButton = styled(Button)`
 
   &&&:hover, &&&:focus {
     background-color: ${ColorWhite.white};
+    .anticon {
+      color: inherit;
+    }
   } 
 
   &&& {
@@ -276,20 +309,28 @@ const StyledGoogleButton = styled(StyledThirdPartyLoginButton)`
 
 const StyledFacebookButton = styled(StyledThirdPartyLoginButton)`
   background-color: ${ColorBlue.denimBlue};
+  color: ${ColorWhite.white};
+
   &&&:hover, &&&:focus {
-    .anticon {
-        color: ${ColorBlue.denimBlue};
-    }
+    background-color: ${ColorWhite.white};
+    color: ${ColorBlue.denimBlue};
   }
 `;
 
-const StyledTwitterButton = styled(StyledThirdPartyLoginButton)`
+const StyledMicrosoftButton = styled(StyledThirdPartyLoginButton)`
   background-color: ${ColorBlack.black};
+  color: ${ColorWhite.white};
   &&&:hover, &&&:focus {
-    .anticon {
-        color: ${ColorBlack.black};
-    }
+    background-color: ${ColorWhite.white};
+    color: ${ColorBlack.black};  
   }
+`;
+
+const LoginButtonGroups = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 6%;
+  margin-top: -1.5%;
 `;
 
 const NewAccount = styled.div`
