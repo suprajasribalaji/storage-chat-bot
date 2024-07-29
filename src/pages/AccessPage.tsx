@@ -4,8 +4,23 @@ import Title from "antd/es/typography/Title"
 import { Button, Divider } from "antd"
 import { HomeFilled, LoginOutlined } from "@ant-design/icons"
 import { ColorBlack, ColorGray, ColorWhite } from "../assets/themes/color"
+import { useNavigate } from "react-router-dom"
 
 const AccessPage = () => {
+    const navigate = useNavigate()
+    
+    const handleGetStartedButton = () => {
+        navigate("/signup");
+    }
+    
+    const handleLoginButton = () => {
+        navigate("/login");
+    }
+
+    const handleHomeButton = () => {
+
+    }
+
     return (
         <StyledAccessPage>
             <AccessPageBackground1>
@@ -18,19 +33,19 @@ const AccessPage = () => {
                             <StyledSubtitle>Safeguard and organized for clutter free Spaces</StyledSubtitle>
                         </AccessPageSubtitle>
                         <StyledGetStartedButton>
-                            <StyledGSButton>Get Started</StyledGSButton>
+                            <StyledGSButton onClick={handleGetStartedButton}>Get Started</StyledGSButton>
                         </StyledGetStartedButton>
                         <StyledDivider plain>explor</StyledDivider>
                         <StyledButtonsGroup>
-                            <StyledLoginHomeButton icon={<LoginOutlined />}></StyledLoginHomeButton>
-                            <StyledLoginHomeButton icon={<HomeFilled />}></StyledLoginHomeButton>
+                            <StyledLoginHomeButton onClick={handleLoginButton} icon={<LoginOutlined />}></StyledLoginHomeButton>
+                            <StyledLoginHomeButton onClick={handleHomeButton} icon={<HomeFilled />}></StyledLoginHomeButton>
                         </StyledButtonsGroup>
                         <JoinNow>
                             <NewToOurPlatform>
                                 New to our platform?
                             </NewToOurPlatform>
                             <JoinNowButtonDiv>
-                                <StyledJoinNowButton type="link">Join Now</StyledJoinNowButton>
+                                <StyledJoinNowButton onClick={handleGetStartedButton} type="link">Join Now</StyledJoinNowButton>
                             </JoinNowButtonDiv>
                         </JoinNow>
                     </AccessPageContent>
@@ -139,7 +154,7 @@ const StyledLoginHomeButton = styled(Button)`
         color: ${ColorWhite.white};
     }
 
-    &&&:hover, &&&:focus {
+    &&&:hover {
         background-color: ${ColorWhite.white};
         .anticon {
             color: ${ColorBlack.black};
