@@ -221,12 +221,12 @@ const StyledCheckbox = styled(Checkbox)`
   }
 
   .ant-checkbox-checked .ant-checkbox-inner {
-    border-color: ${ColorRed.candleAppleRed};
+    border-color: ${ColorBlack.raisinBlack};
     background-color: ${ColorWhite.white};
   }
 
   .ant-checkbox-checked .ant-checkbox-inner::after {
-    border-color: ${ColorRed.candleAppleRed};
+    border-color: ${ColorBlack.raisinBlack};
   }
 
   &&&:hover .ant-checkbox-inner,
@@ -237,7 +237,7 @@ const StyledCheckbox = styled(Checkbox)`
 
   &&&:hover .ant-checkbox-checked .ant-checkbox-inner,
   &&&:focus .ant-checkbox-checked .ant-checkbox-inner {
-    border-color: ${ColorRed.candleAppleRed};
+    border-color: ${ColorBlack.raisinBlack};
     background-color: ${ColorWhite.white};
   }
 `;
@@ -268,12 +268,12 @@ const StyledAccessButton = styled(Button)`
   width: 95%;
   height: 5.5vh;
   border-radius: 12px;
-  background-color: ${ColorRed.candleAppleRed};
+  background-color: ${ColorBlack.raisinBlack};
   border: none;
   font-weight: bold;
   &&&:hover {
     background-color: ${ColorWhite.white};
-    color: ${ColorRed.candleAppleRed};
+    color: ${ColorBlack.raisinBlack};
   }
 `;
 
