@@ -1,5 +1,6 @@
 export const ColorBlack = {
     black: '#000000',
+    raisinBlack: '#272030',
     charcoalBlack: '#1D1D1F',
     semiTransparentBlack: '#00000080',
 }
