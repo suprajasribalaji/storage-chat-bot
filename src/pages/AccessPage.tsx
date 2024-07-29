@@ -123,14 +123,14 @@ const StyledGSButton = styled(Button)`
     width: 302%;
     height: 6.5vh;
     border-radius: 14px;
-    background-color: ${ColorBlack.black};
+    background-color: ${ColorBlack.raisinBlack};
     color: ${ColorWhite.white};
     font-weight: bold;
     border: none;
 
-    &&&:hover, &&&:focus {
-        color: ${ColorWhite.white};
-        background-color: ${ColorBlack.black};
+    &&&:hover {
+        color: ${ColorBlack.raisinBlack};
+        background-color: ${ColorWhite.white};
     }
 `;
 
@@ -148,7 +148,7 @@ const StyledLoginHomeButton = styled(Button)`
     height: 5.5vh;
     width: 5rem !important;
     border-radius: 10px;
-    background-color: ${ColorBlack.black};
+    background-color: ${ColorBlack.raisinBlack};
     border: none;
     .anticon {
         color: ${ColorWhite.white};
@@ -157,7 +157,7 @@ const StyledLoginHomeButton = styled(Button)`
     &&&:hover {
         background-color: ${ColorWhite.white};
         .anticon {
-            color: ${ColorBlack.black};
+            color: ${ColorBlack.raisinBlack};
         }
     }
 `;
