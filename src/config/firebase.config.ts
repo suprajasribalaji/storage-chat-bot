@@ -1,5 +1,6 @@
 //SDK's installation
 import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 
 // Firebase's Configuration
 const firebaseConfig = {
@@ -13,4 +14,5 @@ const firebaseConfig = {
 
 // Firebase's app initialization
 const app = initializeApp(firebaseConfig);
-export default app;
+const auth = getAuth(app);
+export { auth };
