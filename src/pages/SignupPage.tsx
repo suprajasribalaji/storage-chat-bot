@@ -222,14 +222,14 @@ const StyledGetClutterFreeButton = styled(Button)`
     width: 100%;
     height: 6vh;
     border-radius: 12px;
-    background-color: ${ColorRed.candleAppleRed};
+    background-color: ${ColorBlack.raisinBlack};
     border: none;
     font-weight: bold;
     font-size: 110%;
     margin-top: 6%;
     &&&:hover {
         background-color: ${ColorWhite.white};
-        color: ${ColorRed.candleAppleRed};
+        color: ${ColorBlack.raisinBlack};
     }
 `;
 
