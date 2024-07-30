@@ -24,4 +24,8 @@ export const ColorRed = {
 
 export const ColorBlue = {
     denimBlue: '#4267B2',
+    deepOceanBlue: '#27374D',
+    grayishBlue: '#758694',
+    paleBlue: '#DDE6EDCC',
+    steelBlue: '#526D82',
 }
