@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Button } from 'antd';
 import styled from 'styled-components';
-import { ColorBlack, ColorWhite, ColorRed, ColorGray } from '../../assets/themes/color';
+import { ColorBlack, ColorWhite, ColorGray } from '../../assets/themes/color';
 
 type RetrieveForgottenPasswordModalProps = {
     isModalOpen: boolean;
