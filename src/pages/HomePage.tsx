@@ -104,7 +104,6 @@ const StyledChatInput = styled(Input.TextArea)`
     z-index: 1;
     padding-left: 1.5rem;
     resize: none;
-    overflow-y: auto;
     padding-top: 1.8%;
 
     &::placeholder {
