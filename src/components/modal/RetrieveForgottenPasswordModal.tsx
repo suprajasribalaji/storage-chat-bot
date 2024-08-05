@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Button } from 'antd';
 import styled from 'styled-components';
-import { ColorBlack, ColorWhite, ColorRed } from '../../assets/themes/color';
+import { ColorBlack, ColorWhite, ColorGray } from '../../assets/themes/color';
 
 type RetrieveForgottenPasswordModalProps = {
     isModalOpen: boolean;
@@ -40,42 +40,42 @@ const RetrieveForgottenPasswordModal: React.FC<RetrieveForgottenPasswordModalPro
 export default RetrieveForgottenPasswordModal;
 
 const StyledModal = styled(Modal)`
-    width: 43% !important;
+    width: 37% !important;
 
     .ant-modal-content {
-        background-color: ${ColorBlack.black} !important;
-        color: ${ColorWhite.white};
-        border-radius: 1.5rem !important;
+        background-color: ${ColorGray.lightGray} !important;
+        color: ${ColorBlack.black};
+        border-radius: 30px !important;
     }
 
     .ant-modal-header {
-        background-color: ${ColorBlack.black} !important;
-        color: ${ColorWhite.white};
+        background-color: ${ColorGray.lightGray} !important;
+        color: ${ColorBlack.black};
         border-radius: 1.5rem !important;
     }
 
     .ant-modal-title {
-        color: ${ColorWhite.white} !important;
-        font-size: 200%;
+        color: ${ColorBlack.black} !important;
+        font-size: 150%;
         font-weight: bold;
     }
 
     .ant-modal-close-x {
-        color: ${ColorWhite.white} !important;
+        color: ${ColorBlack.black} !important;
     }
 
     .ant-modal-body {
-        color: ${ColorWhite.white};
-        height: 12vh;
-        font-size: 115%;
+        color: ${ColorBlack.black};
+        height: 9vh;
+        font-size: 100%;
     }
 
     .ant-modal-footer {
-        background-color: ${ColorBlack.black} !important;
+        background-color: ${ColorGray.lightGray} !important;
         color: ${ColorWhite.white};
         display: flex;
         justify-content: center;
-        margin-top: 2%;
+        margin-bottom: 1%;
         gap: 3%;
         border-radius: 1.5rem !important;
     }
@@ -84,14 +84,14 @@ const StyledModal = styled(Modal)`
 const StyledCancelButton = styled(Button)`
     flex: 1;
     max-width: 40%;
-    height: 5.4vh;
-    background-color: ${ColorBlack.black} !important;
-    border-color: ${ColorWhite.white} !important;
+    height: 6.2vh;
+    background-color: ${ColorGray.blueGray} !important;
+    border-color: ${ColorGray.blueGray} !important;
     color: ${ColorWhite.white} !important;
 
     &&&:hover, &&&:focus {
         background-color: ${ColorWhite.white} !important;
-        border-color: ${ColorBlack.black} !important;
+        border-color: ${ColorWhite.white} !important;
         color: ${ColorBlack.black} !important;
     }
 `;
@@ -99,14 +99,14 @@ const StyledCancelButton = styled(Button)`
 const StyledWooHooButton = styled(Button)`
     flex: 1;
     max-width: 40%;
-    height: 5.4vh;
-    background-color: ${ColorRed.candleAppleRed} !important;
-    border-color: ${ColorRed.candleAppleRed} !important;
+    height: 6.2vh;
+    background-color: ${ColorBlack.raisinBlack} !important;
+    border-color: ${ColorBlack.raisinBlack} !important;
     color: ${ColorWhite.white} !important;
 
     &&&:hover, &&&:focus {
         background-color: ${ColorWhite.white} !important;
-        border-color: ${ColorBlack.black} !important;
+        border-color: ${ColorWhite.white} !important;
         color: ${ColorBlack.black} !important;
     }
 `;
