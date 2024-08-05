@@ -14,6 +14,7 @@ export const ColorGray = {
     ashGray: '#5D5D5B',
     semiAshGray: '#5D5D5B99',
     lightGray: '#F0F0F0',
+    blueGray: '#8e99a2',
 }
 
 export const ColorRed = {
