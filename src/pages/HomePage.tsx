@@ -1,10 +1,14 @@
+import { IoMdSettings } from "react-icons/io";
+import { AiOutlineLogout } from "react-icons/ai";
 import { Button, Input, Menu, Dropdown } from "antd";
-import { UserOutlined, CloudUploadOutlined, SendOutlined, LogoutOutlined } from '@ant-design/icons';
+import { CloudUploadOutlined, SendOutlined } from '@ant-design/icons';
 import styled from "styled-components";
 import { ColorBlue } from "../assets/themes/color";
 import type { MenuProps } from 'antd';
 import ProfilePicture from "../assets/images/ProfilePicture.png";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import ProfileSettingsModal from "../components/modal/ProfileSettingsModal";
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -20,24 +24,28 @@ const StyledMenu = styled(Menu)`
 
 const HomePage = () => {
     const navigate = useNavigate();
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
 
-    const handleLogoutMenu = (e: { key: string }) => {
-        if (e.key === '12') {
-          navigate('/login');
-        }
+    const handleMenuItems = (e: { key: string }) => {
+      if(e.key === '1') {
+        setIsProfileModalOpen(true);
+      }
+      if (e.key === '2') navigate('/login');
     };
+
 
     const items: MenuItem[] = [
         {
           key: '1',
-          label: 'Profile',
-          icon: <UserOutlined />,
+          label: 'Settings',
+          icon: <IoMdSettings style={{ paddingTop: '6%'}}/>,
+          onClick: handleMenuItems,
         },
         {
-          key: '12',
+          key: '2',
           label: 'Logout',
-          icon: <LogoutOutlined />,
-          onClick: handleLogoutMenu,
+          icon: <AiOutlineLogout style={{ paddingTop: '6%'}}/>,
+          onClick: handleMenuItems,
         }
       ];
 
@@ -58,6 +66,10 @@ const HomePage = () => {
                     <CircleButton />
                 </Dropdown>
             </HomePageNavBar>
+            <ProfileSettingsModal
+              isModalOpen={isProfileModalOpen}
+              setIsModalOpen={setIsProfileModalOpen}
+            />
             <HomePageContent>
                 <ChatBoxInput>
                     <StyledChatInput 
