@@ -6,7 +6,6 @@ import SignupPage from "./pages/SignupPage";
 import { AuthProvider, useAuth } from "./components/context/Authentication";
 import HomePage from "./pages/HomePage";
 
-
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const { currentUser } = useAuth();
   return currentUser ? <>{children}</> : <Navigate to="/" />;
