@@ -6,6 +6,9 @@ import { RxUpdate } from "react-icons/rx";
 import { ColorBlack, ColorGray } from '../../assets/themes/color';
 import styled from 'styled-components';
 import type { MenuProps } from 'antd';
+import ProfileSetttingsContentModal from './ProfileSetttingsContentModal';
+import AccountSettingsContentModal from './AccountSettingsContentModal';
+import SubscriptionSettingsContentModal from './SubscriptionSettingsContentModal';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -47,9 +50,9 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({ isModalOpen
             />
             </ProfileSettingsModalContentMenu>
             <ProfileSettingsModalContentDetails>
-                {selectedKey === '1' && <div>Hello 1: Profile Settings</div>}
-                {selectedKey === '2' && <div>Hello 2: Account Settings</div>}
-                {selectedKey === '3' && <div>Hello 3: Subscription Settings</div>}
+                {selectedKey === '1' && <ProfileSetttingsContentModal />}
+                {selectedKey === '2' && <AccountSettingsContentModal />}
+                {selectedKey === '3' && <SubscriptionSettingsContentModal />}
             </ProfileSettingsModalContentDetails>
         </ProfileSettingsModalContent>
     </StyledProfileSettingsModal>
@@ -59,7 +62,7 @@ const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({ isModalOpen
 export default ProfileSettingsModal;
 
 const StyledProfileSettingsModal = styled(Modal)`
-    width: 60% !important;
+    width: 56% !important;
 
     .ant-modal-content {
         background-color: ${ColorGray.lightGray} !important;
@@ -76,7 +79,7 @@ const StyledProfileSettingsModal = styled(Modal)`
     .ant-modal-title {
         color: ${ColorBlack.black} !important;
         font-size: 150%;
-        margin-top: 1%;
+        margin-top: 1.5%;
         margin-left: 1%;
     }
 
@@ -86,7 +89,7 @@ const StyledProfileSettingsModal = styled(Modal)`
 
     .ant-modal-body {
         color: ${ColorBlack.black};
-        height: 50vh;
+        height: 60vh;
         font-size: 100%;
         margin-top: 2.5%;
     }
@@ -106,7 +109,7 @@ const StyledMenu = styled(Menu)`
     color: ${ColorBlack.black};
 
     .ant-menu-item-selected {
-        background-color: ${ColorGray.semiAshGray} !important;
+        background-color: ${ColorGray.softDustyGray} !important;
     }
 
     .ant-menu-item {
@@ -114,12 +117,12 @@ const StyledMenu = styled(Menu)`
     }
 
     .ant-menu-item:hover {
-        background-color: ${ColorGray.semiAshGray} !important;
+        background-color: ${ColorGray.softDustyGray} !important;
     }
 `;
 
 const ProfileSettingsModalContentDetails = styled.div`
     width: 80%;
     padding-left: 3.5%;
-    margin-top: 1.4%;
+    margin-top: 0.6%;
 `;
