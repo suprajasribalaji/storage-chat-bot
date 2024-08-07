@@ -5,25 +5,29 @@ import SignupPage from "./pages/SignupPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { Provider } from "react-redux";
 import store from "./redux/store";
+import HomePage from "./pages/HomePage";
+import { AuthProvider } from "./redux/slices/auth/AuthProvider";
 
 function App() {
   return (
     <Provider store={store}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/access" element={<AccessPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route 
-            path="/" 
-            element={
-              <ProtectedRoute>
-                <AccessPage/> {/* Add home component */}
-              </ProtectedRoute>
-            } 
-          />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<AccessPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route 
+              path="/home" 
+              element={
+                <ProtectedRoute>
+                  <HomePage />
+                </ProtectedRoute>
+              } 
+            />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </Provider>
   );
 }
