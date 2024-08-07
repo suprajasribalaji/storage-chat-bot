@@ -32,7 +32,3 @@ export const ColorBlue = {
     paleBlue: '#DDE6EDCC',
     steelBlue: '#526D82',
 }
-
-export const ColorGreen = {
-    oliveGreen: '#739072',
-}
