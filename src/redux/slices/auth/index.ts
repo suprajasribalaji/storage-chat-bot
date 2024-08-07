@@ -5,7 +5,7 @@ interface User {
     email: string | null;
 }
 
-interface AuthState {
+export interface AuthState {
     currentUser: User | null;
     isLoading: boolean;
 }
@@ -33,5 +33,5 @@ const AuthSlice = createSlice({
     },
 })
 
-export const { setCurrentUser } = AuthSlice.actions;
+export const { setCurrentUser, clearCurrentUser, setLoading } = AuthSlice.actions;
 export default AuthSlice.reducer;

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../../config/firebase.config';
+import { setCurrentUser } from '../auth';
 
 interface LoginPayload {
     email: string
@@ -8,9 +9,16 @@ interface LoginPayload {
 }
 
 export const login = createAsyncThunk<void, LoginPayload>(
-  '/login',
-  async ({ email, password }) => {
-    await signInWithEmailAndPassword(auth, email, password);
+  'login/login',
+  async ({ email, password }, thunkAPI) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      thunkAPI.dispatch(setCurrentUser({ uid: user.uid, email: user.email }));
+    } catch (error) {
+      // Handle login error
+      throw error;
+    }
   }
 );
 

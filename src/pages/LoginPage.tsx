@@ -48,7 +48,7 @@ const LoginPage = () => {
     }
 
     const handleAccessButton = () => {
-      navigate("/access");
+      navigate("/home");
       message.success('Logged in successfully!');
     }
 
