@@ -1,6 +1,6 @@
 import { Button } from "antd";
 import styled from "styled-components";
-import { ColorGreen, ColorWhite } from "../../assets/themes/color";
+import { ColorBlue, ColorWhite } from "../../assets/themes/color";
 
 const SubscriptionSettingsContentModal = () => {
     return (
@@ -56,7 +56,7 @@ const ButtonWrapper = styled.div`
 `;
 
 const StyledButton = styled(Button)`
-    background-color: ${ColorGreen.oliveGreen};
+    background-color: ${ColorBlue.steelBlue};
     border: none;
     border-radius: 50px;
     padding: 4%;
@@ -65,7 +65,7 @@ const StyledButton = styled(Button)`
 
     &&&:hover, &&&:focus {
         background-color: ${ColorWhite.white};
-        color: ${ColorGreen.oliveGreen};
+        color: ${ColorBlue.steelBlue};
     }
 `;
 
