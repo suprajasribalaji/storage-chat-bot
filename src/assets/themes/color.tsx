@@ -14,6 +14,7 @@ export const ColorWhite = {
 export const ColorGray = {
     ashGray: '#5D5D5B',
     semiAshGray: '#5D5D5B99',
+    softDustyGray: '#5D5D5B33',
     lightGray: '#F0F0F0',
     blueGray: '#8e99a2',
 }
@@ -21,8 +22,17 @@ export const ColorGray = {
 export const ColorRed = {
     candleAppleRed: '#C72626',
     tomatoRed: '#DB4437',
+    wineRed: '#A02334',
 }
 
 export const ColorBlue = {
     denimBlue: '#4267B2',
+    deepOceanBlue: '#27374D',
+    grayishBlue: '#758694',
+    paleBlue: '#DDE6EDCC',
+    steelBlue: '#526D82',
+}
+
+export const ColorGreen = {
+    oliveGreen: '#739072',
 }
