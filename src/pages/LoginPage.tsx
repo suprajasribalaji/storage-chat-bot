@@ -3,7 +3,7 @@ import BackgroundImage from "../assets/images/LoginPageBackground.jpg";
 import { ColorBlack, ColorBlue, ColorGray, ColorRed, ColorWhite } from "../assets/themes/color";
 import Title from "antd/es/typography/Title";
 import type { FormProps } from 'antd';
-import { Button, Checkbox, Divider, Form, Input } from 'antd';
+import { Button, Checkbox, Divider, Form, Input, message } from 'antd';
 import { GoogleOutlined } from "@ant-design/icons";
 import { FaFacebookF } from "react-icons/fa";
 import { IoLogoMicrosoft } from "react-icons/io5";
@@ -48,7 +48,8 @@ const LoginPage = () => {
     }
 
     const handleAccessButton = () => {
-      
+      navigate("/access");
+      message.success('Logged in successfully!');
     }
 
     const handleSignupButtton = () => {
