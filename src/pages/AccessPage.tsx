@@ -1,24 +1,20 @@
 import styled from "styled-components"
 import BackgroundImage from "../assets/images/AccessPageBackground.jpg"
 import Title from "antd/es/typography/Title"
-import { Button, Divider } from "antd"
-import { HomeFilled, LoginOutlined } from "@ant-design/icons"
-import { ColorBlack, ColorGray, ColorWhite } from "../assets/themes/color"
+import { Button } from "antd"
+import { LoginOutlined } from "@ant-design/icons"
+import { colors } from "../assets/themes/color"
 import { useNavigate } from "react-router-dom"
 
 const AccessPage = () => {
     const navigate = useNavigate()
     
     const handleGetStartedButton = () => {
-        navigate("/signup");
-    }
-    
-    const handleLoginButton = () => {
-        navigate("/login");
+        navigate('/login');
     }
 
-    const handleHomeButton = () => {
-
+    const handleJoinNowButton = () => {
+        navigate('/signup');
     }
 
     return (
@@ -33,19 +29,14 @@ const AccessPage = () => {
                             <StyledSubtitle>Safeguard and organized for clutter free Spaces</StyledSubtitle>
                         </AccessPageSubtitle>
                         <StyledGetStartedButton>
-                            <StyledGSButton onClick={handleGetStartedButton}>Get Started</StyledGSButton>
+                            <StyledGSButton onClick={handleGetStartedButton} icon={<LoginOutlined />}>Get Started</StyledGSButton>
                         </StyledGetStartedButton>
-                        <StyledDivider plain>explor</StyledDivider>
-                        <StyledButtonsGroup>
-                            <StyledLoginHomeButton onClick={handleLoginButton} icon={<LoginOutlined />}></StyledLoginHomeButton>
-                            <StyledLoginHomeButton onClick={handleHomeButton} icon={<HomeFilled />}></StyledLoginHomeButton>
-                        </StyledButtonsGroup>
                         <JoinNow>
                             <NewToOurPlatform>
                                 New to our platform?
                             </NewToOurPlatform>
                             <JoinNowButtonDiv>
-                                <StyledJoinNowButton onClick={handleGetStartedButton} type="link">Join Now</StyledJoinNowButton>
+                                <StyledJoinNowButton onClick={handleJoinNowButton} type="link">Join Now</StyledJoinNowButton>
                             </JoinNowButtonDiv>
                         </JoinNow>
                     </AccessPageContent>
@@ -77,7 +68,7 @@ const AccessPageBackground2 = styled.div`
     width: 30%;
     height: 80vh;
     border-radius: 10px;
-    background-color: ${ColorGray.lightGray};
+    background-color: ${colors.lightGray};
     display: flex;
     justify-content: center;
     align-items: center;
@@ -101,7 +92,7 @@ const StyledTitle = styled(Title)`
     font-size: 2.5rem !important;
     font-weight: 800 !important;
     margin-top: 2%;
-    color: ${ColorBlack.charcoalBlack};
+    color: ${colors.charcoalBlack};
 `;
 
 const AccessPageSubtitle = styled.div`
@@ -111,54 +102,26 @@ const AccessPageSubtitle = styled.div`
 
 const StyledSubtitle = styled.div`
     font-size: 0.9rem;
-    color: ${ColorGray.ashGray};
+    color: ${colors.ashGray};
 `;
 
 const StyledGetStartedButton = styled.div`
     margin-top: 4%;
-    margin-right: 45%;
+    margin-right: 40%;
 `;
 
 const StyledGSButton = styled(Button)`
-    width: 302%;
+    width: 220%;
     height: 6.5vh;
     border-radius: 14px;
-    background-color: ${ColorBlack.raisinBlack};
-    color: ${ColorWhite.white};
+    background-color: ${colors.raisinBlack};
+    color: ${colors.white};
     font-weight: bold;
     border: none;
 
     &&&:hover {
-        color: ${ColorBlack.raisinBlack};
-        background-color: ${ColorWhite.white};
-    }
-`;
-
-const StyledDivider = styled(Divider)`
-    color: ${ColorBlack.charcoalBlack} !important;
-`;
-
-const StyledButtonsGroup = styled.div`
-    display: flex;
-    gap: 2.5rem;
-    margin-bottom: 1rem;
-`;
-
-const StyledLoginHomeButton = styled(Button)`
-    height: 5.5vh;
-    width: 5rem !important;
-    border-radius: 10px;
-    background-color: ${ColorBlack.raisinBlack};
-    border: none;
-    .anticon {
-        color: ${ColorWhite.white};
-    }
-
-    &&&:hover {
-        background-color: ${ColorWhite.white};
-        .anticon {
-            color: ${ColorBlack.raisinBlack};
-        }
+        color: ${colors.raisinBlack};
+        background-color: ${colors.white};
     }
 `;
 
@@ -167,24 +130,28 @@ const JoinNow = styled.div`
     align-items: center;
     margin-top: -2%;
     font-size: 90%;
+    margin-top: 2%;
 `;
 
 const NewToOurPlatform = styled.div`
     margin-left: 5.5rem;
-    color: ${ColorBlack.charcoalBlack};
+    color: ${colors.charcoalBlack};
+    margin-top: 2%;
 `;
 
 const JoinNowButtonDiv = styled.div`
     margin-left: -0.5rem;
+    margin-top: 1%;
+    
 `;
 
 const StyledJoinNowButton = styled(Button)`
     font-size: 90%;
-    color: ${ColorBlack.charcoalBlack};
+    color: ${colors.charcoalBlack};
     font-weight: 800;
     border: none;
 
     &&&:hover, &&&:focus {
-        color: ${ColorBlack.semiTransparentBlack};
+        color: ${colors.semiTransparentBlack};
     }
 `;

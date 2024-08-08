@@ -1,17 +1,20 @@
 import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const currentUser = useSelector((state: RootState) => state.auth.currentUser);
   const isLoading = useSelector((state: RootState) => state.auth.isLoading);
+  const location = useLocation();
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  console.log(" =======>>>> ", 'current user: ', currentUser, ' ; loading: ', isLoading);
   
-  return currentUser ? <>{children}</> : <Navigate to="/login" />;
+  if (isLoading) return <div>Loading...</div>;
+  
+  if(!currentUser) return <Navigate to="/login" state={{from: location}} replace/>;
+  
+  return children;
 };
 
 export default ProtectedRoute;

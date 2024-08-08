@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Button } from 'antd';
 import styled from 'styled-components';
-import { ColorBlack, ColorWhite, ColorGray } from '../../assets/themes/color';
+import { colors } from '../../assets/themes/color';
 
 type RetrieveForgottenPasswordModalProps = {
     isModalOpen: boolean;
@@ -43,36 +43,36 @@ const StyledModal = styled(Modal)`
     width: 37% !important;
 
     .ant-modal-content {
-        background-color: ${ColorGray.lightGray} !important;
-        color: ${ColorBlack.black};
+        background-color: ${colors.lightGray} !important;
+        color: ${colors.black};
         border-radius: 30px !important;
     }
 
     .ant-modal-header {
-        background-color: ${ColorGray.lightGray} !important;
-        color: ${ColorBlack.black};
+        background-color: ${colors.lightGray} !important;
+        color: ${colors.black};
         border-radius: 1.5rem !important;
     }
 
     .ant-modal-title {
-        color: ${ColorBlack.black} !important;
+        color: ${colors.black} !important;
         font-size: 150%;
         font-weight: bold;
     }
 
     .ant-modal-close-x {
-        color: ${ColorBlack.black} !important;
+        color: ${colors.black} !important;
     }
 
     .ant-modal-body {
-        color: ${ColorBlack.black};
+        color: ${colors.black};
         height: 9vh;
         font-size: 100%;
     }
 
     .ant-modal-footer {
-        background-color: ${ColorGray.lightGray} !important;
-        color: ${ColorWhite.white};
+        background-color: ${colors.lightGray} !important;
+        color: ${colors.white};
         display: flex;
         justify-content: center;
         margin-bottom: 1%;
@@ -81,32 +81,24 @@ const StyledModal = styled(Modal)`
     }
 `;
 
-const StyledCancelButton = styled(Button)`
+const StyledButton = styled(Button)`
     flex: 1;
     max-width: 40%;
     height: 6.2vh;
-    background-color: ${ColorGray.blueGray} !important;
-    border-color: ${ColorGray.blueGray} !important;
-    color: ${ColorWhite.white} !important;
-
+    color: ${colors.white} !important;
     &&&:hover, &&&:focus {
-        background-color: ${ColorWhite.white} !important;
-        border-color: ${ColorWhite.white} !important;
-        color: ${ColorBlack.black} !important;
+        background-color: ${colors.white} !important;
+        border-color: ${colors.white} !important;
+        color: ${colors.black} !important;
     }
 `;
 
-const StyledWooHooButton = styled(Button)`
-    flex: 1;
-    max-width: 40%;
-    height: 6.2vh;
-    background-color: ${ColorBlack.raisinBlack} !important;
-    border-color: ${ColorBlack.raisinBlack} !important;
-    color: ${ColorWhite.white} !important;
+const StyledCancelButton = styled(StyledButton)`
+    background-color: ${colors.blueGray} !important;
+    border-color: ${colors.blueGray} !important;
+`;
 
-    &&&:hover, &&&:focus {
-        background-color: ${ColorWhite.white} !important;
-        border-color: ${ColorWhite.white} !important;
-        color: ${ColorBlack.black} !important;
-    }
+const StyledWooHooButton = styled(StyledButton)`
+    background-color: ${colors.raisinBlack} !important;
+    border-color: ${colors.raisinBlack} !important;
 `;

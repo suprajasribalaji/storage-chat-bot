@@ -1,18 +1,21 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../../../config/firebase.config';
-import { setCurrentUser } from '.';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { onAuthStateChanged, getAuth } from 'firebase/auth';
+import { setCurrentUser, setLoading } from '.';
 
 export const ListenToAuthChanges = createAsyncThunk(
   'auth/listenToAuthChanges',
-  async (_, thunkAPI) => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const { uid, email } = user;
-        thunkAPI.dispatch(setCurrentUser({ uid, email }));
-      } else {
-        thunkAPI.dispatch(setCurrentUser(null));
-      }
+  async (_, { dispatch }) => {
+    const auth = getAuth();
+    return new Promise<() => void>((resolve) => {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          dispatch(setCurrentUser({ uid: user.uid, email: user.email }));
+        } else {
+          dispatch(setCurrentUser(null));
+        }
+        dispatch(setLoading(false));
+        resolve(unsubscribe);
+      });
     });
   }
 );

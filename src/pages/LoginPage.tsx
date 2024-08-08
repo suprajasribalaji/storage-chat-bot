@@ -1,30 +1,27 @@
 import styled from "styled-components";
 import BackgroundImage from "../assets/images/LoginPageBackground.jpg";
-import { ColorBlack, ColorBlue, ColorGray, ColorRed, ColorWhite } from "../assets/themes/color";
+import { colors } from "../assets/themes/color";
 import Title from "antd/es/typography/Title";
 import type { FormProps } from 'antd';
 import { Button, Checkbox, Divider, Form, Input, message } from 'antd';
-import { GoogleOutlined } from "@ant-design/icons";
-import { FaFacebookF } from "react-icons/fa";
-import { IoLogoMicrosoft } from "react-icons/io5";
+import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import RetrieveForgottenPasswordModal from "../components/modal/RetrieveForgottenPasswordModal";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../hooks/useAppDispatch";
+import { requestUserLogin, requestUserLoginByGithub, requestUserLoginByGoogle } from "../redux/slices/login";
+
 
 type FieldType = {
-    email?: string;
-    password?: string;
+    email: string;
+    password: string;
     remember?: string;
 };
   
-const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-    console.log('Success:', values);
-};
-  
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+  console.log('Failed:', errorInfo);
 };
-  
+
 const getEmailValidationRules = () => {
   return [
       { required: true, message: 'Please input your email!' },
@@ -40,6 +37,7 @@ const getPasswordValidationRules = () => {
 };
 
 const LoginPage = () => {
+  const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -47,14 +45,47 @@ const LoginPage = () => {
       setIsModalOpen(true);
     }
 
-    const handleAccessButton = () => {
-      navigate("/access");
-      message.success('Logged in successfully!');
-    }
+    const handleAccessButton: FormProps<FieldType>['onFinish'] = async (values) => {
+      console.log('Success:', values);
+      const { email, password } = values;
+      try {
+        const response = await dispatch(requestUserLogin({email, password})).unwrap();
+        navigate('/home');
+        console.log(response, "this is the response ====>")
+        message.success('Logged in successfully!');
+      } catch (error) {
+        console.error('Login failed:', error);
+        message.error('Login failed. Please check your credentials.');
+      }
+    };
+
+    const handleGoogleProviderButton = async () =>{
+      try {
+        const response = await dispatch(requestUserLoginByGoogle());
+        navigate('/home');
+        console.log(response, " gmail provider respose ----------");
+        message.success('Logged in using gmail successfully!');
+      } catch (error) {
+        console.error('Login failed:', error);
+        message.error('Login failed. Please check your credentials.');
+      }
+    };
+
+    const handleGithubProviderButton = async () =>{
+      try {
+        const response = await dispatch(requestUserLoginByGithub());
+        navigate('/home');
+        console.log(response, " github provider respose ----------");
+        message.success('Logged in using github successfully!');
+      } catch (error) {
+        console.error('Login failed:', error);
+        message.error('Login failed. Please check your credentials.');
+      }
+    };
 
     const handleSignupButtton = () => {
       navigate("/signup")
-    }
+    };
 
     return (
         <StyledLoginPage>
@@ -71,9 +102,9 @@ const LoginPage = () => {
                       name="login-form"
                       layout="vertical"
                       initialValues={{ remember: true }}
-                      onFinish={onFinish as any}
-                      onFinishFailed={onFinishFailed as any}
                       autoComplete="off"
+                      onFinish={handleAccessButton as any}
+                      onFinishFailed={onFinishFailed as any}
                     >
                       <Form.Item<FieldType>
                         label="Enter your room's email"
@@ -116,7 +147,7 @@ const LoginPage = () => {
 
                       <Form.Item>
                         <AccessButton>
-                          <StyledAccessButton type="primary" onClick={handleAccessButton}>
+                          <StyledAccessButton type="primary" htmlType="submit">
                             Access
                           </StyledAccessButton>
                         </AccessButton>
@@ -127,9 +158,8 @@ const LoginPage = () => {
                       </StyledDivider>
 
                       <LoginButtonGroups>
-                        <StyledGoogleButton icon={<GoogleOutlined />} />
-                        <StyledFacebookButton icon={<FaFacebookF />}/>
-                        <StyledMicrosoftButton icon={<IoLogoMicrosoft />}/>
+                        <StyledGoogleButton icon={<GoogleOutlined />} onClick={handleGoogleProviderButton}/>
+                        <StyledGithubButton icon={<GithubOutlined />} onClick={handleGithubProviderButton}/>
                       </LoginButtonGroups>
 
                       <NewAccount>
@@ -163,7 +193,7 @@ const LoginPageBackground1 = styled.div`
 `;
 
 const LoginPageBackground2 = styled.div`
-    background-color: ${ColorGray.lightGray};
+    background-color: ${colors.lightGray};
     height: 100%;
     width: 50%;
     display: flex;
@@ -179,7 +209,7 @@ const LoginPageContent = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: ${ColorBlack.charcoalBlack};
+    color: ${colors.charcoalBlack};
 `;
 
 const LoginPageTitle = styled.div`
@@ -200,7 +230,7 @@ const LoginPageSubtitle = styled.div`
 
 const StyledSubtitle = styled.div`
     font-size: 0.9rem;
-    color: ${ColorGray.ashGray};
+    color: ${colors.ashGray};
 `;
 
 const LoginPageForm = styled(Form)`
@@ -227,42 +257,42 @@ const RememberMeCheckboxContainer = styled.div`
 
 const StyledCheckbox = styled(Checkbox)`
   .ant-checkbox-inner {
-    border-color: ${ColorBlack.black};
-    background-color: ${ColorWhite.white};
+    border-color: ${colors.black};
+    background-color: ${colors.white};
   }
 
   .ant-checkbox-checked .ant-checkbox-inner {
-    border-color: ${ColorBlack.raisinBlack};
-    background-color: ${ColorWhite.white};
+    border-color: ${colors.raisinBlack};
+    background-color: ${colors.white};
   }
 
   .ant-checkbox-checked .ant-checkbox-inner::after {
-    border-color: ${ColorBlack.raisinBlack};
+    border-color: ${colors.raisinBlack};
   }
 
   &&&:hover .ant-checkbox-inner,
   &&&:focus .ant-checkbox-inner {
-    border-color: ${ColorBlack.black};
-    background-color: ${ColorWhite.white};
+    border-color: ${colors.black};
+    background-color: ${colors.white};
   }
 
   &&&:hover .ant-checkbox-checked .ant-checkbox-inner,
   &&&:focus .ant-checkbox-checked .ant-checkbox-inner {
-    border-color: ${ColorBlack.raisinBlack};
-    background-color: ${ColorWhite.white};
+    border-color: ${colors.raisinBlack};
+    background-color: ${colors.white};
   }
 `;
 
 const RememberMe = styled.div`
-  color: ${ColorBlack.charcoalBlack};
+  color: ${colors.charcoalBlack};
   margin-left: 5px;
 `;
 
 const RememberForgotPasswordButton = styled(Button)`
-  color: ${ColorBlack.richBlack};
+  color: ${colors.richBlack};
   border: none;
   &&&:hover {
-    color: ${ColorBlack.semiTransparentBlack};
+    color: ${colors.semiTransparentBlack};
   }
 `;
 
@@ -279,22 +309,22 @@ const StyledAccessButton = styled(Button)`
   width: 95%;
   height: 5.5vh;
   border-radius: 12px;
-  background-color: ${ColorBlack.raisinBlack};
+  background-color: ${colors.raisinBlack};
   border: none;
   font-weight: bold;
   &&&:hover {
-    background-color: ${ColorWhite.white};
-    color: ${ColorBlack.raisinBlack};
+    background-color: ${colors.white};
+    color: ${colors.raisinBlack};
   }
 `;
 
 const StyledThirdPartyLoginButton = styled(Button)`
   .anticon {
-    color: ${ColorWhite.white};
+    color: ${colors.white};
   }
 
   &&&:hover, &&&:focus {
-    background-color: ${ColorWhite.white};
+    background-color: ${colors.white};
     .anticon {
       color: inherit;
     }
@@ -310,30 +340,21 @@ const StyledThirdPartyLoginButton = styled(Button)`
 `;
 
 const StyledGoogleButton = styled(StyledThirdPartyLoginButton)`
-  background-color: ${ColorRed.tomatoRed};
+  background-color: ${colors.tomatoRed};
   &&&:hover, &&&:focus {
     .anticon {
-        color: ${ColorRed.tomatoRed};
+        color: ${colors.tomatoRed};
     }
   } 
 `;
 
-const StyledFacebookButton = styled(StyledThirdPartyLoginButton)`
-  background-color: ${ColorBlue.denimBlue};
-  color: ${ColorWhite.white};
+const StyledGithubButton = styled(StyledThirdPartyLoginButton)`
+  background-color: ${colors.black};
+  color: ${colors.white};
 
   &&&:hover, &&&:focus {
-    background-color: ${ColorWhite.white};
-    color: ${ColorBlue.denimBlue};
-  }
-`;
-
-const StyledMicrosoftButton = styled(StyledThirdPartyLoginButton)`
-  background-color: ${ColorBlack.black};
-  color: ${ColorWhite.white};
-  &&&:hover, &&&:focus {
-    background-color: ${ColorWhite.white};
-    color: ${ColorBlack.black};  
+    background-color: ${colors.white};
+    color: ${colors.black};
   }
 `;
 
@@ -364,6 +385,6 @@ const StyledSignupButton = styled(Button)`
   font-size: 100%;
   font-weight: bold;
   &&&:hover {
-    color: ${ColorGray.semiAshGray};
+    color: ${colors.semiAshGray};
   }
 `;
