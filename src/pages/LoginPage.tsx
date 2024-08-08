@@ -88,7 +88,7 @@ const LoginPage = () => {
     };
 
     return (
-        <StyledLoginPage>
+      <StyledLoginPage>
             <LoginPageBackground1 />
             <LoginPageBackground2>
                 <LoginPageContent>
@@ -111,7 +111,7 @@ const LoginPage = () => {
                         name="email"
                         rules={getEmailValidationRules()}
                       >
-                        <Input placeholder="example@gmail.com" style={{ height: '5.2vh', width: '96%', border: 'none' }}/>
+                        <StyledInput placeholder="example@gmail.com"  />
                       </Form.Item>
 
                       <Form.Item<FieldType>
@@ -119,7 +119,7 @@ const LoginPage = () => {
                         name="password"
                         rules={getPasswordValidationRules()}
                       >
-                        <Input.Password placeholder="****************" style={{ height: '5.2vh', width: '96%', border: 'none' }}/>
+                        <StyledPasswordInput placeholder="****************"/>
                       </Form.Item>
 
                       <Form.Item<FieldType>
@@ -240,6 +240,14 @@ const LoginPageForm = styled(Form)`
     margin-left: 2%;
   }
 `;
+
+const StyledInput = styled(Input)`
+  height: 5.2vh;
+  width: 96%;
+  border: none;
+`;
+
+const StyledPasswordInput = styled(StyledInput).attrs({ type: 'password' })``;
 
 const RememberForgotContainer = styled.div`
   width: 98%;

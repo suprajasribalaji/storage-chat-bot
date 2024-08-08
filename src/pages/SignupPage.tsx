@@ -94,29 +94,27 @@ const SignupPage = () => {
                             onFinishFailed={onFinishFailed as any}
                             autoComplete="off"
                         >
-                            <Form.Item
+                            <StyledFormItem
                                 label="Create your room's email"
                                 name="email"
                                 rules={getEmailValidationRules()}
                             >
-                                <Input placeholder="example@gmail.com" style={{ height: '5.2vh', width: '100%', border: 'none' }}/>
-                            </Form.Item>
+                                <StyledInput placeholder="example@gmail.com"/>
+                            </StyledFormItem>
 
-                            <Form.Item
+                            <StyledFormItem
                                 label="Create your storage password"
                                 name="password"
                                 rules={getPasswordValidationRules()}
-                                style={{ marginTop: '-3%' }}
                             >
-                                <Input.Password placeholder="****************" style={{ height: '6vh', width: '100%', border: 'none' }}/>
-                            </Form.Item>
+                                <StyledPasswordInput placeholder="****************"/>
+                            </StyledFormItem>
 
-                            <Form.Item
+                            <StyledFormItem
                                 name="confirm"
                                 label="Confirm Password"
                                 dependencies={['password']}
                                 hasFeedback
-                                style={{ marginTop: '-3%' }}
                                 rules={[
                                     {
                                         required: true,
@@ -132,8 +130,8 @@ const SignupPage = () => {
                                     }),
                                 ]}
                             >
-                                <Input.Password placeholder="****************" style={{ height: '5.2vh', width: '100%', border: 'none' }}/>
-                            </Form.Item>
+                                <StyledPasswordInput placeholder="****************" />
+                            </StyledFormItem>
 
                             <Form.Item>
                                 <GetClutterFreeButton>
@@ -230,6 +228,18 @@ const StyledSignupPageForm = styled(Form)`
         font-size: 0.8rem;
     }
 `;
+
+const StyledFormItem = styled(Form.Item)`
+    margin-top: -3%;
+`;
+
+const StyledInput = styled(Input)`
+    height: 5.2vh;
+    width: 100%;
+    border: none;
+`;
+
+const StyledPasswordInput = styled(StyledInput).attrs({ type: 'password' })``;
 
 const SignupPageDivider = styled.div`
     margin-top: -8%;
