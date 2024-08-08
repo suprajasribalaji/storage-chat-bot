@@ -89,7 +89,7 @@ const LoginPage = () => {
 
     const handleSignupButtton = () => {
       navigate("/signup")
-    };
+    };  
 
     return (
       <StyledLoginPage>
@@ -139,12 +139,12 @@ const LoginPage = () => {
                         valuePropName="checked"
                       >
                         <RememberForgotContainer>
-                          <RememberMeCheckboxContainer>
+                          <SaveCredentialsCheckboxContainer>
                             <StyledCheckbox />
-                            <RememberMe>
-                              Remember me
-                            </RememberMe>
-                          </RememberMeCheckboxContainer>                        
+                            <SaveCredentials>
+                              Save Credentials
+                            </SaveCredentials>
+                          </SaveCredentialsCheckboxContainer>                        
                           <RememberForgotPasswordButton type="link" onClick={handleRetrieveForgottenPassword}>Retrieve forgotten password</RememberForgotPasswordButton>
                         </RememberForgotContainer>
                       </Form.Item>
@@ -270,7 +270,7 @@ const RememberForgotContainer = styled.div`
   margin-left: 2%;
 `;
 
-const RememberMeCheckboxContainer = styled.div`
+const SaveCredentialsCheckboxContainer = styled.div`
   display: flex;
   align-items: center;
 `;
@@ -303,7 +303,7 @@ const StyledCheckbox = styled(Checkbox)`
   }
 `;
 
-const RememberMe = styled.div`
+const SaveCredentials = styled.div`
   color: ${colors.charcoalBlack};
   margin-left: 5px;
 `;

@@ -8,6 +8,8 @@ type RetrieveForgottenPasswordModalProps = {
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+// mute panitu thittu 
+
 const RetrieveForgottenPasswordModal: React.FC<RetrieveForgottenPasswordModalProps> = ({ isModalOpen, setIsModalOpen }) => {
     return (
         <StyledModal
@@ -32,6 +34,7 @@ const RetrieveForgottenPasswordModal: React.FC<RetrieveForgottenPasswordModalPro
                 </StyledWooHooButton>,
             ]}
         >
+            <Button>Send Credentials via email</Button>
             <p>Access credentials have been delivered to your registered room's email. Keep an eye on your inbox to stay organized and clutter-free!</p>
         </StyledModal>
     );
