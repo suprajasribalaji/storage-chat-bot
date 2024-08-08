@@ -3,34 +3,30 @@ import { AiOutlineLogout } from "react-icons/ai";
 import { Button, Input, Menu, Dropdown } from "antd";
 import { CloudUploadOutlined, SendOutlined } from '@ant-design/icons';
 import styled from "styled-components";
-import { ColorBlue } from "../assets/themes/color";
+import { colors } from "../assets/themes/color";
 import type { MenuProps } from 'antd';
 import ProfilePicture from "../assets/images/ProfilePicture.png";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import ProfileSettingsModal from "../components/modal/ProfileSettingsModal";
+import { useAppDispatch } from "../hooks/useAppDispatch";
+import { requestUserLogout } from "../redux/slices/logout";
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-const StyledMenu = styled(Menu)`
-  background-color: ${ColorBlue.paleBlue};
-  color: ${ColorBlue.deepOceanBlue};
-
-  .ant-menu-item:hover {
-    background-color: ${ColorBlue.deepOceanBlue};
-    color: ${ColorBlue.paleBlue};
-  }
-`;
-
 const HomePage = () => {
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
 
-    const handleMenuItems = (e: { key: string }) => {
+    const handleMenuItems = async (e: { key: string }) => {
       if(e.key === '1') {
         setIsProfileModalOpen(true);
       }
-      if (e.key === '2') navigate('/login');
+      if (e.key === '2') {
+        await dispatch(requestUserLogout());
+        navigate('/login');
+      };
     };
 
 
@@ -92,14 +88,24 @@ const StyledHomePage = styled.div`
   justify-content: space-between;
   width: 100%;
   height: 100vh;
-  background-color: ${ColorBlue.paleBlue};
+  background-color: ${colors.paleBlue};
+`;
+
+const StyledMenu = styled(Menu)`
+  background-color: ${colors.paleBlue};
+  color: ${colors.deepOceanBlue};
+
+  .ant-menu-item:hover {
+    background-color: ${colors.deepOceanBlue};
+    color: ${colors.paleBlue};
+  }
 `;
 
 const HomePageNavBar = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: ${ColorBlue.steelBlue};
+  color: ${colors.steelBlue};
   padding: 0.5% 0.9%;
   font-family: cursive;
 `;
@@ -156,7 +162,7 @@ const StyledChatInput = styled(Input.TextArea)`
   padding-top: 1.8%;
 
   &::placeholder {
-    color: ${ColorBlue.grayishBlue};
+    color: ${colors.grayishBlue};
     opacity: 1;
     position: absolute;
     top: 50%;
@@ -195,11 +201,11 @@ const SendButton = styled(Button)`
 `;
 
 const UploadIcon = styled(CloudUploadOutlined)`
-  color: ${ColorBlue.deepOceanBlue};
+  color: ${colors.deepOceanBlue};
   font-size: 1.3rem !important;
 `;
 
 const SendIcon = styled(SendOutlined)`
-  color: ${ColorBlue.deepOceanBlue};
+  color: ${colors.deepOceanBlue};
   font-size: 1.2rem !important;
 `;

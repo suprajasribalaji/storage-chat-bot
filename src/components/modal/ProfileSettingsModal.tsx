@@ -3,7 +3,7 @@ import { Menu, Modal } from 'antd';
 import { FaUserLarge } from "react-icons/fa6";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { RxUpdate } from "react-icons/rx";
-import { ColorBlack, ColorGray } from '../../assets/themes/color';
+import { colors } from '../../assets/themes/color';
 import styled from 'styled-components';
 import type { MenuProps } from 'antd';
 import ProfileSetttingsContentModal from './ProfileSetttingsContentModal';
@@ -65,30 +65,30 @@ const StyledProfileSettingsModal = styled(Modal)`
     width: 56% !important;
 
     .ant-modal-content {
-        background-color: ${ColorGray.lightGray} !important;
-        color: ${ColorBlack.black};
+        background-color: ${colors.lightGray} !important;
+        color: ${colors.black};
         border-radius: 30px !important;
     }
 
     .ant-modal-header {
-        background-color: ${ColorGray.lightGray} !important;
-        color: ${ColorBlack.black};
+        background-color: ${colors.lightGray} !important;
+        color: ${colors.black};
         border-radius: 1.5rem !important;
     }
 
     .ant-modal-title {
-        color: ${ColorBlack.black} !important;
+        color: ${colors.black} !important;
         font-size: 150%;
         margin-top: 1.5%;
         margin-left: 1%;
     }
 
     .ant-modal-close-x {
-        color: ${ColorBlack.black} !important;
+        color: ${colors.black} !important;
     }
 
     .ant-modal-body {
-        color: ${ColorBlack.black};
+        color: ${colors.black};
         height: 60vh;
         font-size: 100%;
         margin-top: 2.5%;
@@ -104,20 +104,20 @@ const ProfileSettingsModalContentMenu = styled.div`
 `;
 
 const StyledMenu = styled(Menu)`
-    background-color: ${ColorGray.lightGray} !important;
+    background-color: ${colors.lightGray} !important;
     border-right: none !important;
-    color: ${ColorBlack.black};
+    color: ${colors.black};
 
     .ant-menu-item-selected {
-        background-color: ${ColorGray.softDustyGray} !important;
+        background-color: ${colors.softDustyGray} !important;
     }
 
     .ant-menu-item {
-        color: ${ColorBlack.black} !important;
+        color: ${colors.black} !important;
     }
 
     .ant-menu-item:hover {
-        background-color: ${ColorGray.softDustyGray} !important;
+        background-color: ${colors.softDustyGray} !important;
     }
 `;
 

@@ -1,21 +1,19 @@
 import styled from "styled-components";
 import BackgroundImage from "../assets/images/SignupPageBackground.jpg";
-import { ColorBlack, ColorBlue, ColorRed, ColorWhite } from "../assets/themes/color";
+import { colors } from "../assets/themes/color";
 import Title from "antd/es/typography/Title";
 import type { FormProps } from 'antd';
-import { Button, Divider, Form, Input } from 'antd';
-import { GoogleOutlined } from "@ant-design/icons";
-import { FaFacebookF } from "react-icons/fa";
-import { IoLogoMicrosoft } from "react-icons/io5";
+import { Button, Divider, Form, Input, message } from 'antd';
+import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import { requestUserLoginByGithub } from "../redux/slices/login";
+import { useAppDispatch } from "../hooks/useAppDispatch";
+import { requestUserSignup } from "../redux/slices/signup";
 
 type FieldType = {
-    email?: string;
-    password?: string;
+    email: string;
+    password: string;
     remember?: string;
-};
-
-const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
-    console.log('Success:', values);
 };
 
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
@@ -37,6 +35,46 @@ const getPasswordValidationRules = () => {
 };
 
 const SignupPage = () => {
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+
+    const handleGetClutterFreeButton: FormProps<FieldType>['onFinish'] = async (values) => {
+        console.log('Success:', values);
+        const { email, password } = values;
+        try {
+            const response = await dispatch(requestUserSignup({email, password})).unwrap();
+            navigate('/home');
+            console.log(response, "this is the response ====>")
+            message.success('Logged in successfully!');
+        } catch (error) {
+            console.error('Login failed:', error);
+            message.error('Login failed. Please check your credentials.');
+        }
+      };
+
+    const handleGoogleProviderButton = async () =>{
+        try {
+          const response = await dispatch(requestUserLoginByGithub());
+          navigate('/home');
+          console.log(response, " github provider respose ----------");
+          message.success('Logged in using github successfully!');
+        } catch (error) {
+          console.error('Login failed:', error);
+          message.error('Login failed. Please check your credentials.');
+        }
+      };
+
+    const handleGithubProviderButton = async () =>{
+        try {
+          const response = await dispatch(requestUserLoginByGithub());
+          navigate('/home');
+          console.log(response, " github provider respose ----------");
+          message.success('Logged in using github successfully!');
+        } catch (error) {
+          console.error('Login failed:', error);
+          message.error('Login failed. Please check your credentials.');
+        }
+      };
     return (
         <StyledSigupPage>
             <SignupPageContent>
@@ -52,7 +90,7 @@ const SignupPage = () => {
                             name="login-form"
                             layout="vertical"
                             initialValues={{ remember: true }}
-                            onFinish={onFinish as any}
+                            onFinish={handleGetClutterFreeButton as any}
                             onFinishFailed={onFinishFailed as any}
                             autoComplete="off"
                         >
@@ -110,9 +148,8 @@ const SignupPage = () => {
                             </SignupPageDivider>
 
                             <SignupButtonGroups>
-                                <StyledGoogleButton icon={<GoogleOutlined />} />
-                                <StyledFacebookButton icon={<FaFacebookF />} />
-                                <StyledMicrosoftButton icon={<IoLogoMicrosoft />} />
+                                <StyledGoogleButton icon={<GoogleOutlined />} onClick={handleGoogleProviderButton}/>
+                                <StyledGithubButton icon={<GithubOutlined />} onClick={handleGithubProviderButton}/>
                             </SignupButtonGroups>
                         </StyledSignupPageForm>
                     </StyledForm>
@@ -144,7 +181,7 @@ const SignupPageContent = styled.div`
     align-items: center;
     border-radius: 30px;
     margin-left: 38%;
-    background-color: ${ColorBlack.lightSemiTransparentBlack}; 
+    background-color: ${colors.lightSemiTransparentBlack}; 
     font-family: "Poppins", sans-serif;   
 `;
 
@@ -155,9 +192,9 @@ const SignupPageTitle = styled.div`
 `;
 
 const StyledTitle = styled(Title)`
-    font-size: 3.5rem !important;
+    font-size: 2.8rem !important;
     font-weight: 700 !important;
-    color: ${ColorWhite.white} !important;
+    color: ${colors.white} !important;
 `;
 
 const SignupPageSubtitle = styled.div`
@@ -168,7 +205,7 @@ const SignupPageSubtitle = styled.div`
 const StyledSubtitle = styled.div`
     font-size: 0.9rem;
     font-weight: 100;
-    color: ${ColorWhite.white};
+    color: ${colors.white};
 `;
 
 const SignupPageForm = styled.div`
@@ -185,11 +222,11 @@ const StyledForm = styled.div`
 
 const StyledSignupPageForm = styled(Form)`
     .ant-form-item-label > label {
-        color: ${ColorWhite.white} !important; 
+        color: ${colors.white} !important; 
     }
 
     .ant-form-item-explain-error {
-        color: ${ColorWhite.white}; 
+        color: ${colors.white}; 
         font-size: 0.8rem;
     }
 `;
@@ -202,18 +239,18 @@ const SignupPageDivider = styled.div`
 const StyledDivider = styled(Divider)`
     width: 100%;
     margin: 1rem 0; /* Adjust spacing around the divider */
-    color: ${ColorWhite.white};
-    border-color: ${ColorWhite.white};
+    color: ${colors.white};
+    border-color: ${colors.white};
 `;
 
 const StyledDividerText = styled.p`
-    color: ${ColorWhite.white} !important;
+    color: ${colors.white} !important;
     text-align: center;
     font-size: 130%;
 `;
 
 const GetClutterFreeButton = styled.div`
-    margin-bottom: 1rem; 
+    margin-bottom: 0.2rem; 
     display: flex;
     justify-content: center;
 `;
@@ -222,14 +259,14 @@ const StyledGetClutterFreeButton = styled(Button)`
     width: 100%;
     height: 6vh;
     border-radius: 12px;
-    background-color: ${ColorBlack.raisinBlack};
+    background-color: ${colors.raisinBlack};
     border: none;
     font-weight: bold;
     font-size: 110%;
     margin-top: 6%;
     &&&:hover {
-        background-color: ${ColorWhite.white};
-        color: ${ColorBlack.raisinBlack};
+        background-color: ${colors.white};
+        color: ${colors.raisinBlack};
     }
 `;
 
@@ -242,11 +279,11 @@ const SignupButtonGroups = styled.div`
 
 const StyledThirdPartySignupButton = styled(Button)`
     .anticon {
-        color: ${ColorWhite.white};
+        color: ${colors.white};
     }
 
     &&&:hover, &&&:focus {
-        background-color: ${ColorWhite.white};
+        background-color: ${colors.white};
     } 
 
     &&& {
@@ -259,30 +296,29 @@ const StyledThirdPartySignupButton = styled(Button)`
 `;
 
 const StyledGoogleButton = styled(StyledThirdPartySignupButton)`
-    background-color: ${ColorRed.tomatoRed};
+    background-color: ${colors.tomatoRed};
     &&&:hover, &&&:focus {
         .anticon {
-            color: ${ColorRed.tomatoRed};
+            color: ${colors.tomatoRed};
         }
     } 
 `;
 
-const StyledFacebookButton = styled(StyledThirdPartySignupButton)`
-    background-color: ${ColorBlue.denimBlue};
-    color: ${ColorWhite.white};
+const StyledGithubButton = styled(StyledThirdPartySignupButton)`
+    background-color: ${colors.black};
+    color: ${colors.white};
 
     &&&:hover, &&&:focus {
-        background-color: ${ColorWhite.white};
-        color: ${ColorBlue.denimBlue};
+        background-color: ${colors.white};
+        color: ${colors.black};
+
+        .anticon {
+            color: ${colors.black};
+        }
+    }
+
+    .anticon {
+        color: ${colors.white};
     }
 `;
 
-const StyledMicrosoftButton = styled(StyledThirdPartySignupButton)`
-    background-color: ${ColorBlack.black};
-    color: ${ColorWhite.white};
-
-    &&&:hover, &&&:focus {
-        background-color: ${ColorWhite.white};
-        color: ${ColorBlack.black};
-    }
-`;

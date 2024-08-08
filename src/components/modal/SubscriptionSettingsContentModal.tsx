@@ -1,6 +1,6 @@
 import { Button } from "antd";
 import styled from "styled-components";
-import { ColorBlue, ColorWhite } from "../../assets/themes/color";
+import { colors } from "../../assets/themes/color";
 
 const SubscriptionSettingsContentModal = () => {
     return (
@@ -41,9 +41,7 @@ const PlanSection = styled.div`
     flex-direction: column;
 `;
 
-const PlanDetails = styled.div`
-    display: flex;
-    flex-direction: column;
+const PlanDetails = styled(PlanSection)`
     gap: 20px;
 `;
 
@@ -56,16 +54,16 @@ const ButtonWrapper = styled.div`
 `;
 
 const StyledButton = styled(Button)`
-    background-color: ${ColorBlue.steelBlue};
+    background-color: ${colors.steelBlue};
     border: none;
     border-radius: 50px;
     padding: 4%;
     font-size: 100%;
-    color: ${ColorWhite.white};
+    color: ${colors.white};
 
     &&&:hover, &&&:focus {
-        background-color: ${ColorWhite.white};
-        color: ${ColorBlue.steelBlue};
+        background-color: ${colors.white};
+        color: ${colors.steelBlue};
     }
 `;
 

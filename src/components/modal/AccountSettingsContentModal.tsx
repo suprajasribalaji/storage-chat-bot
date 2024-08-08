@@ -1,6 +1,6 @@
 import { Button } from "antd";
 import styled from "styled-components";
-import { ColorBlue, ColorRed, ColorWhite } from "../../assets/themes/color";
+import { colors } from "../../assets/themes/color";
 
 const AccountSettingsContentModal = () => {
     return (
@@ -40,25 +40,24 @@ const Label = styled.div`
 
 const StyledButton = styled(Button)`
     transform: translateX(-40%);
+    border: none;
+    &&&:hover, &&&:focus {
+        background-color: ${colors.white};
+    }
 `;
 
 const StyledDeleteButton = styled(StyledButton)`
-    background-color: ${ColorRed.wineRed};
-    border: none;
-    color: ${ColorWhite.white};
-
+    background-color: ${colors.wineRed};
+    color: ${colors.white};
     &&&:hover, &&&:focus {
-        color: ${ColorRed.wineRed};
-        background-color: ${ColorWhite.white};
+        color: ${colors.wineRed};
     }
 `;
 
 const StyledEnableExportButton = styled(StyledButton)`
-    background-color: ${ColorBlue.steelBlue};
-    color: ${ColorWhite.white};
-    border: none;
+    background-color: ${colors.steelBlue};
+    color: ${colors.white};
     &&&:hover, &&&:focus {
-        background-color: ${ColorWhite.white};
-        color: ${ColorBlue.deepOceanBlue};
+        color: ${colors.deepOceanBlue};
     }
 `;
