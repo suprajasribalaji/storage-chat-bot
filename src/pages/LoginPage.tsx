@@ -15,7 +15,7 @@ import { requestUserLogin, requestUserLoginByGithub, requestUserLoginByGoogle } 
 type FieldType = {
     email: string;
     password: string;
-    remember?: string;
+    remember: string;
 };
   
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
@@ -47,11 +47,15 @@ const LoginPage = () => {
 
     const handleAccessButton: FormProps<FieldType>['onFinish'] = async (values) => {
       console.log('Success:', values);
-      const { email, password } = values;
+      const { email, password, remember } = values;
       try {
+        if(remember){
+          localStorage.setItem('email', email);
+          localStorage.setItem('password', password);
+        }
         const response = await dispatch(requestUserLogin({email, password})).unwrap();
         navigate('/home');
-        console.log(response, "this is the response ====>")
+        console.log(response, "this is the response ====>");
         message.success('Logged in successfully!');
       } catch (error) {
         console.error('Login failed:', error);
@@ -101,7 +105,11 @@ const LoginPage = () => {
                     <LoginPageForm                      
                       name="login-form"
                       layout="vertical"
-                      initialValues={{ remember: true }}
+                      initialValues={{
+                        email: localStorage.getItem('email') || '',
+                        password: localStorage.getItem('password') || '',
+                        remember: false,
+                      }}
                       autoComplete="off"
                       onFinish={handleAccessButton as any}
                       onFinishFailed={onFinishFailed as any}
@@ -111,7 +119,9 @@ const LoginPage = () => {
                         name="email"
                         rules={getEmailValidationRules()}
                       >
-                        <StyledInput placeholder="example@gmail.com"  />
+                        <StyledInput 
+                          placeholder="example@gmail.com"
+                        />
                       </Form.Item>
 
                       <Form.Item<FieldType>
@@ -119,7 +129,9 @@ const LoginPage = () => {
                         name="password"
                         rules={getPasswordValidationRules()}
                       >
-                        <StyledPasswordInput placeholder="****************"/>
+                        <StyledPasswordInput
+                          placeholder="****************"
+                        />
                       </Form.Item>
 
                       <Form.Item<FieldType>
