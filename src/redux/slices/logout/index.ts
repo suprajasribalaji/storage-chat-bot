@@ -1,11 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../../config/firebase.config';
+import { clearCurrentUser } from '../auth';
 
-export const logout = createAsyncThunk(
-  '/logout',
-  async (_) => {
-    await signOut(auth);
+export const requestUserLogout = createAsyncThunk(
+  'logout/requestUserLogout',
+  async (_, thunkAPI) => {
+    try {
+      await signOut(auth);
+      thunkAPI.dispatch(clearCurrentUser());
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
   }
 );
 
@@ -17,13 +23,13 @@ const LogoutSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(logout.pending, (state) => {
+      .addCase(requestUserLogout.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(logout.fulfilled, (state) => {
+      .addCase(requestUserLogout.fulfilled, (state) => {
         state.isLoading = false;
       })
-      .addCase(logout.rejected, (state) => {
+      .addCase(requestUserLogout.rejected, (state) => {
         state.isLoading = false;
       });
   },

@@ -1,12 +1,12 @@
 import { Button } from 'antd';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { ColorRed, ColorWhite } from '../../assets/themes/color';
+import { colors } from '../../assets/themes/color';
 
 const ProfileSettingsContentModal: React.FC = () => {
     const [profile, setProfile] = useState({
-        fullname: 'Supraja Sri',
-        callAs: 'Supraja',
+        fullName: 'Supraja Sri',
+        nickName: 'Supraja',
         email: 'suprajasrirb@gmail.com',
     });
 
@@ -24,17 +24,17 @@ const ProfileSettingsContentModal: React.FC = () => {
                 <Label>Full Name</Label>
                 <Input
                     type="text"
-                    name="fullname"
-                    value={profile.fullname}
+                    name="fullName"
+                    value={profile.fullName}
                     onChange={handleChange}
                 />
             </ProfileField>
             <ProfileField>
-                <Label>Call As</Label>
+                <Label>Nick Name</Label>
                 <Input
                     type="text"
-                    name="callAs"
-                    value={profile.callAs}
+                    name="nickName"
+                    value={profile.nickName}
                     onChange={handleChange}
                 />
             </ProfileField>
@@ -89,12 +89,12 @@ const UpdateButton = styled.div`
 `;
 
 const StyledUpdateButton = styled(Button)`
-    background-color: ${ColorRed.wineRed};
+    background-color: ${colors.wineRed};
     border: none;
-    color: ${ColorWhite.white};
+    color: ${colors.white};
 
     &&&:hover, &&&:focus {
-        color: ${ColorRed.wineRed};
-        background-color: ${ColorWhite.white};
+        color: ${colors.wineRed};
+        background-color: ${colors.white};
     }
 `;

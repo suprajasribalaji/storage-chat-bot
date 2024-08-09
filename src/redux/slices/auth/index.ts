@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface User {
     uid: string;
@@ -19,7 +19,7 @@ const AuthSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        setCurrentUser(state, action) {
+        setCurrentUser(state, action: PayloadAction<User | null>) {
             state.currentUser = action.payload;
             state.isLoading = false;
         },
