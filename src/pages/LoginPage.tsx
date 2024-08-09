@@ -1,11 +1,8 @@
 import styled from "styled-components";
 import BackgroundImage from "../assets/images/LoginPageBackground.jpg";
 import { colors } from "../assets/themes/color";
-import { colors } from "../assets/themes/color";
 import Title from "antd/es/typography/Title";
 import type { FormProps } from 'antd';
-import { Button, Checkbox, Divider, Form, Input, message } from 'antd';
-import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Divider, Form, Input, message } from 'antd';
 import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
 import { useState } from "react";
@@ -42,9 +39,7 @@ const getPasswordValidationRules = () => {
 };
 
 const LoginPage = () => {
-  const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -98,54 +93,7 @@ const LoginPage = () => {
       navigate("/signup")
     };  
 
-    const handleAccessButton: FormProps<FieldType>['onFinish'] = async (values) => {
-      console.log('Success:', values);
-      const { email, password, remember } = values;
-      try {
-        if(remember){
-          localStorage.setItem('email', email);
-          localStorage.setItem('password', password);
-        }
-        const response = await dispatch(requestUserLogin({email, password})).unwrap();
-        navigate('/home');
-        console.log(response, "this is the response ====>");
-        message.success('Logged in successfully!');
-      } catch (error) {
-        console.error('Login failed:', error);
-        message.error('Login failed. Please check your credentials.');
-      }
-    };
-
-    const handleGoogleProviderButton = async () =>{
-      try {
-        const response = await dispatch(requestUserLoginByGoogle());
-        navigate('/home');
-        console.log(response, " gmail provider respose ----------");
-        message.success('Logged in using gmail successfully!');
-      } catch (error) {
-        console.error('Login failed:', error);
-        message.error('Login failed. Please check your credentials.');
-      }
-    };
-
-    const handleGithubProviderButton = async () =>{
-      try {
-        const response = await dispatch(requestUserLoginByGithub());
-        navigate('/home');
-        console.log(response, " github provider respose ----------");
-        message.success('Logged in using github successfully!');
-      } catch (error) {
-        console.error('Login failed:', error);
-        message.error('Login failed. Please check your credentials.');
-      }
-    };
-
-    const handleSignupButtton = () => {
-      navigate("/signup")
-    };  
-
     return (
-      <StyledLoginPage>
       <StyledLoginPage>
             <LoginPageBackground1 />
             <LoginPageBackground2>
@@ -166,13 +114,6 @@ const LoginPage = () => {
                       }}
                       autoComplete="off"
                       onFinish={handleAccessButton as any}
-                      initialValues={{
-                        email: localStorage.getItem('email') || '',
-                        password: localStorage.getItem('password') || '',
-                        remember: false,
-                      }}
-                      autoComplete="off"
-                      onFinish={handleAccessButton as any}
                       onFinishFailed={onFinishFailed as any}
                     >
                       <Form.Item<FieldType>
@@ -180,9 +121,6 @@ const LoginPage = () => {
                         name="email"
                         rules={getEmailValidationRules()}
                       >
-                        <StyledInput 
-                          placeholder="example@gmail.com"
-                        />
                         <StyledInput 
                           placeholder="example@gmail.com"
                         />
@@ -196,9 +134,6 @@ const LoginPage = () => {
                         <StyledPasswordInput
                           placeholder="****************"
                         />
-                        <StyledPasswordInput
-                          placeholder="****************"
-                        />
                       </Form.Item>
 
                       <Form.Item<FieldType>
@@ -206,7 +141,6 @@ const LoginPage = () => {
                         valuePropName="checked"
                       >
                         <RememberForgotContainer>
-                          <SaveCredentialsCheckboxContainer>
                           <SaveCredentialsCheckboxContainer>
                             <StyledCheckbox />
                             <SaveCredentials>
@@ -240,8 +174,6 @@ const LoginPage = () => {
                       <LoginButtonGroups>
                         <StyledGoogleButton icon={<GoogleOutlined />} onClick={handleGoogleProviderButton}/>
                         <StyledGithubButton icon={<GithubOutlined />} onClick={handleGithubProviderButton}/>
-                        <StyledGoogleButton icon={<GoogleOutlined />} onClick={handleGoogleProviderButton}/>
-                        <StyledGithubButton icon={<GithubOutlined />} onClick={handleGithubProviderButton}/>
                       </LoginButtonGroups>
 
                       <NewAccount>
@@ -249,7 +181,6 @@ const LoginPage = () => {
                           Create a new account.
                         </CreateNewAccount>
                         <SignupButton>
-                          <StyledSignupButton onClick={handleSignupButtton} type="link">Sign up</StyledSignupButton>
                           <StyledSignupButton onClick={handleSignupButtton} type="link">Sign up</StyledSignupButton>
                         </SignupButton>
                       </NewAccount>
@@ -259,6 +190,7 @@ const LoginPage = () => {
         </StyledLoginPage>
     )
 }
+
 
 export default LoginPage
 
@@ -335,14 +267,6 @@ const StyledInput = styled(Input)`
 
 const StyledPasswordInput = styled(StyledInput).attrs({ type: 'password' })``;
 
-const StyledInput = styled(Input)`
-  height: 5.2vh;
-  width: 96%;
-  border: none;
-`;
-
-const StyledPasswordInput = styled(StyledInput).attrs({ type: 'password' })``;
-
 const RememberForgotContainer = styled.div`
   width: 98%;
   display: flex;
@@ -352,7 +276,6 @@ const RememberForgotContainer = styled.div`
   margin-left: 2%;
 `;
 
-const SaveCredentialsCheckboxContainer = styled.div`
 const SaveCredentialsCheckboxContainer = styled.div`
   display: flex;
   align-items: center;
@@ -395,8 +318,6 @@ const StyledCheckbox = styled(Checkbox)`
   }
 `;
 
-const SaveCredentials = styled.div`
-  color: ${colors.charcoalBlack};
 const SaveCredentials = styled.div`
   color: ${colors.charcoalBlack};
   margin-left: 5px;
@@ -470,9 +391,6 @@ const StyledGoogleButton = styled(StyledThirdPartyLoginButton)`
   } 
 `;
 
-const StyledGithubButton = styled(StyledThirdPartyLoginButton)`
-  background-color: ${colors.black};
-  color: ${colors.white};
 const StyledGithubButton = styled(StyledThirdPartyLoginButton)`
   background-color: ${colors.black};
   color: ${colors.white};
