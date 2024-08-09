@@ -6,7 +6,7 @@ import type { FormProps } from 'antd';
 import { Button, Checkbox, Divider, Form, Input, message } from 'antd';
 import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import RetrieveForgottenPasswordModal from "../components/modal/RetrieveForgottenPasswordModal";
+import RetrieveCredentialsModal from "../components/modal/RetrieveCredentialsModal";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { requestUserLogin, requestUserLoginByGithub, requestUserLoginByGoogle } from "../redux/slices/login";
@@ -41,7 +41,7 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-    const handleRetrieveForgottenPassword = () => {
+    const handleRetrieveCredentials = () => {
       setIsModalOpen(true);
     }
 
@@ -145,13 +145,13 @@ const LoginPage = () => {
                               Save Credentials
                             </SaveCredentials>
                           </SaveCredentialsCheckboxContainer>                        
-                          <RememberForgotPasswordButton type="link" onClick={handleRetrieveForgottenPassword}>Retrieve forgotten password</RememberForgotPasswordButton>
+                          <RememberRetrieveCredentialsButton type="link" onClick={handleRetrieveCredentials}>Retrieve Credentials</RememberRetrieveCredentialsButton>
                         </RememberForgotContainer>
                       </Form.Item>
 
                       {
                           isModalOpen && 
-                          <RetrieveForgottenPasswordModal
+                          <RetrieveCredentialsModal
                             isModalOpen={isModalOpen}
                             setIsModalOpen={setIsModalOpen}
                           />
@@ -308,7 +308,7 @@ const SaveCredentials = styled.div`
   margin-left: 5px;
 `;
 
-const RememberForgotPasswordButton = styled(Button)`
+const RememberRetrieveCredentialsButton = styled(Button)`
   color: ${colors.richBlack};
   border: none;
   &&&:hover {
