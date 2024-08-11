@@ -6,7 +6,7 @@ import type { FormProps } from 'antd';
 import { Button, Checkbox, Divider, Form, Input, message } from 'antd';
 import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import RetrieveCredentialsModal from "../components/modal/RetrieveCredentialsModal";
+import ForgotPasswordModal from "../components/modal/ForgotPasswordModal";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { requestUserLogin, requestUserLoginByGithub, requestUserLoginByGoogle } from "../redux/slices/login";
@@ -43,11 +43,11 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-    const handleRetrieveCredentials = () => {
+    const handleForgotPassword = () => {
       setIsModalOpen(true);
     }
 
-    const handleAccessButton: FormProps<FieldType>['onFinish'] = async (values) => {
+    const handleLoginButton: FormProps<FieldType>['onFinish'] = async (values) => {
       console.log('Success:', values);
       const { email, password, remember } = values;
       try {
@@ -113,7 +113,7 @@ const LoginPage = () => {
                         remember: false,
                       }}
                       autoComplete="off"
-                      onFinish={handleAccessButton as any}
+                      onFinish={handleLoginButton as any}
                       onFinishFailed={onFinishFailed as any}
                     >
                       <Form.Item<FieldType>
@@ -147,24 +147,24 @@ const LoginPage = () => {
                               Save Credentials
                             </SaveCredentials>
                           </SaveCredentialsCheckboxContainer>                        
-                          <RememberRetrieveCredentialsButton type="link" onClick={handleRetrieveCredentials}>Retrieve Credentials</RememberRetrieveCredentialsButton>
+                          <RememberForgotPasswordButton type="link" onClick={handleForgotPassword}>Forgot Password?</RememberForgotPasswordButton>
                         </RememberForgotContainer>
                       </Form.Item>
 
                       {
                           isModalOpen && 
-                          <RetrieveCredentialsModal
+                          <ForgotPasswordModal
                             isModalOpen={isModalOpen}
                             setIsModalOpen={setIsModalOpen}
                           />
                       }
 
                       <Form.Item>
-                        <AccessButton>
-                          <StyledAccessButton type="primary" htmlType="submit">
-                            Access
-                          </StyledAccessButton>
-                        </AccessButton>
+                        <LoginButton>
+                          <StyledLoginButton type="primary" htmlType="submit">
+                            LOG IN
+                          </StyledLoginButton>
+                        </LoginButton>
                       </Form.Item>
 
                       <StyledDivider>
@@ -323,7 +323,7 @@ const SaveCredentials = styled.div`
   margin-left: 5px;
 `;
 
-const RememberRetrieveCredentialsButton = styled(Button)`
+const RememberForgotPasswordButton = styled(Button)`
   color: ${colors.richBlack};
   border: none;
   &&&:hover {
@@ -337,11 +337,11 @@ const StyledDivider = styled.div`
   margin-top: -6%;
 `;
 
-const AccessButton = styled.div`
+const LoginButton = styled.div`
   margin-top: -8%;
 `;
 
-const StyledAccessButton = styled(Button)`
+const StyledLoginButton = styled(Button)`
   width: 95%;
   height: 5.5vh;
   border-radius: 12px;

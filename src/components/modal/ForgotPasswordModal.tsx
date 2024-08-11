@@ -54,7 +54,7 @@ const RetrieveCredentialsModal: React.FC<RetrieveCredentialsModalProps> = ({ isM
 
     return (
         <StyledModal
-            title="Retrieve Credentials"
+            title="Forgot Password"
             centered
             open={isModalOpen}
             onOk={() => setIsModalOpen(false)}

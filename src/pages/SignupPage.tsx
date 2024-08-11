@@ -13,7 +13,6 @@ import { requestUserSignup } from "../redux/slices/signup";
 type FieldType = {
     email: string;
     password: string;
-    remember?: string;
 };
 
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
@@ -38,7 +37,7 @@ const SignupPage = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
-    const handleGetClutterFreeButton: FormProps<FieldType>['onFinish'] = async (values) => {
+    const handleSignupButton: FormProps<FieldType>['onFinish'] = async (values) => {
         console.log('Success:', values);
         const { email, password } = values;
         try {
@@ -87,10 +86,10 @@ const SignupPage = () => {
                 <SignupPageForm>
                     <StyledForm>
                         <StyledSignupPageForm
-                            name="login-form"
+                            name="signup-form"
                             layout="vertical"
                             initialValues={{ remember: true }}
-                            onFinish={handleGetClutterFreeButton as any}
+                            onFinish={handleSignupButton as any}
                             onFinishFailed={onFinishFailed as any}
                             autoComplete="off"
                         >
@@ -134,11 +133,11 @@ const SignupPage = () => {
                             </StyledFormItem>
 
                             <Form.Item>
-                                <GetClutterFreeButton>
-                                    <StyledGetClutterFreeButton type="primary" htmlType="submit">
-                                        Get Clutter-Free
-                                    </StyledGetClutterFreeButton>
-                                </GetClutterFreeButton>
+                                <SignupButton>
+                                    <StyledSignupButton type="primary" htmlType="submit">
+                                        SIGN UP
+                                    </StyledSignupButton>
+                                </SignupButton>
                             </Form.Item>
 
                             <SignupPageDivider>
@@ -248,7 +247,7 @@ const SignupPageDivider = styled.div`
 
 const StyledDivider = styled(Divider)`
     width: 100%;
-    margin: 1rem 0; /* Adjust spacing around the divider */
+    margin: 1rem 0;
     color: ${colors.white};
     border-color: ${colors.white};
 `;
@@ -259,13 +258,13 @@ const StyledDividerText = styled.p`
     font-size: 130%;
 `;
 
-const GetClutterFreeButton = styled.div`
+const SignupButton = styled.div`
     margin-bottom: 0.2rem; 
     display: flex;
     justify-content: center;
 `;
 
-const StyledGetClutterFreeButton = styled(Button)`
+const StyledSignupButton = styled(Button)`
     width: 100%;
     height: 6vh;
     border-radius: 12px;
