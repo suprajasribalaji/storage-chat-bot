@@ -1,145 +1,225 @@
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button, Input, Menu, Dropdown, message } from "antd";
 import { IoMdSettings } from "react-icons/io";
 import { AiOutlineLogout } from "react-icons/ai";
-import { Button, Input, Menu, Dropdown, message } from "antd";
-import { CloudUploadOutlined, SendOutlined } from '@ant-design/icons';
+import { CloudUploadOutlined, SendOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import styled from "styled-components";
 import { colors } from "../assets/themes/color";
 import type { MenuProps } from 'antd';
 import ProfilePicture from "../assets/images/ProfilePicture.png";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
 import ProfileSettingsModal from "../components/modal/ProfileSettingsModal";
-import { useAppDispatch } from "../hooks/useAppDispatch";
-import WallPaper from "../assets/wallpaper/chat-wp.webp";
 import UploadFileModal from "../components/modal/UploadFileModal";
+import { useAppDispatch } from "../hooks/useAppDispatch";
 import { requestUserLogout } from "../redux/slices/user/logout";
+import ContentBeforeStartingChatComponent from "../components/ContentBeforeStartingChat";
+import { auth, document } from "../config/firebase.config";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { RespondedMessage } from "../utils/utils";
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-type Message = {
-  content: string;
-}
-
 const HomePage = () => {
-    const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-    const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
-    const [isUploadFileModalOpen, setIsUploadFileModalOpen] = useState<boolean>(false);
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [input, setInput] = useState<string>('');
-    const webSocket = useRef<WebSocket | null>(null);
-    const contentRef = useRef<HTMLDivElement>(null);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
+  const [isUploadFileModalOpen, setIsUploadFileModalOpen] = useState<boolean>(false);
+  const [profilePicture, setProfilePicture] = useState<string | null>('');
+  const [responseMessages, setResponseMessages] = useState<RespondedMessage[]>([]);
+  const [input, setInput] = useState<string>('');
+  const webSocket = useRef<WebSocket | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const profilePictureURL = auth.currentUser?.photoURL || ProfilePicture;
 
-    useEffect(() => {
-      if (contentRef.current) {
-        contentRef.current.scrollTop = contentRef.current.scrollHeight;
-      }
-    }, [messages]);
+  useEffect(() => {
+    setProfilePicture(profilePictureURL);
+  }, [profilePictureURL]);
 
-    useEffect(() => {
-      webSocket.current = new WebSocket('ws://localhost:8080');
-      
-      webSocket.current.onopen = () => {
-        console.log('Connected to WebSocket server successfully');
-      };
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = contentRef.current.scrollHeight;
+    }
+  }, [responseMessages]);
 
-      webSocket.current.onmessage = (event) => {
-        console.log('Received message:', event.data);
-        try {
-          const message: Message = JSON.parse(event.data);
-          setMessages((prevMessages) => [...prevMessages, message]);
-        } catch (error) {
-          console.error('Error parsing message:', error);
-        }
-      };
-
-      webSocket.current.onclose = () => {
-        console.log('Disconnected from WebSocket server');
-      };
-      
-      return () => {
-        if (webSocket.current) {
-          webSocket.current.close();
-        }
-      };
-    }, []);
-
-    const handleMenuItems = async (e: { key: string }) => {
-      if(e.key === '1') {
-        setIsProfileModalOpen(true);
-      }
-      if (e.key === '2') {
-        await dispatch(requestUserLogout());
-        navigate('/login');
-      };
+  useEffect(() => {
+    webSocket.current = new WebSocket('ws://localhost:8080');
+    
+    webSocket.current.onopen = () => {
+      console.log('Connected to WebSocket server successfully');
     };
 
-    const items: MenuItem[] = [
-        {
-          key: '1',
-          label: 'Settings',
-          icon: <IoMdSettings style={{ paddingTop: '6%'}}/>,
-          onClick: handleMenuItems,
-        },
-        {
-          key: '2',
-          label: 'Logout',
-          icon: <AiOutlineLogout style={{ paddingTop: '6%'}}/>,
-          onClick: handleMenuItems,
-        }
-      ];
-
-    const menu = (
-        <StyledMenu
-            mode="vertical"
-            items={items}
-        />
-    );
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      setInput(e.target.value);
-    };
-  
-    const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        handleSendButton();
+    webSocket.current.onmessage = (event) => {
+      console.log('Received message:', event.data);
+      try {
+        const receivedMessage: RespondedMessage = JSON.parse(event.data);
+        setResponseMessages((prevMessages) => [...prevMessages, receivedMessage]);
+      } catch (error) {
+        console.error('Error parsing message:', error);
       }
     };
 
-    const handleSendButton = () => {
+    webSocket.current.onclose = () => {
+      console.log('Disconnected from WebSocket server');
+    };
+    
+    return () => {
       if (webSocket.current) {
-        const message = { content: input };
-        webSocket.current.send(JSON.stringify(message));
-        setInput('');
-      } else {
-        console.error('WebSocket is not connected');
-        message.error('Failed to send message. Please try again.');
+        webSocket.current.close();
       }
     };
+  }, []);
 
-    const handleUploadButton = () => {
-      setIsUploadFileModalOpen(true);
+  const handleMenuItems = async (e: { key: string }) => {
+    if (e.key === '1') {
+      setIsProfileModalOpen(true);
+    }
+    if (e.key === '2') {
+      await dispatch(requestUserLogout());
+      navigate('/login');
     };
+  };
 
-    return (
-         <StyledHomePage>
+  const items: MenuItem[] = [
+    {
+      key: '1',
+      label: 'Settings',
+      icon: <IoMdSettings style={{ paddingTop: '6%'}}/>,
+      onClick: handleMenuItems,
+    },
+    {
+      key: '2',
+      label: 'Logout',
+      icon: <AiOutlineLogout style={{ paddingTop: '6%'}}/>,
+      onClick: handleMenuItems,
+    }
+  ];
+
+  const menu = (
+    <StyledMenu mode="vertical" items={items} />
+  );
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);      
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendButton();
+    }
+  };
+
+  const normalizeString = (str: string) => {
+    return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+  };
+
+  const retrieveFileFromDataBase = async (requestedFileName: string, requestedTime: number) => {
+    try {
+      const fileQuery = query(collection(document, 'Files'), where('user_id', '==', auth.currentUser?.uid));
+      const querySnapshot = await getDocs(fileQuery);
+      if(querySnapshot.empty) throw new Error('User not found');
+  
+      const files: RespondedMessage[] = [];
+  
+      querySnapshot.forEach((doc) => {
+        const fileDetails = doc.data();
+        const fileName = fileDetails.file_detail.name + '.' + fileDetails.file_detail.ext;
+        if (normalizeString(fileName).includes(requestedFileName)) {
+          const fileURL = fileDetails.url;
+          const newMessage: RespondedMessage = {
+            type: 'response',
+            file_name: fileName,
+            downloadable_url: fileURL,
+            timestamp: requestedTime,
+            responded_at: Date.now(),
+          };
+          files.push(newMessage);
+        }
+      });
+  
+      if (files.length > 0) {
+        setResponseMessages((prevMessages) => [...prevMessages, ...files]);
+      } else {
+        const newMessage: RespondedMessage = {
+          type: 'response',
+          file_name: 'No file found',
+          timestamp: requestedTime,
+          responded_at: Date.now(),
+          noFileFound: true,
+        };
+        files.push(newMessage);
+        setResponseMessages((prevMessages) => [...prevMessages, ...files]);
+      }
+    } catch (error) {
+      console.error('Error retrieving file:', error);
+    }
+  };
+
+  const handleSendButton = () => {
+    if (webSocket.current) {
+      const message: RespondedMessage = { 
+        type: 'request', 
+        content: input, 
+        timestamp: Date.now() 
+      };
+      webSocket.current.send(JSON.stringify(message));
+      retrieveFileFromDataBase(normalizeString(input), message.timestamp);
+      setInput('');
+    } else {
+      console.error('WebSocket is not connected');
+      message.error('Failed to send message. Please try again.');
+    }
+  };
+
+  const handleUploadButton = () => {
+    setIsUploadFileModalOpen(true);
+  };
+
+  const formatTimestamp = (timestamp: number) => {
+    return new Date(timestamp).toLocaleTimeString();
+  };
+
+  return (
+    <StyledHomePage>
       <HomePageNavBar>
-        <HomePageHeader>
-          Warehouse
-        </HomePageHeader>
+        <HomePageHeader>Warehouse</HomePageHeader>
         <Dropdown overlay={menu} trigger={['click']} placement="bottomRight">
-          <CircleButton />
+          <CircleButton type="link">
+            {
+              profilePicture && <StyledProfilePicture src={profilePicture} alt='Profile Picture'/>
+            }
+          </CircleButton>
         </Dropdown>
       </HomePageNavBar>
-      <Content ref={contentRef}>
-        {messages.map((msg, index) => (
-          <Message key={index} isCurrentUser={true}>
-            <UserMessage>{msg.content}</UserMessage>
-          </Message>
-        ))}
-      </Content>
-
+      {responseMessages.length > 0 ? (
+        <Content hasContent={true} ref={contentRef}>
+          {responseMessages.map((msg, index) => (
+            <MessageContainer key={index}>
+              {msg.type === 'request' ? (
+                <RequestMessage>
+                  <RequestContent>{msg.content}</RequestContent>
+                  <RequestTime>{formatTimestamp(msg.timestamp)}</RequestTime>
+                </RequestMessage>
+              ) : (
+                <ResponseMessage>
+                  <ResponseContent>
+                    <FileName>{msg.file_name}</FileName>
+                    {!msg.noFileFound && msg.downloadable_url && (
+                      <DownloadButton 
+                        icon={<ArrowDownOutlined />}
+                        onClick={() => window.open(msg.downloadable_url, '_blank')}
+                      />
+                    )}
+                  </ResponseContent>
+                  <ResponseTime>{formatTimestamp(msg.responded_at || msg.timestamp)}</ResponseTime>
+                </ResponseMessage>
+              )}
+            </MessageContainer>
+          ))}
+        </Content>
+      ) : (
+        <ContentBeforeStartingChatComponent />
+      )}
       <HomePageContent>
         <ChatBoxInput>
           <StyledChatInput 
@@ -162,7 +242,7 @@ const HomePage = () => {
         setIsModalOpen={setIsUploadFileModalOpen}
       />
     </StyledHomePage>
-    );
+  );
 };
 
 export default HomePage;
@@ -191,75 +271,45 @@ const HomePageNavBar = styled.nav`
   justify-content: space-between;
   align-items: center;
   color: ${colors.steelBlue};
-  padding: 0.5% 0.9%;
   font-family: cursive;
+  margin-top: 0.5%;
 `;
 
 const HomePageHeader = styled.span`
   font-size: 130%;
+  margin-left: 1%;
 `;
 
 const CircleButton = styled(Button)`
-  width: 3%;
-  height: 6vh;
+  width: 5%;
+  height: 7vh;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 0.5%;
   border: none;
-  background-image: url(${ProfilePicture});
-  background-size: cover;
+  margin-top: 0.5%;
+  background-color: transparent;
 
   &&&:hover, &&&:focus {
-    background-image: url(${ProfilePicture});
-    background-size: cover;
+    background-color: transparent;
   }
 `;
 
+const StyledProfilePicture = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+  border-radius: 50%;
+`;
+
 const HomePageContent = styled.div`
-  flex-grow: 1;
+flex-grow: 1;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
   overflow: auto;
-`;
-
-const Content = styled.div`
-  display: flex;
-  color: white;
-  align-items: center;
-  flex-direction: column;
-  overflow-y: auto;
-  height: 80.8vh;
-  width: 52%;
-  margin-left: 23.9%;
-  margin-right: 26.1%;
-  border-radius: 0.5rem;
-  scroll-behavior: smooth;
-  background-image: url(${WallPaper});
-`;
-
-const Message = styled.div<{ isCurrentUser: boolean }>`
-  display: flex;
-  flex-direction: column;
-  align-items: ${props => props.isCurrentUser ? 'flex-end' : 'flex-start'};
-  padding: 1%;
-  max-width: 50%;
-  word-wrap: break-word; 
-  overflow-wrap: break-word;
-  align-self: ${props => props.isCurrentUser ? 'flex-end' : 'flex-start'};
-  background-color: ${colors.semiTransparentBlack};
-  border-radius: 2rem;
-  padding: 2% 2.5%;
-  margin-top: 2%;
-  margin-bottom: 2%;
-  margin-right: 3%;
-`;
-
-const UserMessage = styled.div`
-  word-wrap: break-word;
 `;
 
 const ChatBoxInput = styled.div`
@@ -308,7 +358,7 @@ const UploadButton = styled(Button)`
   background: none;
   border: none;
   z-index: 2;
-  padding: 0; 
+  padding: 0;
 `;
 
 const SendButton = styled(Button)`
@@ -318,15 +368,104 @@ const SendButton = styled(Button)`
   border: none;
   background: none;
   z-index: 2;
-  padding: 0; 
+  padding: 0;
 `;
 
 const UploadIcon = styled(CloudUploadOutlined)`
-  color: ${colors.deepOceanBlue};
+color: ${colors.deepOceanBlue};
   font-size: 1.3rem !important;
 `;
 
 const SendIcon = styled(SendOutlined)`
   color: ${colors.deepOceanBlue};
   font-size: 1.2rem !important;
+`;
+
+const Content = styled.div<{ hasContent: boolean }>`
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    height: 80.8vh;
+    width: 50%;
+    margin-left: 25%;
+    margin-right: 25%;
+    border-radius: 0.5rem;
+    scroll-behavior: smooth;
+`;
+
+const MessageContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    width: 100%;
+`;
+
+const RequestMessage = styled.div`
+    align-self: flex-end;
+    background-color: ${colors.semiTransparentBlack};
+    border-radius: 1rem;
+    padding: 2%;
+    text-align: right;
+    margin-bottom: 10px;
+    max-width: 70%;
+`;
+
+const ResponseMessage = styled.div`
+    align-self: flex-start;
+    background-color: ${colors.lightSemiTransparentBlack};
+    border-radius: 1rem;
+    padding: 2%;
+    max-width: 70%;
+`;
+
+const RequestTime = styled.div`
+    font-size: 0.8em;
+    color: ${colors.richBlack};
+    margin-top: 12%;
+    text-align: left;
+`;
+
+const ResponseTime = styled.div`
+    font-size: 0.8em;
+    color: ${colors.richBlack};
+    margin-top: 12%;
+    text-align: right;
+`;
+
+const RequestContent = styled.div`
+    color: ${colors.white};
+    margin: 2%;
+    width: 100%;
+    text-align: right;
+`;
+
+const ResponseContent = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: ${colors.white};
+    text-align: left;
+`;
+
+const FileName = styled.span`
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    flex-grow: 1;
+    margin-right: 10px;
+`;
+
+const DownloadButton = styled(Button)`
+    background-color: ${colors.charcoalBlack};
+    color: ${colors.paleBlue};
+    border: none;
+    padding: 0.5rem 1rem;
+    
+    &&&:hover {
+        background-color: ${colors.paleBlue};
+        color: ${colors.charcoalBlack};
+    }
+    
+    &&& {
+        border-radius: 2rem;
+    }
 `;
