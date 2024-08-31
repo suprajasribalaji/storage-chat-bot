@@ -23,4 +23,4 @@ const storage = getStorage(app);
 const googleAuthProvider = new GoogleAuthProvider();
 const githubAuthProvider = new GithubAuthProvider();
 
-export { auth, document, storage, googleAuthProvider, githubAuthProvider };
+export { app, auth, document, storage, googleAuthProvider, githubAuthProvider };

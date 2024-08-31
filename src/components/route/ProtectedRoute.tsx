@@ -1,18 +1,18 @@
 import { ReactNode } from "react";
-import { Navigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import { Spin } from "antd";
+import UnauthorizedUserPage from "../../pages/UnauthorizedUserPage";
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const currentUser = useSelector((state: RootState) => state.auth.currentUser);
   const isLoading = useSelector((state: RootState) => state.auth.isLoading);
-  const location = useLocation();
 
-  console.log(" =======>>>> ", 'current user in protected route: ', currentUser, ' ; loading: ', isLoading);
+  console.log(" =======>>>> ", 'current user: ', currentUser, ' ; loading: ', isLoading);
   
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <div><Spin spinning = {isLoading}/></div>;
   
-  if(!currentUser) return <Navigate to="/login" state={{from: location}} replace/>;
+  if(!currentUser) return <UnauthorizedUserPage />;
   
   return children;
 };
