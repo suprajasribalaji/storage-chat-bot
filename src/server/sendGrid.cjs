@@ -1,9 +1,9 @@
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config({ path: '../../.env' });
 const express = require('express');
 const cors = require('cors');
 const sendgrid = require('@sendgrid/mail');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 const SENDGRID_API_KEY = process.env.REACT_SENDGRID_API_KEY;
 const SENDGRID_TEMPLATE_ID = process.env.REACT_SENDGRID_TEMPLATE_ID;
 
