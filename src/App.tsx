@@ -7,8 +7,6 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 import HomePage from "./pages/HomePage";
 import { AuthProvider } from "./redux/slices/auth/AuthProvider";
-import HomePage from "./pages/HomePage";
-import { AuthProvider } from "./redux/slices/auth/AuthProvider";
 
 function App() {
   return (
