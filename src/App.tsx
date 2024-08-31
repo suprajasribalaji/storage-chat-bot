@@ -2,11 +2,11 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AccessPage from "./pages/AccessPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
-import ProtectedRoute from "./routes/ProtectedRoute";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 import HomePage from "./pages/HomePage";
 import { AuthProvider } from "./redux/slices/auth/AuthProvider";
+import ProtectedRoute from "./components/route/ProtectedRoute";
 
 function App() {
   return (
