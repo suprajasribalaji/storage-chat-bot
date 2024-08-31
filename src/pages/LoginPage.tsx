@@ -20,7 +20,6 @@ type FieldType = {
   
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
   console.log('Failed:', errorInfo);
-  console.log('Failed:', errorInfo);
 };
 
 
@@ -209,7 +208,6 @@ const LoginPageBackground1 = styled.div`
 
 const LoginPageBackground2 = styled.div`
     background-color: ${colors.lightGray};
-    background-color: ${colors.lightGray};
     height: 100%;
     width: 50%;
     display: flex;
@@ -225,7 +223,6 @@ const LoginPageContent = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: ${colors.charcoalBlack};
     color: ${colors.charcoalBlack};
 `;
 
@@ -247,7 +244,6 @@ const LoginPageSubtitle = styled.div`
 
 const StyledSubtitle = styled.div`
     font-size: 0.9rem;
-    color: ${colors.ashGray};
     color: ${colors.ashGray};
 `;
 
@@ -285,19 +281,14 @@ const StyledCheckbox = styled(Checkbox)`
   .ant-checkbox-inner {
     border-color: ${colors.black};
     background-color: ${colors.white};
-    border-color: ${colors.black};
-    background-color: ${colors.white};
   }
 
   .ant-checkbox-checked .ant-checkbox-inner {
     border-color: ${colors.raisinBlack};
     background-color: ${colors.white};
-    border-color: ${colors.raisinBlack};
-    background-color: ${colors.white};
   }
 
   .ant-checkbox-checked .ant-checkbox-inner::after {
-    border-color: ${colors.raisinBlack};
     border-color: ${colors.raisinBlack};
   }
 
@@ -305,14 +296,10 @@ const StyledCheckbox = styled(Checkbox)`
   &&&:focus .ant-checkbox-inner {
     border-color: ${colors.black};
     background-color: ${colors.white};
-    border-color: ${colors.black};
-    background-color: ${colors.white};
   }
 
   &&&:hover .ant-checkbox-checked .ant-checkbox-inner,
   &&&:focus .ant-checkbox-checked .ant-checkbox-inner {
-    border-color: ${colors.raisinBlack};
-    background-color: ${colors.white};
     border-color: ${colors.raisinBlack};
     background-color: ${colors.white};
   }
@@ -327,7 +314,6 @@ const RememberForgotPasswordButton = styled(Button)`
   color: ${colors.richBlack};
   border: none;
   &&&:hover {
-    color: ${colors.semiTransparentBlack};
     color: ${colors.semiTransparentBlack};
   }
 `;
@@ -346,12 +332,9 @@ const StyledLoginButton = styled(Button)`
   height: 5.5vh;
   border-radius: 12px;
   background-color: ${colors.raisinBlack};
-  background-color: ${colors.raisinBlack};
   border: none;
   font-weight: bold;
   &&&:hover {
-    background-color: ${colors.white};
-    color: ${colors.raisinBlack};
     background-color: ${colors.white};
     color: ${colors.raisinBlack};
   }
@@ -360,11 +343,9 @@ const StyledLoginButton = styled(Button)`
 const StyledThirdPartyLoginButton = styled(Button)`
   .anticon {
     color: ${colors.white};
-    color: ${colors.white};
   }
 
   &&&:hover, &&&:focus {
-    background-color: ${colors.white};
     background-color: ${colors.white};
     .anticon {
       color: inherit;
@@ -382,10 +363,8 @@ const StyledThirdPartyLoginButton = styled(Button)`
 
 const StyledGoogleButton = styled(StyledThirdPartyLoginButton)`
   background-color: ${colors.tomatoRed};
-  background-color: ${colors.tomatoRed};
   &&&:hover, &&&:focus {
     .anticon {
-        color: ${colors.tomatoRed};
         color: ${colors.tomatoRed};
     }
   } 
@@ -396,8 +375,6 @@ const StyledGithubButton = styled(StyledThirdPartyLoginButton)`
   color: ${colors.white};
 
   &&&:hover, &&&:focus {
-    background-color: ${colors.white};
-    color: ${colors.black};
     background-color: ${colors.white};
     color: ${colors.black};
   }
@@ -430,7 +407,6 @@ const StyledSignupButton = styled(Button)`
   font-size: 100%;
   font-weight: bold;
   &&&:hover {
-    color: ${colors.semiAshGray};
     color: ${colors.semiAshGray};
   }
 `;

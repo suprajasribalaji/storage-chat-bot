@@ -12,6 +12,7 @@ import ProfileSettingsModal from "../components/modal/ProfileSettingsModal";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { requestUserLogout } from "../redux/slices/logout";
 import WallPaper from "../assets/wallpaper/chat-wp.webp";
+import UploadFileModal from "../components/modal/UploadFileModal";
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -23,6 +24,7 @@ const HomePage = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
+    const [isUploadFileModalOpen, setIsUploadFileModalOpen] = useState<boolean>(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState<string>('');
     const webSocket = useRef<WebSocket | null>(null);
@@ -116,6 +118,10 @@ const HomePage = () => {
       }
     };
 
+    const handleUploadButton = () => {
+      setIsUploadFileModalOpen(true);
+    };
+
     return (
          <StyledHomePage>
       <HomePageNavBar>
@@ -126,13 +132,9 @@ const HomePage = () => {
           <CircleButton />
         </Dropdown>
       </HomePageNavBar>
-      <ProfileSettingsModal
-        isModalOpen={isProfileModalOpen}
-        setIsModalOpen={setIsProfileModalOpen}
-      />
       <Content ref={contentRef}>
         {messages.map((msg, index) => (
-          <Message key={index} isCurrentUser={true}> {/* Update condition as per your logic */}
+          <Message key={index} isCurrentUser={true}>
             <UserMessage>{msg.content}</UserMessage>
           </Message>
         ))}
@@ -147,10 +149,18 @@ const HomePage = () => {
             onKeyPress={handleKeyPress}
             autoSize={{ minRows: 1, maxRows: 6 }}
           />
-          <UploadButton icon={<UploadIcon />} />
+          <UploadButton icon={<UploadIcon />} onClick={handleUploadButton}/>
           <SendButton icon={<SendIcon />} onClick={handleSendButton}/>
         </ChatBoxInput>
       </HomePageContent>
+      <ProfileSettingsModal
+        isModalOpen={isProfileModalOpen}
+        setIsModalOpen={setIsProfileModalOpen}
+      />
+      <UploadFileModal
+        isModalOpen={isUploadFileModalOpen}
+        setIsModalOpen={setIsUploadFileModalOpen}
+      />
     </StyledHomePage>
     );
 };
