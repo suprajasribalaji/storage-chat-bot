@@ -10,9 +10,9 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import ProfileSettingsModal from "../components/modal/ProfileSettingsModal";
 import { useAppDispatch } from "../hooks/useAppDispatch";
-import { requestUserLogout } from "../redux/slices/logout";
 import WallPaper from "../assets/wallpaper/chat-wp.webp";
 import UploadFileModal from "../components/modal/UploadFileModal";
+import { requestUserLogout } from "../redux/slices/user/logout";
 
 type MenuItem = Required<MenuProps>['items'][number];
 

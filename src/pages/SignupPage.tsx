@@ -6,9 +6,9 @@ import type { FormProps } from 'antd';
 import { Button, Divider, Form, Input, message } from 'antd';
 import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { requestUserLoginByGithub } from "../redux/slices/login";
 import { useAppDispatch } from "../hooks/useAppDispatch";
-import { requestUserSignup } from "../redux/slices/signup";
+import { requestUserSignup } from "../redux/slices/user/signup";
+import { requestUserLoginByGithub } from "../redux/slices/user/login";
 
 type FieldType = {
     email: string;

@@ -1,16 +1,33 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, githubAuthProvider, googleAuthProvider } from '../../../config/firebase.config';
-import { setCurrentUser } from '../auth';
+import { setCurrentUser } from '../auth/auth';
+import { addNewUser } from './signup';
+import { Actions } from '../../actions/actionPayload';
+import { RequestUserCredentialsPayload } from './userPayload';
+
+const handleUserLogin = async (userCredential: any, provider: string | null, thunkAPI: any) => {
+  const user = userCredential.user;
+  if (!user) return thunkAPI.rejectWithValue("User not found");
+
+  const profilePicture = user.photoURL;
+  thunkAPI.dispatch(setCurrentUser({ uid: user.uid, email: user.email, profilePictureURL: profilePicture, user: user }));
+
+  if (provider) {
+    await addNewUser({ uid: user.uid, mail: user.email, provider });
+  }
+
+  return { uid: user.uid, email: user.email, profilePictureURL: profilePicture, user: user };
+};
 
 export const requestUserLogin = createAsyncThunk(
-  'login/requestUserLogin',
-  async ({ email, password }: { email: string; password: string }, thunkAPI) => {
+  Actions.requestUserLogin,
+  async ({ email, password }: RequestUserCredentialsPayload, thunkAPI) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      thunkAPI.dispatch(setCurrentUser({ uid: user.uid, email: user.email }));
-      return { uid: user.uid, email: user.email };
+      console.log('user ----------<<<<<<<<<<< ', userCredential.user);
+      
+      return await handleUserLogin(userCredential, null, thunkAPI);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
@@ -18,11 +35,11 @@ export const requestUserLogin = createAsyncThunk(
 );
 
 export const requestUserLoginByGoogle = createAsyncThunk(
-  'login/requestUserLoginByGoogle',
+  Actions.requestUserLoginByGoogle,
   async (_, thunkAPI) => {
     try {
       const userCredential = await signInWithPopup(auth, googleAuthProvider);
-      return userCredential.user;
+      return await handleUserLogin(userCredential, 'google', thunkAPI);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
@@ -30,17 +47,16 @@ export const requestUserLoginByGoogle = createAsyncThunk(
 );
 
 export const requestUserLoginByGithub = createAsyncThunk(
-  'login/requestUserLoginByGoogle',
+  Actions.requestUserLoginByGithub,
   async (_, thunkAPI) => {
     try {
       const userCredential = await signInWithPopup(auth, githubAuthProvider);
-      return userCredential.user;
+      return await handleUserLogin(userCredential, 'github', thunkAPI);
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
   }
 );
-
 
 const LoginSlice = createSlice({
   name: 'login',

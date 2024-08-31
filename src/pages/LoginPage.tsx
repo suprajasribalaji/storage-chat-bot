@@ -9,7 +9,7 @@ import { useState } from "react";
 import ForgotPasswordModal from "../components/modal/ForgotPasswordModal";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../hooks/useAppDispatch";
-import { requestUserLogin, requestUserLoginByGithub, requestUserLoginByGoogle } from "../redux/slices/login";
+import { requestUserLogin, requestUserLoginByGithub, requestUserLoginByGoogle } from "../redux/slices/user/login";
 
 
 type FieldType = {

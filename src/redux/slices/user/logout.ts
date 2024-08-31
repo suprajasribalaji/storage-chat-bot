@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../../config/firebase.config';
-import { clearCurrentUser } from '../auth';
+import { clearCurrentUser } from '../auth/auth';
+import { Actions } from '../../actions/actionPayload';
 
 export const requestUserLogout = createAsyncThunk(
-  'logout/requestUserLogout',
+  Actions.requestUserLogout,
   async (_, thunkAPI) => {
     try {
       await signOut(auth);
