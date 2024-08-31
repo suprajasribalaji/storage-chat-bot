@@ -135,8 +135,7 @@ app.post('/send-subscription-invoice', async (req, res) => {
         
         const response = await sendgrid.send(message);
         console.log('SendGrid response:', response);
-        res.status(202).send('Email sent successfully!');
-        
+        res.status(202).send('Email sent successfully!'); 
     } catch (error) {
         console.error('Error sending email:', error.response ? error.response.body : error.message);
         res.status(500).json({ message: 'Error sending email', error: error.message });
