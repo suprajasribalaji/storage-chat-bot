@@ -1,21 +1,54 @@
-import { Button } from 'antd';
-import React, { useState } from 'react';
+import { Button, message } from 'antd';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../assets/themes/color';
+import { auth, document } from '../../config/firebase.config';
+import { collection, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { Profile } from '../../utils/utils';
 
-const ProfileSettingsContentModal: React.FC = () => {
-    const [profile, setProfile] = useState({
-        fullName: 'Supraja Sri',
-        nickName: 'Supraja',
-        email: 'suprajasrirb@gmail.com',
-    });
+type ProfileSettingsContentModalProps = {
+    profile: Profile;
+    setProfile: React.Dispatch<React.SetStateAction<Profile>>;
+}
 
+const ProfileSettingsContentModal = ( props: ProfileSettingsContentModalProps ) => {
+    const { profile, setProfile } = props;
+    const [isChanged, setIsChanged] = useState<boolean>(false);
+    
     const handleChange = (e: any) => {
         const { name, value } = e.target;
+        setIsChanged(true);
         setProfile({
             ...profile,
             [name]: value,
         });
+    };
+
+    const handleUpdateButton = async () => {
+        if(!auth.currentUser?.email){
+            message.error('User is not logged in!');
+            return;
+        }
+        try {
+            setIsChanged(false);
+            const userQuery = query(collection(document, "Users"), where("email", "==", profile.email));
+            const querySnapshot = await getDocs(userQuery);
+            if (!querySnapshot.empty) {
+                const userDoc = querySnapshot.docs[0];
+                const userRef = userDoc.ref; 
+                await updateDoc(userRef, {
+                    full_name: profile.full_name,
+                    nick_name: profile.nick_name,
+                });
+                message.success('Profile updated successfully!');                
+            } else {
+                message.error('User not found');
+                console.log("No user found with that email.");
+            }
+        } catch (error) {
+            console.log(error);
+            setIsChanged(false);
+        }
     };
 
     return (
@@ -24,8 +57,8 @@ const ProfileSettingsContentModal: React.FC = () => {
                 <Label>Full Name</Label>
                 <Input
                     type="text"
-                    name="fullName"
-                    value={profile.fullName}
+                    name="full_name"
+                    value={profile.full_name}
                     onChange={handleChange}
                 />
             </ProfileField>
@@ -33,8 +66,8 @@ const ProfileSettingsContentModal: React.FC = () => {
                 <Label>Nick Name</Label>
                 <Input
                     type="text"
-                    name="nickName"
-                    value={profile.nickName}
+                    name="nick_name"
+                    value={profile.nick_name}
                     onChange={handleChange}
                 />
             </ProfileField>
@@ -48,13 +81,14 @@ const ProfileSettingsContentModal: React.FC = () => {
                 />
             </ProfileField>
             <UpdateButton>
-                <StyledUpdateButton>Update</StyledUpdateButton>
+                <StyledUpdateButton onClick={handleUpdateButton} disabled={!isChanged}>Update</StyledUpdateButton>
             </UpdateButton>
         </ProfileSettingsContent>
     );
 }
 
 export default ProfileSettingsContentModal;
+
 
 const ProfileSettingsContent = styled.div`
     padding-left: 2%;
@@ -76,7 +110,7 @@ const Input = styled.input`
     border-radius: 4px;
     border: none;
     outline: none;
-    background-color: ${({ disabled }) => (disabled ? '#f5f5f5' : 'white')};
+    background-color: ${({ disabled }) => (disabled ? '#f5f5f5' : 'white')}; // dont use hexa values directly 
 
     &:focus {
         border: none;
@@ -93,7 +127,7 @@ const StyledUpdateButton = styled(Button)`
     border: none;
     color: ${colors.white};
 
-    &&&:hover, &&&:focus {
+    &&&:hover {
         color: ${colors.wineRed};
         background-color: ${colors.white};
     }

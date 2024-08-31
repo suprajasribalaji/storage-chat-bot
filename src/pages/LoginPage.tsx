@@ -10,31 +10,15 @@ import ForgotPasswordModal from "../components/modal/ForgotPasswordModal";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { requestUserLogin, requestUserLoginByGithub, requestUserLoginByGoogle } from "../redux/slices/user/login";
+import { getEmailValidationRules, getPasswordValidationRules } from "../helpers/helpers";
+import { FieldType } from "../utils/utils";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { auth, document } from "../config/firebase.config";
+import axios from "axios";
 
-
-type FieldType = {
-    email: string;
-    password: string;
-    remember: string;
-};
-  
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
   console.log('Failed:', errorInfo);
-};
-
-
-const getEmailValidationRules = () => {
-  return [
-      { required: true, message: 'Please input your email!' },
-      { pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Please enter a valid email address!' },
-  ];
-};
-
-const getPasswordValidationRules = () => {
-  return [
-      { required: true, message: 'Please input your password!' },
-      { pattern: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/, message: 'Password must be min 8 and max 16 valid characters! Includes at least one uppercase letter, one lowercase letter, one digit, and one special character' },
-  ];
+  console.log('Failed:', errorInfo);
 };
 
 const LoginPage = () => {
@@ -55,7 +39,25 @@ const LoginPage = () => {
           localStorage.setItem('password', password);
         }
         const response = await dispatch(requestUserLogin({email, password})).unwrap();
-        navigate('/home');
+        console.log('in login page: =======-----<<<<< ', response);
+       
+        const userQuery = query(collection(document, "Users"), where("email", "==", auth.currentUser?.email));
+        const querySnapshot = await getDocs(userQuery);
+        
+        if (!querySnapshot.empty) {
+          const userDoc = querySnapshot.docs[0];
+          const userData = userDoc.data();
+          const response = await axios.post('http://localhost:5001/generate-send-otp', { email: userData.email, nickName: userData.nick_name });
+          console.log('otp generate and send: ', response);
+          
+          if(userData.is_2fa_enabled) {
+            navigate('/verify-user')
+          } else {
+            navigate('/home');
+          }
+        } else {
+          navigate('/home');
+        }
         console.log(response, "this is the response ====>");
         message.success('Logged in successfully!');
       } catch (error) {
@@ -64,24 +66,14 @@ const LoginPage = () => {
       }
     };
 
-    const handleGoogleProviderButton = async () =>{
+    const handleLoginByProvider = async (provider: string) => {
       try {
-        const response = await dispatch(requestUserLoginByGoogle());
+        let response;
+        if(provider==='google') response = await dispatch(requestUserLoginByGoogle());
+        if(provider==='github') response = await dispatch(requestUserLoginByGithub());
         navigate('/home');
-        console.log(response, " gmail provider respose ----------");
+        console.log(response, " : provider respose ----------");
         message.success('Logged in using gmail successfully!');
-      } catch (error) {
-        console.error('Login failed:', error);
-        message.error('Login failed. Please check your credentials.');
-      }
-    };
-
-    const handleGithubProviderButton = async () =>{
-      try {
-        const response = await dispatch(requestUserLoginByGithub());
-        navigate('/home');
-        console.log(response, " github provider respose ----------");
-        message.success('Logged in using github successfully!');
       } catch (error) {
         console.error('Login failed:', error);
         message.error('Login failed. Please check your credentials.');
@@ -116,7 +108,7 @@ const LoginPage = () => {
                       onFinishFailed={onFinishFailed as any}
                     >
                       <Form.Item<FieldType>
-                        label="Enter your room's email"
+                        label="Enter your registered email"
                         name="email"
                         rules={getEmailValidationRules()}
                       >
@@ -126,7 +118,7 @@ const LoginPage = () => {
                       </Form.Item>
 
                       <Form.Item<FieldType>
-                        label="Enter your storage password"
+                        label="Enter your password correctly"
                         name="password"
                         rules={getPasswordValidationRules()}
                       >
@@ -171,8 +163,8 @@ const LoginPage = () => {
                       </StyledDivider>
 
                       <LoginButtonGroups>
-                        <StyledGoogleButton icon={<GoogleOutlined />} onClick={handleGoogleProviderButton}/>
-                        <StyledGithubButton icon={<GithubOutlined />} onClick={handleGithubProviderButton}/>
+                        <StyledGoogleButton icon={<GoogleOutlined />} onClick={() => handleLoginByProvider('google')}/>
+                        <StyledGithubButton icon={<GithubOutlined />} onClick={() => handleLoginByProvider('github')}/>
                       </LoginButtonGroups>
 
                       <NewAccount>
@@ -194,46 +186,46 @@ const LoginPage = () => {
 export default LoginPage
 
 const StyledLoginPage = styled.div`
-    width: 100%;
-    height: 100vh;
-    display: flex;
+  width: 100%;
+  height: 100vh;
+  display: flex;
 `;
 
-const LoginPageBackground1 = styled.div`
-    background-image: url(${BackgroundImage});
-    background-size: cover;
-    height: 100%;
-    width: 50%;
+const PageDivision = styled.div`
+  height: 100%;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
-const LoginPageBackground2 = styled.div`
-    background-color: ${colors.lightGray};
-    height: 100%;
-    width: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+const LoginPageBackground1 = styled(PageDivision)`
+  background-image: url(${BackgroundImage});
+  background-size: cover;
+`;
+
+const LoginPageBackground2 = styled(PageDivision)`
+  background-color: ${colors.lightGray};
 `;
 
 const LoginPageContent = styled.div`
-    margin-top: -4%;
-    width: 80%;
-    max-width: 500px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: ${colors.charcoalBlack};
+  margin-top: -4%;
+  width: 80%;
+  max-width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: ${colors.charcoalBlack};
 `;
 
 const LoginPageTitle = styled.div`
-    width: 100%;
+  width: 100%;
 `;
 
 const StyledTitle = styled(Title)`
-    font-size: 3.5rem !important;
-    font-weight: 700 !important;
-    margin-top: 2%;
+  font-size: 3.5rem !important;
+  font-weight: 700 !important;
 `;
 
 const LoginPageSubtitle = styled.div`
@@ -307,7 +299,7 @@ const StyledCheckbox = styled(Checkbox)`
 
 const SaveCredentials = styled.div`
   color: ${colors.charcoalBlack};
-  margin-left: 5px;
+  margin-left: 0.5em;
 `;
 
 const RememberForgotPasswordButton = styled(Button)`
@@ -340,7 +332,7 @@ const StyledLoginButton = styled(Button)`
   }
 `;
 
-const StyledThirdPartyLoginButton = styled(Button)`
+const StyledThirdPartyButton = styled(Button)`
   .anticon {
     color: ${colors.white};
   }
@@ -355,13 +347,13 @@ const StyledThirdPartyLoginButton = styled(Button)`
   &&& {
     width: 27%;
     height: 5.8vh;
-    border-radius: 14px;
+    border-radius: 1.2em;
     border: none;
     font-weight: bold;
   }
 `;
 
-const StyledGoogleButton = styled(StyledThirdPartyLoginButton)`
+export const StyledGoogleButton = styled(StyledThirdPartyButton)`
   background-color: ${colors.tomatoRed};
   &&&:hover, &&&:focus {
     .anticon {
@@ -370,7 +362,7 @@ const StyledGoogleButton = styled(StyledThirdPartyLoginButton)`
   } 
 `;
 
-const StyledGithubButton = styled(StyledThirdPartyLoginButton)`
+export const StyledGithubButton = styled(StyledThirdPartyButton)`
   background-color: ${colors.black};
   color: ${colors.white};
 
@@ -380,17 +372,18 @@ const StyledGithubButton = styled(StyledThirdPartyLoginButton)`
   }
 `;
 
-const LoginButtonGroups = styled.div`
+export const CenteringTheDiv = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
+`;
+
+const LoginButtonGroups = styled(CenteringTheDiv)`
   gap: 6%;
   margin-top: -1.5%;
 `;
 
-const NewAccount = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+const NewAccount = styled(CenteringTheDiv)`
   width: 100%;
   font-size: 118%;
   margin-top: 6%;
@@ -403,7 +396,7 @@ const SignupButton = styled.div`
 `;
 
 const StyledSignupButton = styled(Button)`
-  color: rgba(93, 93, 91);
+  color: ${colors.ashGray};
   font-size: 100%;
   font-weight: bold;
   &&&:hover {

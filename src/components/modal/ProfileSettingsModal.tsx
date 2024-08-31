@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
-import { Menu, Modal } from 'antd';
+import { useEffect, useState } from 'react';
+import { Menu, Modal, Spin } from 'antd'; // Add Spin for loading indicator
 import { FaUserLarge } from "react-icons/fa6";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { RxUpdate } from "react-icons/rx";
 import { colors } from '../../assets/themes/color';
 import styled from 'styled-components';
 import type { MenuProps } from 'antd';
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { auth, document } from '../../config/firebase.config';
 import ProfileSetttingsContentModal from './ProfileSetttingsContentModal';
 import AccountSettingsContentModal from './AccountSettingsContentModal';
 import SubscriptionSettingsContentModal from './SubscriptionSettingsContentModal';
+import { Profile } from '../../utils/utils';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -23,40 +26,101 @@ const items: MenuItem[] = [
     { key: '3', icon: <RxUpdate />, label: 'Subscription' },    
 ];
 
-const ProfileSettingsModal: React.FC<ProfileSettingsModalProps> = ({ isModalOpen, setIsModalOpen }) => {
+const ProfileSettingsModal = (props: ProfileSettingsModalProps) => {
+    const { isModalOpen, setIsModalOpen } = props;
     const [selectedKey, setSelectedKey] = useState<string>('1');
+    const [profile, setProfile] = useState<Profile>({
+        full_name: '',
+        nick_name: '',
+        email: '',
+    });
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        if (isModalOpen && selectedKey === '1') {
+            getUserByEmail();
+        }
+    }, [isModalOpen, selectedKey]);
 
     const handleMenuClick = (e: { key: string }) => {
         setSelectedKey(e.key);
     };
 
+    const getUserByEmail = async () => {
+        setLoading(true);
+        try {
+            const userQuery = query(collection(document, "Users"), where("email", "==", auth.currentUser?.email));
+            const querySnapshot = await getDocs(userQuery);
+            if (!querySnapshot.empty) {
+                querySnapshot.forEach((doc) => {
+                    const userData = doc.data() as Profile;
+                    setProfile({
+                        full_name: userData.full_name || '',
+                        nick_name: userData.nick_name || '',
+                        email: userData.email || '',
+                    });
+                });
+            } else {
+                console.log("No user found with that email.");
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
-    <StyledProfileSettingsModal
-        title="Settings"
-        centered
-        open={isModalOpen}
-        onOk={() => setIsModalOpen(false)}
-        onCancel={() => setIsModalOpen(false)}
-        footer={null}
-    >
-        <ProfileSettingsModalContent>
-            <ProfileSettingsModalContentMenu>
-            <StyledMenu
-                defaultSelectedKeys={['1']}
-                defaultOpenKeys={['1']}
-                items={items}
-                selectedKeys={[selectedKey]}
-                onClick={handleMenuClick}
-            />
-            </ProfileSettingsModalContentMenu>
-            <ProfileSettingsModalContentDetails>
-                {selectedKey === '1' && <ProfileSetttingsContentModal />}
-                {selectedKey === '2' && <AccountSettingsContentModal />}
-                {selectedKey === '3' && <SubscriptionSettingsContentModal />}
-            </ProfileSettingsModalContentDetails>
-        </ProfileSettingsModalContent>
-    </StyledProfileSettingsModal>
-  );
+        <StyledProfileSettingsModal
+            title="Settings"
+            centered
+            open={isModalOpen}
+            onOk={() => setIsModalOpen(false)}
+            onCancel={() => setIsModalOpen(false)}
+            footer={null}
+        >
+    {/*use same case use isLoading  */}
+            {loading ? (
+                <Spin />
+            ) : (
+                <ProfileSettingsModalContent>
+                    <ProfileSettingsModalContentMenu>
+                        <StyledMenu
+                            defaultSelectedKeys={['1']}
+                            // dont read like ['1'] instead : menuItems[0].key
+                            defaultOpenKeys={['1']}
+                            items={items}
+                            selectedKeys={[selectedKey]}
+                            onClick={handleMenuClick}
+                        />
+                    </ProfileSettingsModalContentMenu>
+                    <ProfileSettingsModalContentDetails>
+                        {
+                            selectedKey === '1' && 
+                            <ProfileSetttingsContentModal 
+                                profile={profile}
+                                setProfile={setProfile} 
+                            />
+                        }
+                        {
+                            selectedKey === '2' && 
+                            <AccountSettingsContentModal
+                                profile={profile}
+                                setSelectedKey={setSelectedKey}
+                            />
+                        }
+                        {
+                            selectedKey === '3' && 
+                            <SubscriptionSettingsContentModal
+                            setIsModalOpen={setIsModalOpen}
+                            setSelectedKey={setSelectedKey}
+                            />
+                        }
+                    </ProfileSettingsModalContentDetails>
+                </ProfileSettingsModalContent>
+            )}
+        </StyledProfileSettingsModal>
+    );
 };
 
 export default ProfileSettingsModal;

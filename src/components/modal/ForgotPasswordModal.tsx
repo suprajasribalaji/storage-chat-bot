@@ -4,43 +4,37 @@ import type { FormProps } from 'antd';
 import styled from 'styled-components';
 import { colors } from '../../assets/themes/color';
 import axios from 'axios';
+import { FieldType } from '../../utils/utils';
+import { getEmailValidationRules } from '../../helpers/helpers';
 
 type RetrieveCredentialsModalProps = {
     isModalOpen: boolean;
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-type FieldType = {
-    email: string;
-}
-
-const getEmailValidationRules = () => {
-    return [
-        { required: true, message: 'Please input your email!' },
-        { pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Please enter a valid email address!' },
-    ];
-};
-
-const RetrieveCredentialsModal: React.FC<RetrieveCredentialsModalProps> = ({ isModalOpen, setIsModalOpen }) => {
-
+const RetrieveCredentialsModal = ( props: RetrieveCredentialsModalProps ) => {
+    const { isModalOpen, setIsModalOpen } = props;
+    
     const handleSendEmail: FormProps<FieldType>['onFinish'] = async (value) => {
         const { email } = value;
         try {
-            const response = await axios.post('http://localhost:5001/send-credentials', { to: email });
-            if (response.status === 200) {
+            const resetPasswordLink = await axios.post('http://localhost:5001/reset-password', { email: email });
+            const emailTriggerForResetPassword = await axios.post('http://localhost:5001/send-reset-password-link', { to: email, link: resetPasswordLink});
+            console.log('response: ', emailTriggerForResetPassword);
+            if(emailTriggerForResetPassword.status === 202) {
                 setIsModalOpen(false);
                 notification.success({
                     message: 'Success',
                     description: 'Email Sent Successfully!',
                     placement: 'topRight',
                 });
-            } else {
+            } else { 
                 notification.error({
-                    message: 'Error',
-                    description: 'Failed to send email!',
-                    placement: 'topRight',
-                });
-                console.log(response.status + ": " + response.statusText);
+                message: 'Error',
+                description: 'Failed to send email!',
+                placement: 'topRight',
+            });
+            console.log(emailTriggerForResetPassword.status + ": " + emailTriggerForResetPassword.statusText);
             }
         } catch (error) {
             notification.error({
@@ -74,7 +68,8 @@ const RetrieveCredentialsModal: React.FC<RetrieveCredentialsModalProps> = ({ isM
                         >
                             <StyledInput placeholder='Enter your registered email' />
                         </Form.Item>
-                        <Form.Item style={{ marginLeft: '8px' }}>
+                        <Form.Item style={{ marginLeft: '8px' }}> 
+                            {/* no inline css no px only rem */}
                             <StyledButton htmlType='submit'>Send</StyledButton>
                         </Form.Item>
                     </FlexContainer>

@@ -6,31 +6,15 @@ import type { FormProps } from 'antd';
 import { Button, Divider, Form, Input, message } from 'antd';
 import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { requestUserLoginByGithub, requestUserLoginByGoogle } from "../redux/slices/user/login";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { requestUserSignup } from "../redux/slices/user/signup";
-import { requestUserLoginByGithub } from "../redux/slices/user/login";
-
-type FieldType = {
-    email: string;
-    password: string;
-};
+import { FieldType } from "../utils/utils";
+import { getEmailValidationRules, getPasswordValidationRules } from "../helpers/helpers";
+import { CenteringTheDiv, StyledGithubButton, StyledGoogleButton } from "./LoginPage";
 
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
     console.log('Failed:', errorInfo);
-};
-
-const getEmailValidationRules = () => {
-    return [
-        { required: true, message: 'Please input your email!' },
-        { pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Please enter a valid email address!' },
-    ];
-};
-
-const getPasswordValidationRules = () => {
-    return [
-        { required: true, message: 'Please input your password!' },
-        { pattern: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/, message: 'Password must be min 8 and max 16 valid characters! Includes at least one uppercase letter, one lowercase letter, one digit, and one special character' },
-    ];
 };
 
 const SignupPage = () => {
@@ -49,31 +33,22 @@ const SignupPage = () => {
             console.error('Login failed:', error);
             message.error('Login failed. Please check your credentials.');
         }
-      };
-
-    const handleGoogleProviderButton = async () =>{
+    };
+    
+    const handleLoginByProvider = async (provider: string) => {
         try {
-          const response = await dispatch(requestUserLoginByGithub());
-          navigate('/home');
-          console.log(response, " github provider respose ----------");
-          message.success('Logged in using github successfully!');
+            let response;
+            if(provider==='google') response = await dispatch(requestUserLoginByGoogle());
+            if(provider==='github') response = await dispatch(requestUserLoginByGithub());
+            navigate('/home');
+            console.log(response, " : provider respose ----------");
+            message.success('Logged in using gmail successfully!');
         } catch (error) {
-          console.error('Login failed:', error);
-          message.error('Login failed. Please check your credentials.');
+            console.error('Login failed:', error);
+            message.error('Login failed. Please check your credentials.');
         }
-      };
+    };
 
-    const handleGithubProviderButton = async () =>{
-        try {
-          const response = await dispatch(requestUserLoginByGithub());
-          navigate('/home');
-          console.log(response, " github provider respose ----------");
-          message.success('Logged in using github successfully!');
-        } catch (error) {
-          console.error('Login failed:', error);
-          message.error('Login failed. Please check your credentials.');
-        }
-      };
     return (
         <StyledSigupPage>
             <SignupPageContent>
@@ -145,8 +120,8 @@ const SignupPage = () => {
                             </SignupPageDivider>
 
                             <SignupButtonGroups>
-                                <StyledGoogleButton icon={<GoogleOutlined />} onClick={handleGoogleProviderButton}/>
-                                <StyledGithubButton icon={<GithubOutlined />} onClick={handleGithubProviderButton}/>
+                                <StyledGoogleSignupButton icon={<GoogleOutlined />} onClick={() => handleLoginByProvider('google')}/>
+                                <StyledGithubSignupButton icon={<GithubOutlined />} onClick={() => handleLoginByProvider('github')}/>
                             </SignupButtonGroups>
                         </StyledSignupPageForm>
                     </StyledForm>
@@ -158,24 +133,18 @@ const SignupPage = () => {
 
 export default SignupPage;
 
-const StyledSigupPage = styled.div`
+const StyledSigupPage = styled(CenteringTheDiv)`
     height: 100vh;
     width: 100%;
     background-image: url(${BackgroundImage});
     background-size: cover;
     background-position: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 `;
 
-const SignupPageContent = styled.div`
+const SignupPageContent = styled(CenteringTheDiv)`
     width: 42%;
     height: 90vh;
-    display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
     border-radius: 30px;
     margin-left: 38%;
     background-color: ${colors.lightSemiTransparentBlack}; 
@@ -183,8 +152,7 @@ const SignupPageContent = styled.div`
 `;
 
 const SignupPageTitle = styled.div`
-    margin-bottom: -1rem;
-    margin-top: -1.8rem;
+    margin: -1.8rem 0 -1rem 0;
     text-align: center;
 `;
 
@@ -195,7 +163,7 @@ const StyledTitle = styled(Title)`
 `;
 
 const SignupPageSubtitle = styled.div`
-    margin-bottom: 2rem;
+    margin: 0.2rem 0 2rem 0;
     text-align: center;
 `;
 
@@ -205,11 +173,9 @@ const StyledSubtitle = styled.div`
     color: ${colors.white};
 `;
 
-const SignupPageForm = styled.div`
+const SignupPageForm = styled(CenteringTheDiv)`
     width: 100%;
-    display: flex;
     flex-direction: column;
-    align-items: center;
 `;
 
 const StyledForm = styled.div`
@@ -241,8 +207,7 @@ const StyledInput = styled(Input)`
 const StyledPasswordInput = styled(StyledInput).attrs({ type: 'password' })``;
 
 const SignupPageDivider = styled.div`
-    margin-top: -8%;
-    margin-bottom: -3%;
+    margin: -8% 0 -3% 0;
 `;
 
 const StyledDivider = styled(Divider)`
@@ -258,10 +223,8 @@ const StyledDividerText = styled.p`
     font-size: 130%;
 `;
 
-const SignupButton = styled.div`
-    margin-bottom: 0.2rem; 
-    display: flex;
-    justify-content: center;
+const SignupButton = styled(CenteringTheDiv)`
+    margin-bottom: 0.2rem;
 `;
 
 const StyledSignupButton = styled(Button)`
@@ -279,55 +242,16 @@ const StyledSignupButton = styled(Button)`
     }
 `;
 
-const SignupButtonGroups = styled.div`
-    display: flex;
-    justify-content: center;
+const SignupButtonGroups = styled(CenteringTheDiv)`
     gap: 6%;
     width: 100%;
 `;
 
-const StyledThirdPartySignupButton = styled(Button)`
-    .anticon {
-        color: ${colors.white};
-    }
-
-    &&&:hover, &&&:focus {
-        background-color: ${colors.white};
-    } 
-
-    &&& {
-        width: 100%;
-        height: 5.8vh;
-        border-radius: 14px;
-        border: none;
-        font-weight: bold;
-    }
+const StyledGoogleSignupButton = styled(StyledGoogleButton)`
+    width: 45% !important;
 `;
 
-const StyledGoogleButton = styled(StyledThirdPartySignupButton)`
-    background-color: ${colors.tomatoRed};
-    &&&:hover, &&&:focus {
-        .anticon {
-            color: ${colors.tomatoRed};
-        }
-    } 
-`;
-
-const StyledGithubButton = styled(StyledThirdPartySignupButton)`
-    background-color: ${colors.black};
-    color: ${colors.white};
-
-    &&&:hover, &&&:focus {
-        background-color: ${colors.white};
-        color: ${colors.black};
-
-        .anticon {
-            color: ${colors.black};
-        }
-    }
-
-    .anticon {
-        color: ${colors.white};
-    }
+const StyledGithubSignupButton = styled(StyledGithubButton)`
+    width: 45% !important;
 `;
 

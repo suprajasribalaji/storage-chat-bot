@@ -1,121 +1,197 @@
-import React, { useState } from "react";
-import styled from "styled-components";
+import { useState } from "react";
+import { Modal, message, Upload, Spin, Button } from "antd";
 import { InboxOutlined } from '@ant-design/icons';
-import { Modal, message, Upload, Button } from 'antd';
-import type { UploadProps, RcFile } from 'antd/es/upload/interface';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { app } from "../../config/firebase.config";
+import styled from "styled-components";
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { auth, document, storage } from '../../config/firebase.config';
+import { colors } from "../../assets/themes/color";
+import { addDoc, collection } from "firebase/firestore";
 
-const storage = getStorage(app);
 const { Dragger } = Upload;
 
 type UploadFileModalProps = {
-  isModalOpen: boolean;
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-};
+    isModalOpen: boolean;
+    setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-const UploadFileModal: React.FC<UploadFileModalProps> = ({ isModalOpen, setIsModalOpen }) => {
-  const [selectedFiles, setSelectedFiles] = useState<RcFile[]>([]);
-  const [uploading, setUploading] = useState(false);
+const UploadFileModal = ( prop: UploadFileModalProps ) => {
+    const { isModalOpen, setIsModalOpen } = prop;
+    const [fileList, setFileList] = useState<any[]>([]);
+    const [uploading, setUploading] = useState(false);
 
-  const handleUpload = async () => {
-    setUploading(true);
-    let success = true;
+    const props = {
+        name: 'file',
+        multiple: true,
+        fileList,
+        beforeUpload: (file: any) => {
+            setFileList((prev) => [...prev, file]);
+            return false;
+        },
+        onRemove: (file: any) => {
+            setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
+        },
+        onDrop(e: any) {
+            console.log('Dropped files', e.dataTransfer.files);
+        },
+    };
 
-    // link generate aagu adha store paniaka
-    try {
-      for (const file of selectedFiles) {
-        const storageRef = ref(storage, `${file.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, file);
-        // await setDoc(do(db, "files", file.name), metadata);
-
-        await new Promise<void>((resolve, reject) => {
-          uploadTask.on(
-            'state_changed',
-            (snapshot) => {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              console.log(`Upload is ${progress}% done`);
-            },
-            (error) => {
-              console.error("Upload failed:", error);
-              message.error(`${file.name} upload failed.`);
-              success = false;
-              reject(error);
-            },
-            async () => {
-              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref); 
-              console.log('url: ', downloadURL);
-              
-              console.log("File available at", downloadURL);
-              message.success(`${file.name} uploaded successfully.`);
-              resolve();
+    const addNewFileDetails = async (fileDownloadURL: string, fileName: string) => {
+        try {
+            const email = auth.currentUser?.email;
+            const uid = auth.currentUser?.uid;
+    
+            if (!email || !uid) {
+                throw new Error("User is not authenticated");
             }
-          );
+    
+            const fileRef = await addDoc(collection(document, "Files"), {
+                user_id: uid,
+                email: email,
+                url: fileDownloadURL,
+                file_detail: {
+                    ext: fileName.split('.').pop() || '',
+                    name: fileName.split('.')[0] || '',
+                }
+            });
+            console.log(fileRef.id, ' ------->>> Document added successfully');
+        } catch (error) {
+            console.log("Error adding file details:", error);
+        }
+    };
+
+    const handleUpload = () => {
+        if (fileList.length === 0) {
+            message.warning('Please select at least one file to upload.');
+            return;
+        }
+
+        setUploading(true);
+        let completedUploads = 0;
+
+        fileList.forEach((file) => {
+            const storageRef = ref(storage, `${auth.currentUser?.email}/${file.name}`);
+            const uploadTask = uploadBytesResumable(storageRef, file);
+
+            uploadTask.on(
+                'state_changed',
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('Upload is ' + progress + '% done');
+                },
+                (error) => {
+                    message.error(`${file.name} file upload failed.`);
+                    console.error('Upload failed:', error);
+                    setUploading(false);
+                },
+                () => {
+                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                        message.success(`${file.name} file uploaded successfully.`);
+                        console.log('File available at', downloadURL);
+                        addNewFileDetails(downloadURL, file.name);
+                        completedUploads++;
+
+                        if (completedUploads === fileList.length) {
+                            setUploading(false);
+                            setIsModalOpen(false);
+                            setFileList([]);                            
+                        }
+                    });
+                }
+            );
         });
-      }
-    } catch (error) {
-      console.error("Error during file upload:", error);
-      message.error('Upload failed.');
-      success = false;
-    } finally {
-      if (success) {
-        setIsModalOpen(false);
-      }
-      setUploading(false);
-    }
-  };
+    };
 
-  const props: UploadProps = {
-    name: 'file',
-    multiple: true,
-    beforeUpload: (file) => {
-      setSelectedFiles(prev => [...prev, file]);
-      return false;
-    },
-    onRemove: (file) => {
-      setSelectedFiles(prev => prev.filter(item => item.uid !== file.uid));
-    },
-    onDrop(e) {
-      console.log('Dropped files', e.dataTransfer.files);
-    },
-  };
-
-  return (
-    <UploadFile>
-      <Modal
-        title='Upload File'
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        footer={[
-          <Button key="cancel" onClick={() => setIsModalOpen(false)}>
-            Cancel
-          </Button>,
-          <Button key="upload" type="primary" onClick={handleUpload} disabled={uploading || selectedFiles.length === 0}>
-            {uploading ? 'Uploading...' : 'Upload'}
-          </Button>,
-        ]}
-      >
-        <StyledDraggerDropper>
-          <Dragger {...props}>
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">Click or drag file to this area to upload</p>
-            <p className="ant-upload-hint">
-              Support for a single or bulk upload. Strictly prohibited from uploading company data or other
-              banned files.
-            </p>
-          </Dragger>
-        </StyledDraggerDropper>
-      </Modal>
-    </UploadFile>
-  );
-};
+    return (
+        <StyledModal
+            title='Upload File'
+            open={isModalOpen}
+            onCancel={() => {
+                if (!uploading) {
+                    setIsModalOpen(false);
+                    setFileList([]);
+                }
+            }}
+            footer={[
+                <CancelButton 
+                    key="cancel" 
+                    onClick={() => {
+                        if (!uploading) {
+                            setIsModalOpen(false);
+                            setFileList([]);
+                        }
+                    }}
+                    disabled={uploading}
+                >
+                    Cancel
+                </CancelButton>,
+                <UploadButton
+                    key="upload"
+                    onClick={handleUpload}
+                    disabled={uploading}
+                    icon={uploading ? <Spin size="small" /> : undefined}
+                >
+                    {uploading ? 'Uploading...' : 'Upload'}
+                </UploadButton>
+            ]}
+        >
+            <FileDragger>
+                <Dragger {...props} disabled={uploading}>
+                    <p className="ant-upload-drag-icon">
+                        <InboxOutlined />
+                    </p>
+                    <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                    <p className="ant-upload-hint">
+                        Support for a single or bulk upload. Strictly prohibited from uploading company data or other
+                        banned files.
+                    </p>
+                </Dragger>
+            </FileDragger>
+        </StyledModal>
+    );
+}
 
 export default UploadFileModal;
 
-const UploadFile = styled.div``;
+const StyledModal = styled(Modal)`
+  .ant-modal-header {
+    .ant-modal-title {
+      font-size: 1.3rem;
+    }
+  }
+  .ant-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+`;
 
-const StyledDraggerDropper = styled.div`
-  margin: 5%;
+const CancelButton = styled(Button)`
+  background-color: ${colors.wineRed};
+  color: ${colors.white};
+  border: none;
+  margin-right: 8px;
+
+  &&&:hover {
+    background-color: ${colors.white};
+    color: ${colors.wineRed};
+  }
+`;
+
+const UploadButton = styled(Button)`
+  background-color: ${colors.denimBlue};
+  color: ${colors.white};
+  border: none;
+  
+  &&&:hover {
+    background-color: ${colors.white};
+    color: ${colors.denimBlue};
+  }
+
+  &:disabled {
+    background-color: ${colors.lightGray};
+    color: ${colors.darkGray};
+  }
+`;
+
+const FileDragger = styled.div`
+  padding: 4%;
 `;
