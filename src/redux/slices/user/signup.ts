@@ -2,9 +2,9 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, document } from '../../../config/firebase.config';
 import { setCurrentUser } from '../auth/auth';
-import { collection, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
+import { collection, doc, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { Actions } from '../../actions/actionPayload';
-import { AddNewUserPayload, RequestUserCredentialsPayload } from './userPayload';
+import { AddNewUserPayload, RequestUserCredentialsPayload, UpdateExistingUserPayload } from './userPayload';
 
 export const requestUserSignup = createAsyncThunk(
   Actions.requestUserSignup,
@@ -22,8 +22,8 @@ export const requestUserSignup = createAsyncThunk(
       await addNewUser({uid, mail, provider});
       
       return { uid: user.uid, email: user.email, profilePictureURL: user.photoURL, user: user };
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message || 'Signup failed');
     }
   }
 );
@@ -33,7 +33,7 @@ export const addNewUser = async ({ uid, mail, provider }: AddNewUserPayload) => 
     const userQuery = query(collection(document, 'Users'), where('email', '==', mail));
     const existingUsers = await getDocs(userQuery);
 
-    if (!existingUsers.empty) return;
+    if (!existingUsers.empty) return 1;
 
     const userRef = doc(document, 'Users', uid);
     const name = mail?.split('@')[0];
@@ -42,7 +42,7 @@ export const addNewUser = async ({ uid, mail, provider }: AddNewUserPayload) => 
       email: mail,
       full_name: name,
       nick_name: name,
-      plan: 'basic',
+      plan: 'Basic',
       type_of_provider: provider,
       is_2fa_enabled: false,
     });
@@ -50,6 +50,25 @@ export const addNewUser = async ({ uid, mail, provider }: AddNewUserPayload) => 
     console.log("User added to Firestore successfully");
   } catch (error) {
     console.error("Error adding user data to Firestore: ", error);
+  }
+};
+
+export const updateExistingUser = async ({ uid, mail, provider }: UpdateExistingUserPayload) => {
+  try {
+    const userQuery = query(collection(document, 'Users'), where('email', '==', mail));
+    const existingUsers = await getDocs(userQuery);
+
+    if (!existingUsers.empty) return 1;
+
+    const userRef = doc(document, 'Users', uid);
+
+    await updateDoc(userRef, {
+      type_of_provider: provider,
+    });
+
+    console.log("User updated in Firestore successfully");
+  } catch (error) {
+    console.error("Error updating user data in Firestore: ", error);
   }
 };
 
@@ -64,11 +83,14 @@ const signupSlice = createSlice({
       .addCase(requestUserSignup.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(requestUserSignup.fulfilled, (state) => {
-        state.isLoading = false;
+      .addCase(requestUserSignup.fulfilled, (state: any, action) => {
+        state.currentUser = action.payload;
+        state.status = 'succeeded';
+        state.error = null;
       })
-      .addCase(requestUserSignup.rejected, (state) => {
-        state.isLoading = false;
+      .addCase(requestUserSignup.rejected, (state: any, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
       });
   },
 });

@@ -32,11 +32,14 @@ const AuthListenerSlice = createSlice({
       .addCase(ListenToAuthChanges.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(ListenToAuthChanges.fulfilled, (state) => {
-        state.isLoading = false;
+      .addCase(ListenToAuthChanges.fulfilled, (state: any, action) => {
+        state.currentUser = action.payload;
+        state.status = 'succeeded';
+        state.error = null;
       })
-      .addCase(ListenToAuthChanges.rejected, (state) => {
-        state.isLoading = false;
+      .addCase(ListenToAuthChanges.rejected, (state: any, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
       });
   },
 });

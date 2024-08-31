@@ -24,9 +24,9 @@ export const requestResetPassword = createAsyncThunk(
             const emailTriggerForResetPassword = await handleSetResetPasswordLink(email, resetPasswordLink, thunkAPI);
             console.log('response: ', emailTriggerForResetPassword);
             return emailTriggerForResetPassword;
-        } catch (error) {
-            return thunkAPI.rejectWithValue(error);
-        }  
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue(error.message || 'Sending reset password link failed');
+        } 
     }
 );
 
@@ -41,11 +41,14 @@ const ResetPasswordSlice = createSlice({
         .addCase(requestResetPassword.pending, (state) => {
             state.isLoading = true;
         })
-        .addCase(requestResetPassword.fulfilled, (state) => {
-        state.isLoading = false;
+        .addCase(requestResetPassword.fulfilled, (state: any, action) => {
+            state.currentUser = action.payload;
+            state.status = 'succeeded';
+            state.error = null;
         })
-        .addCase(requestResetPassword.rejected, (state) => {
-        state.isLoading = false;
+        .addCase(requestResetPassword.rejected, (state: any, action) => {
+            state.status = 'failed';
+            state.error = action.payload;
         });
     },
 });

@@ -10,8 +10,8 @@ export const requestUserLogout = createAsyncThunk(
     try {
       await signOut(auth);
       thunkAPI.dispatch(clearCurrentUser());
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message || 'Logout failed');
     }
   }
 );
@@ -27,11 +27,14 @@ const LogoutSlice = createSlice({
       .addCase(requestUserLogout.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(requestUserLogout.fulfilled, (state) => {
-        state.isLoading = false;
+      .addCase(requestUserLogout.fulfilled, (state: any, action) => {
+        state.currentUser = action.payload;
+        state.status = 'succeeded';
+        state.error = null;
       })
-      .addCase(requestUserLogout.rejected, (state) => {
-        state.isLoading = false;
+      .addCase(requestUserLogout.rejected, (state: any, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
       });
   },
 });

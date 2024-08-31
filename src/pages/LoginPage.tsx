@@ -247,13 +247,25 @@ const LoginPageForm = styled(Form)`
   }
 `;
 
-const StyledInput = styled(Input)`
+export const StyledInput = styled(Input)`
   height: 5.2vh;
   width: 96%;
   border: none;
 `;
 
-const StyledPasswordInput = styled(StyledInput).attrs({ type: 'password' })``;
+export const StyledPasswordInput = styled(Input.Password)`
+  height: 5.2vh;
+  width: 96%;
+  border: none;
+  .ant-input {
+    height: 100%;
+    border: none;
+  }
+  .ant-input-password-icon {
+    color: ${colors.charcoalBlack};
+  }
+`;
+
 
 const RememberForgotContainer = styled.div`
   width: 98%;

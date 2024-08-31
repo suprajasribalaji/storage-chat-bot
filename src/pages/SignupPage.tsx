@@ -3,7 +3,7 @@ import BackgroundImage from "../assets/images/SignupPageBackground.jpg";
 import { colors } from "../assets/themes/color";
 import Title from "antd/es/typography/Title";
 import type { FormProps } from 'antd';
-import { Button, Divider, Form, Input, message } from 'antd';
+import { Button, Divider, Form, message } from 'antd';
 import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { requestUserLoginByGithub, requestUserLoginByGoogle } from "../redux/slices/user/login";
@@ -11,7 +11,7 @@ import { useAppDispatch } from "../hooks/useAppDispatch";
 import { requestUserSignup } from "../redux/slices/user/signup";
 import { FieldType } from "../utils/utils";
 import { getEmailValidationRules, getPasswordValidationRules } from "../helpers/helpers";
-import { CenteringTheDiv, StyledGithubButton, StyledGoogleButton } from "./LoginPage";
+import { CenteringTheDiv, StyledGithubButton, StyledGoogleButton, StyledInput, StyledPasswordInput } from "./LoginPage";
 
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
     console.log('Failed:', errorInfo);
@@ -197,14 +197,6 @@ const StyledSignupPageForm = styled(Form)`
 const StyledFormItem = styled(Form.Item)`
     margin-top: -3%;
 `;
-
-const StyledInput = styled(Input)`
-    height: 5.2vh;
-    width: 100%;
-    border: none;
-`;
-
-const StyledPasswordInput = styled(StyledInput).attrs({ type: 'password' })``;
 
 const SignupPageDivider = styled.div`
     margin: -8% 0 -3% 0;
