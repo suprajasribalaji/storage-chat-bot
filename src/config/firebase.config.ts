@@ -1,6 +1,8 @@
 //SDK's installation
 import { initializeApp } from "firebase/app";
 import { getAuth, GithubAuthProvider, GoogleAuthProvider } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 // Firebase's Configuration
 const firebaseConfig = {
@@ -15,6 +17,10 @@ const firebaseConfig = {
 // Firebase's app initialization
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const document = getFirestore(app);
+const storage = getStorage(app);
+
 const googleAuthProvider = new GoogleAuthProvider();
 const githubAuthProvider = new GithubAuthProvider();
-export { app, auth, googleAuthProvider, githubAuthProvider };
+
+export { auth, document, storage, googleAuthProvider, githubAuthProvider };
