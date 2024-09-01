@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, document } from '../../../config/firebase.config';
+import { auth, database } from '../../../config/firebase.config';
 import { setCurrentUser } from '../auth/auth';
 import { collection, doc, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { Actions } from '../../actions/actionPayload';
@@ -30,12 +30,12 @@ export const requestUserSignup = createAsyncThunk(
 
 export const addNewUser = async ({ uid, mail, provider }: AddNewUserPayload) => {
   try {
-    const userQuery = query(collection(document, 'Users'), where('email', '==', mail));
+    const userQuery = query(collection(database, 'Users'), where('email', '==', mail));
     const existingUsers = await getDocs(userQuery);
 
     if (!existingUsers.empty) return 1;
 
-    const userRef = doc(document, 'Users', uid);
+    const userRef = doc(database, 'Users', uid);
     const name = mail?.split('@')[0];
 
     await setDoc(userRef, {
@@ -55,12 +55,12 @@ export const addNewUser = async ({ uid, mail, provider }: AddNewUserPayload) => 
 
 export const updateExistingUser = async ({ uid, mail, provider }: UpdateExistingUserPayload) => {
   try {
-    const userQuery = query(collection(document, 'Users'), where('email', '==', mail));
+    const userQuery = query(collection(database, 'Users'), where('email', '==', mail));
     const existingUsers = await getDocs(userQuery);
 
     if (!existingUsers.empty) return 1;
 
-    const userRef = doc(document, 'Users', uid);
+    const userRef = doc(database, 'Users', uid);
 
     await updateDoc(userRef, {
       type_of_provider: provider,

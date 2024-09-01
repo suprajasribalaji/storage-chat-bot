@@ -13,7 +13,7 @@ import UploadFileModal from "../components/modal/UploadFileModal";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { requestUserLogout } from "../redux/slices/user/logout";
 import ContentBeforeStartingChatComponent from "../components/ContentBeforeStartingChat";
-import { auth, document } from "../config/firebase.config";
+import { auth, database } from "../config/firebase.config";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { RespondedMessage } from "../utils/utils";
 
@@ -115,7 +115,7 @@ const HomePage = () => {
 
   const retrieveFileFromDataBase = async (requestedFileName: string, requestedTime: number) => {
     try {
-      const fileQuery = query(collection(document, 'Files'), where('user_id', '==', auth.currentUser?.uid));
+      const fileQuery = query(collection(database, 'Files'), where('user_id', '==', auth.currentUser?.uid));
       const querySnapshot = await getDocs(fileQuery);
       if(querySnapshot.empty) throw new Error('User not found');
   

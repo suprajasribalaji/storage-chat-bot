@@ -17,10 +17,10 @@ const firebaseConfig = {
 // Firebase's app initialization
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const document = getFirestore(app);
+const database = getFirestore(app);
 const storage = getStorage(app);
 
 const googleAuthProvider = new GoogleAuthProvider();
 const githubAuthProvider = new GithubAuthProvider();
 
-export { app, auth, document, storage, googleAuthProvider, githubAuthProvider };
+export { app, auth, database, storage, googleAuthProvider, githubAuthProvider };

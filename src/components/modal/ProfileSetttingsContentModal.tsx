@@ -2,7 +2,7 @@ import { Button, message } from 'antd';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { colors } from '../../assets/themes/color';
-import { auth, document } from '../../config/firebase.config';
+import { auth, database } from '../../config/firebase.config';
 import { collection, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { Profile } from '../../utils/utils';
 
@@ -31,7 +31,7 @@ const ProfileSettingsContentModal = ( props: ProfileSettingsContentModalProps ) 
         }
         try {
             setIsChanged(false);
-            const userQuery = query(collection(document, "Users"), where("email", "==", profile.email));
+            const userQuery = query(collection(database, "Users"), where("email", "==", profile.email));
             const querySnapshot = await getDocs(userQuery);
             if (!querySnapshot.empty) {
                 const userDoc = querySnapshot.docs[0];

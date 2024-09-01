@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { colors } from "../../assets/themes/color";
 import axios from "axios";
 import { collection, getDocs, query, updateDoc, where } from "firebase/firestore";
-import { auth, document } from "../../config/firebase.config";
+import { auth, database } from "../../config/firebase.config";
 import { useEffect, useState } from "react";
 
 type SubscriptionSettingsContentModalProps = {
@@ -21,7 +21,7 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
     useEffect(() => {
         const fetchUserPlan = async () => {
             try {
-                const userQuery = query(collection(document, "Users"), where("email", "==", auth.currentUser?.email));
+                const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
                 const querySnapshot = await getDocs(userQuery);
                 if (!querySnapshot.empty) {
                     const userDoc = querySnapshot.docs[0];
@@ -94,7 +94,7 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
 
     const handleProfileUpdation = async (subscribeTo: string) => {
         try {
-            const userQuery = query(collection(document, "Users"), where("email", "==", auth.currentUser?.email));
+            const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
             const querySnapshot = await getDocs(userQuery);
             if (!querySnapshot.empty) {
                 const userDoc = querySnapshot.docs[0];

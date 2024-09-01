@@ -8,7 +8,7 @@ import { colors } from '../../assets/themes/color';
 import styled from 'styled-components';
 import type { MenuProps } from 'antd';
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { auth, document } from '../../config/firebase.config';
+import { auth, database } from '../../config/firebase.config';
 import ProfileSetttingsContentModal from './ProfileSetttingsContentModal';
 import AccountSettingsContentModal from './AccountSettingsContentModal';
 import SubscriptionSettingsContentModal from './SubscriptionSettingsContentModal';
@@ -52,7 +52,7 @@ const ProfileSettingsModal = (props: ProfileSettingsModalProps) => {
     const getUserByEmail = async () => {
         setLoading(true);
         try {
-            const userQuery = query(collection(document, "Users"), where("email", "==", auth.currentUser?.email));
+            const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
             const querySnapshot = await getDocs(userQuery);
             if (!querySnapshot.empty) {
                 querySnapshot.forEach((doc) => {

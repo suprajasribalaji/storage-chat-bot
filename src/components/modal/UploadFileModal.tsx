@@ -3,7 +3,7 @@ import { Modal, message, Upload, Spin, Button, Progress } from "antd";
 import { LoadingOutlined, InboxOutlined } from '@ant-design/icons';
 import styled from "styled-components";
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { auth, document, storage } from '../../config/firebase.config';
+import { auth, database, storage } from '../../config/firebase.config';
 import { colors } from "../../assets/themes/color";
 import { addDoc, collection } from "firebase/firestore";
 
@@ -48,7 +48,7 @@ const UploadFileModal = (prop: UploadFileModalProps) => {
                 throw new Error("User is not authenticated");
             }
     
-            const fileRef = await addDoc(collection(document, "Files"), {
+            const fileRef = await addDoc(collection(database, "Files"), {
                 user_id: uid,
                 email: email,
                 url: fileDownloadURL,
@@ -57,7 +57,7 @@ const UploadFileModal = (prop: UploadFileModalProps) => {
                     name: fileName.split('.')[0] || '',
                 }
             });
-            console.log(fileRef.id, ' ------->>> Document added successfully');
+            console.log(fileRef.id, ' ------->>> Database added successfully');
         } catch (error) {
             console.log("Error adding file details:", error);
         }

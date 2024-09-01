@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { colors } from "../assets/themes/color";
 import { useEffect, useState } from "react";
-import { auth, document } from "../config/firebase.config";
+import { auth, database } from "../config/firebase.config";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { User } from "../utils/utils";
 
@@ -15,7 +15,7 @@ const ContentBeforeStartingChatComponent = () => {
         const getCurrentUserName = () => {
             try {
                 const userQuery = query(
-                    collection(document, 'Users'),
+                    collection(database, 'Users'),
                     where('email', '==', auth.currentUser?.email)
                 );
 

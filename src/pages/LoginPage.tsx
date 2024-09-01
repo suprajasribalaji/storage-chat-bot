@@ -13,7 +13,7 @@ import { requestUserLogin, requestUserLoginByGithub, requestUserLoginByGoogle } 
 import { getEmailValidationRules, getPasswordValidationRules } from "../helpers/helpers";
 import { FieldType } from "../utils/utils";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { auth, document } from "../config/firebase.config";
+import { auth, database } from "../config/firebase.config";
 import axios from "axios";
 
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
@@ -41,7 +41,7 @@ const LoginPage = () => {
         const response = await dispatch(requestUserLogin({email, password})).unwrap();
         console.log('in login page: =======-----<<<<< ', response);
        
-        const userQuery = query(collection(document, "Users"), where("email", "==", auth.currentUser?.email));
+        const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
         const querySnapshot = await getDocs(userQuery);
         const userDoc = querySnapshot.docs[0];
           const userData = userDoc.data();
@@ -61,7 +61,7 @@ const LoginPage = () => {
             message.error('Failed to generate OTP. Please try again.');
           }
         } else {
-          navigate('/login');
+          navigate('/home');
         }
         console.log(response, "this is the response ====>");
         message.success('Logged in successfully!');
