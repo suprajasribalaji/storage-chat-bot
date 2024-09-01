@@ -9,8 +9,7 @@ export interface AddNewUserPayload {
     provider?: string;
 };
 
-export interface UpdateExistingUserPayload {
-    uid: string;
-    mail: string | null;
-    provider: string;
+export type OnRequestGenerateAndSendOTP = {
+    email: string;
+    nickName: string;
 };

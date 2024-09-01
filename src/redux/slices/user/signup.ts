@@ -2,9 +2,9 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, database } from '../../../config/firebase.config';
 import { setCurrentUser } from '../auth/auth';
-import { collection, doc, getDocs, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { collection, doc, getDocs, query, setDoc, where } from 'firebase/firestore';
 import { Actions } from '../../actions/actionPayload';
-import { AddNewUserPayload, RequestUserCredentialsPayload, UpdateExistingUserPayload } from './userPayload';
+import { AddNewUserPayload, RequestUserCredentialsPayload } from './userPayload';
 
 export const requestUserSignup = createAsyncThunk(
   Actions.requestUserSignup,
@@ -50,25 +50,6 @@ export const addNewUser = async ({ uid, mail, provider }: AddNewUserPayload) => 
     console.log("User added to Firestore successfully");
   } catch (error) {
     console.error("Error adding user data to Firestore: ", error);
-  }
-};
-
-export const updateExistingUser = async ({ uid, mail, provider }: UpdateExistingUserPayload) => {
-  try {
-    const userQuery = query(collection(database, 'Users'), where('email', '==', mail));
-    const existingUsers = await getDocs(userQuery);
-
-    if (!existingUsers.empty) return 1;
-
-    const userRef = doc(database, 'Users', uid);
-
-    await updateDoc(userRef, {
-      type_of_provider: provider,
-    });
-
-    console.log("User updated in Firestore successfully");
-  } catch (error) {
-    console.error("Error updating user data in Firestore: ", error);
   }
 };
 

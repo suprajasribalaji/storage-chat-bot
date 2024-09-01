@@ -9,7 +9,7 @@ import { useState } from "react";
 import ForgotPasswordModal from "../components/modal/ForgotPasswordModal";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../hooks/useAppDispatch";
-import { requestUserLogin, requestUserLoginByGithub, requestUserLoginByGoogle } from "../redux/slices/user/login";
+import { requestGenerateAndSendOTP, requestUserLogin, requestUserLoginByGithub, requestUserLoginByGoogle } from "../redux/slices/user/login";
 import { getEmailValidationRules, getPasswordValidationRules } from "../helpers/helpers";
 import { FieldType } from "../utils/utils";
 import { collection, getDocs, query, where } from "firebase/firestore";
@@ -48,8 +48,9 @@ const LoginPage = () => {
         
         if (!querySnapshot.empty && userData.is_2fa_enabled) {
           try {
-            const response = await axios.post('http://localhost:5001/generate-send-otp', { email: userData.email, nickName: userData.nick_name });
-            console.log('otp generate and send: ', response);
+            // const response = await axios.post('http://localhost:5002/generate-send-otp', { email: userData.email, nickName: userData.nick_name });
+            const generateAndSendOTPResponse = await dispatch(requestGenerateAndSendOTP({ email: userData.email, nickName: userData.nick_name }));
+            console.log('otp generate and send: ', generateAndSendOTPResponse);
             
             if(userData.is_2fa_enabled) {
               navigate('/verify-user')
@@ -90,15 +91,23 @@ const LoginPage = () => {
 
     const handleLoginByProvider = async (provider: string) => {
       try {
-        let response;
-        if(provider==='google') response = await dispatch(requestUserLoginByGoogle());
-        if(provider==='github') response = await dispatch(requestUserLoginByGithub());
-        navigate('/home');
-        console.log(response, " : provider respose ----------");
-        message.success('Logged in using gmail successfully!');
+        if(provider==='google') {
+          await dispatch(requestUserLoginByGoogle()).then(() => {
+            navigate('/home');
+            message.success('Logged in successfully!');
+          }).catch((error) => console.log('error at login:google', error))
+        } else if(provider==='github') {
+          await dispatch(requestUserLoginByGithub()).then(() => {
+            navigate('/home');
+            message.success('Logged in successfully!');
+          }).catch((error) => console.log('error at login:google', error))
+        }
+        
+        message.success('Logged in successfully!');
       } catch (error) {
         console.error('Login failed:', error);
         message.error('Login failed. Please check your credentials.');
+        navigate('/login');
       }
     };
 

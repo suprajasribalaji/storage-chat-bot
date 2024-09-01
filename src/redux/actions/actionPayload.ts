@@ -5,6 +5,7 @@ export enum Actions {
     requestUserLogin = 'login/requestUserLogin',
     requestUserLoginByGoogle = 'login/requestUserLoginByGoogle',
     requestUserLoginByGithub = 'login/requestUserLoginByGithub',
+    requestGenerateAndSendOTP = 'login/requestGenerateAndSendOTP',
     requestUserLogout = 'logout/requestUserLogout',
     requestResetPassword = 'reset-password/requestResetPassword',
 }

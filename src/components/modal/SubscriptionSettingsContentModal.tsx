@@ -18,6 +18,7 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
     const [currentPlan, setCurrentPlan] = useState<string>('');
     const [planValidity, setPlanValidity] = useState<Date | null>();
 
+
     useEffect(() => {
         const fetchUserPlan = async () => {
             try {
@@ -181,7 +182,7 @@ const StyledButton = styled(Button)`
     font-size: 100%;
     color: ${colors.white};
 
-    &&&:hover, &&&:focus {
+    &&&:hover {
         background-color: ${colors.white};
         color: ${colors.steelBlue};
     }

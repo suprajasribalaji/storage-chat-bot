@@ -22,10 +22,6 @@ const OTPVerificationPage = () => {
         if (value && index < 5) {
             inputRefs.current[index + 1]?.focus();
         }
-
-        if (index === 5 && newOtp.every((digit) => digit !== "")) {
-            handleSubmit();
-        }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
@@ -40,7 +36,7 @@ const OTPVerificationPage = () => {
             const otpString = otp.join("");
             console.log('otp:: ', otpString);
             
-            const response = await axios.post('http://localhost:5001/verify-otp', { email: auth.currentUser?.email, otp: otpString });
+            const response = await axios.post('http://localhost:5002/verify-otp', { email: auth.currentUser?.email, otp: otpString });
             if (response.data.success) {
                 navigate('/home');
             } else {
