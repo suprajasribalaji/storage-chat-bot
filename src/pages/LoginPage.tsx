@@ -17,14 +17,14 @@ import { auth, document } from "../config/firebase.config";
 import axios from "axios";
 
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
-  console.log('Failed:', errorInfo);
-  console.log('Failed:', errorInfo);
+  console.log('Failed on finish:', errorInfo);
 };
 
 const LoginPage = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [failedAttempts, setFailedAttempts] = useState<number>(0);
 
     const handleForgotPassword = () => {
       setIsModalOpen(true);
@@ -61,12 +61,19 @@ const LoginPage = () => {
             message.error('Failed to generate OTP. Please try again.');
           }
         } else {
-          navigate('/home');
+          navigate('/login');
         }
         console.log(response, "this is the response ====>");
         message.success('Logged in successfully!');
+        setFailedAttempts(0);
       } catch (error) {
         console.error('Login failed:', error);
+        setFailedAttempts(prev => prev + 1);
+
+        if (failedAttempts >= 3) {
+          handleForgotPassword();
+        }
+
         if (axios.isAxiosError(error)) {
           if (error.response) {
             message.error(`Login failed: ${error.response.data.message || 'Unknown error'}`);
@@ -76,7 +83,7 @@ const LoginPage = () => {
             message.error(`Error: ${error.message}`);
           }
         } else {
-          message.error('An unexpected error occurred. Please try again.');
+          message.error('Please input valid credentials!');
         }
       }
     };
