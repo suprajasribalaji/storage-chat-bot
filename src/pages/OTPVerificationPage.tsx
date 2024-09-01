@@ -9,7 +9,7 @@ import { colors } from "../assets/themes/color";
 const OTPVerificationPage = () => {
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [errorIndex, setErrorIndex] = useState<number | null>(null); // Track which input box has an error
+    const [errorIndex, setErrorIndex] = useState<number | null>(null);
     const inputRefs = useRef<HTMLInputElement[]>([]);
     const navigate = useNavigate();
 
@@ -45,8 +45,8 @@ const OTPVerificationPage = () => {
                 navigate('/home');
             } else {
                 message.error(response.data.message);
-                setErrorIndex(response.data.errorIndex); // Set the index of the error input box
-                setOtp(["", "", "", "", "", ""]); // Clear OTP inputs
+                setErrorIndex(response.data.errorIndex);
+                setOtp(["", "", "", "", "", ""]);
             }
         } catch (error) {
             message.error('Error verifying OTP');
@@ -56,7 +56,7 @@ const OTPVerificationPage = () => {
     };
 
     const handleCancel = () => {
-        navigate('/login'); // Navigate to login page on cancel
+        navigate('/login');
     };
 
     useEffect(() => {
@@ -81,7 +81,7 @@ const OTPVerificationPage = () => {
                                 onKeyDown={(e) => handleKeyDown(e, index)}
                                 ref={(el) => el && (inputRefs.current[index] = el)}
                                 maxLength={1}
-                                isError={index === errorIndex} // Highlight error input box
+                                isError={index === errorIndex}
                             />
                         ))}
                     </OTPContainer>
@@ -159,8 +159,8 @@ const OTPInput = styled.input<{ isError?: boolean }>`
     border: 1px solid ${props => props.isError ? colors.red : colors.softGray};
     outline: none;
     &:focus {
-        border-color: ${colors.grayishBlue}; // Highlight border color when focused
-        box-shadow: 0 0 0 2px ${colors.lightGray}; // Add a subtle glow effect
+        border-color: ${colors.grayishBlue};
+        box-shadow: 0 0 0 2px ${colors.lightGray};
     }
 `;
 

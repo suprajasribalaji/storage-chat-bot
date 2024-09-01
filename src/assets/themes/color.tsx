@@ -6,8 +6,11 @@ export const colors = {
     semiTransparentBlack: '#00000080',
     lightSemiTransparentBlack: '#00000066',
     veryLightBlack: '#0000001A',
+
     white: '#FFFFFF',
     lightWhite: '#FFFFFF80',
+    smokeWhite: '#F5F5F5',
+
     darkGray: '#00000040',
     ashGray: '#5D5D5B',
     semiAshGray: '#5D5D5B99',
@@ -16,10 +19,12 @@ export const colors = {
     lightGray: '#F0F0F0',
     silverGray: '#F0F2F5',
     blueGray: '#8e99a2',
+
     candleAppleRed: '#C72626',
     red: '#FF0000',
     tomatoRed: '#DB4437',
     wineRed: '#A02334',
+
     denimBlue: '#4267B2',
     deepOceanBlue: '#27374D',
     grayishBlue: '#758694',

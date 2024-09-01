@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Menu, Modal, Spin } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 import { FaUserLarge } from "react-icons/fa6";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { RxUpdate } from "react-icons/rx";
@@ -35,6 +36,8 @@ const ProfileSettingsModal = (props: ProfileSettingsModalProps) => {
         email: '',
     });
     const [loading, setLoading] = useState<boolean>(true);
+
+    const customSpinIcon = <LoadingOutlined style={{ fontSize: 18 }} spin />;
 
     useEffect(() => {
         if (isModalOpen && selectedKey === '1') {
@@ -79,7 +82,7 @@ const ProfileSettingsModal = (props: ProfileSettingsModalProps) => {
             onCancel={() => setIsModalOpen(false)}
             footer={null}
         >
-            <Spin spinning={loading} size="large">
+            <Spin spinning={loading} indicator={customSpinIcon} >
                 <ProfileSettingsModalContent>
                     <ProfileSettingsModalContentMenu>
                         <StyledMenu

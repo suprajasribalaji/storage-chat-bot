@@ -110,7 +110,7 @@ const Input = styled.input`
     border-radius: 4px;
     border: none;
     outline: none;
-    background-color: ${({ disabled }) => (disabled ? '#f5f5f5' : 'white')}; // dont use hexa values directly 
+    background-color: ${({ disabled }) => (disabled ? colors.smokeWhite : colors.white)};
 
     &:focus {
         border: none;
