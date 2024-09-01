@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
-import { Spin } from "antd";
 import UnauthorizedUserPage from "../../pages/UnauthorizedUserPage";
+import { ReactNode } from "react";
+import CustomCenterSpinner from "../CustomCenterSpinner";
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const currentUser = useSelector((state: RootState) => state.auth.currentUser);
@@ -10,11 +10,15 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 
   console.log(" =======>>>> ", 'current user: ', currentUser, ' ; loading: ', isLoading);
   
-  if (isLoading) return <div><Spin spinning = {isLoading}/></div>;
+  if (isLoading) {
+    return <CustomCenterSpinner />;
+  }
   
-  if(!currentUser) return <UnauthorizedUserPage />;
+  if (!currentUser) {
+    return <UnauthorizedUserPage />;
+  }
   
-  return children;
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

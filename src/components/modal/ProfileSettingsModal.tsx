@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Menu, Modal, Spin } from 'antd'; // Add Spin for loading indicator
+import { Menu, Modal, Spin } from 'antd';
 import { FaUserLarge } from "react-icons/fa6";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { RxUpdate } from "react-icons/rx";
@@ -22,7 +22,7 @@ type ProfileSettingsModalProps = {
 
 const items: MenuItem[] = [
     { key: '1', icon: <FaUserLarge />, label: 'Profile' },
-    { key: '2', icon: <MdOutlineManageAccounts style={{ fontSize: '140%' }}/>, label: 'Account' },
+    { key: '2', icon: <MdOutlineManageAccounts style={{ fontSize: '140%' }} />, label: 'Account' },
     { key: '3', icon: <RxUpdate />, label: 'Subscription' },    
 ];
 
@@ -79,15 +79,11 @@ const ProfileSettingsModal = (props: ProfileSettingsModalProps) => {
             onCancel={() => setIsModalOpen(false)}
             footer={null}
         >
-    {/*use same case use isLoading  */}
-            {loading ? (
-                <Spin />
-            ) : (
+            <Spin spinning={loading} size="large">
                 <ProfileSettingsModalContent>
                     <ProfileSettingsModalContentMenu>
                         <StyledMenu
                             defaultSelectedKeys={['1']}
-                            // dont read like ['1'] instead : menuItems[0].key
                             defaultOpenKeys={['1']}
                             items={items}
                             selectedKeys={[selectedKey]}
@@ -95,30 +91,27 @@ const ProfileSettingsModal = (props: ProfileSettingsModalProps) => {
                         />
                     </ProfileSettingsModalContentMenu>
                     <ProfileSettingsModalContentDetails>
-                        {
-                            selectedKey === '1' && 
+                        {selectedKey === '1' && 
                             <ProfileSetttingsContentModal 
                                 profile={profile}
                                 setProfile={setProfile} 
                             />
                         }
-                        {
-                            selectedKey === '2' && 
+                        {selectedKey === '2' && 
                             <AccountSettingsContentModal
                                 profile={profile}
                                 setSelectedKey={setSelectedKey}
                             />
                         }
-                        {
-                            selectedKey === '3' && 
+                        {selectedKey === '3' && 
                             <SubscriptionSettingsContentModal
-                            setIsModalOpen={setIsModalOpen}
-                            setSelectedKey={setSelectedKey}
+                                setIsModalOpen={setIsModalOpen}
+                                setSelectedKey={setSelectedKey}
                             />
                         }
                     </ProfileSettingsModalContentDetails>
                 </ProfileSettingsModalContent>
-            )}
+            </Spin>
         </StyledProfileSettingsModal>
     );
 };

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Modal, message, Upload, Spin, Button } from "antd";
-import { InboxOutlined } from '@ant-design/icons';
+import { Modal, message, Upload, Spin, Button, Progress } from "antd";
+import { LoadingOutlined, InboxOutlined } from '@ant-design/icons';
 import styled from "styled-components";
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { auth, document, storage } from '../../config/firebase.config';
@@ -14,10 +14,14 @@ type UploadFileModalProps = {
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const UploadFileModal = ( prop: UploadFileModalProps ) => {
+const UploadFileModal = (prop: UploadFileModalProps) => {
     const { isModalOpen, setIsModalOpen } = prop;
     const [fileList, setFileList] = useState<any[]>([]);
     const [uploading, setUploading] = useState(false);
+    const [spinning, setSpinning] = useState(false);
+    const [percent, setPercent] = useState(0);
+
+    const customSpinIcon = <LoadingOutlined style={{ fontSize: 18 }} spin />;
 
     const props = {
         name: 'file',
@@ -66,6 +70,8 @@ const UploadFileModal = ( prop: UploadFileModalProps ) => {
         }
 
         setUploading(true);
+        setSpinning(true);
+        setPercent(0);
         let completedUploads = 0;
 
         fileList.forEach((file) => {
@@ -76,12 +82,14 @@ const UploadFileModal = ( prop: UploadFileModalProps ) => {
                 'state_changed',
                 (snapshot) => {
                     const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    setPercent(Math.round(progress));
                     console.log('Upload is ' + progress + '% done');
                 },
                 (error) => {
                     message.error(`${file.name} file upload failed.`);
                     console.error('Upload failed:', error);
                     setUploading(false);
+                    setSpinning(false);
                 },
                 () => {
                     getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
@@ -92,6 +100,7 @@ const UploadFileModal = ( prop: UploadFileModalProps ) => {
 
                         if (completedUploads === fileList.length) {
                             setUploading(false);
+                            setSpinning(false);
                             setIsModalOpen(false);
                             setFileList([]);                            
                         }
@@ -128,24 +137,27 @@ const UploadFileModal = ( prop: UploadFileModalProps ) => {
                     key="upload"
                     onClick={handleUpload}
                     disabled={uploading}
-                    icon={uploading ? <Spin size="small" /> : undefined}
+                    icon={uploading ? <Spin spinning={spinning} indicator={customSpinIcon} /> : undefined}
                 >
                     {uploading ? 'Uploading...' : 'Upload'}
                 </UploadButton>
             ]}
         >
-            <FileDragger>
-                <Dragger {...props} disabled={uploading}>
-                    <p className="ant-upload-drag-icon">
-                        <InboxOutlined />
-                    </p>
-                    <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                    <p className="ant-upload-hint">
-                        Support for a single or bulk upload. Strictly prohibited from uploading company data or other
-                        banned files.
-                    </p>
-                </Dragger>
-            </FileDragger>
+         
+                <FileDragger>
+                    <Dragger {...props} disabled={uploading}>
+                        <p className="ant-upload-drag-icon">
+                            <InboxOutlined />
+                        </p>
+                        <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                        <p className="ant-upload-hint">
+                            Support for a single or bulk upload. Strictly prohibited from uploading company data or other
+                            banned files.
+                        </p>
+                    </Dragger>
+                </FileDragger>
+                {spinning && <Progress percent={percent} />}
+          
         </StyledModal>
     );
 }

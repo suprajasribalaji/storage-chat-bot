@@ -43,17 +43,22 @@ const LoginPage = () => {
        
         const userQuery = query(collection(document, "Users"), where("email", "==", auth.currentUser?.email));
         const querySnapshot = await getDocs(userQuery);
-        
-        if (!querySnapshot.empty) {
-          const userDoc = querySnapshot.docs[0];
+        const userDoc = querySnapshot.docs[0];
           const userData = userDoc.data();
-          const response = await axios.post('http://localhost:5001/generate-send-otp', { email: userData.email, nickName: userData.nick_name });
-          console.log('otp generate and send: ', response);
-          
-          if(userData.is_2fa_enabled) {
-            navigate('/verify-user')
-          } else {
-            navigate('/home');
+        
+        if (!querySnapshot.empty && userData.is_2fa_enabled) {
+          try {
+            const response = await axios.post('http://localhost:5001/generate-send-otp', { email: userData.email, nickName: userData.nick_name });
+            console.log('otp generate and send: ', response);
+            
+            if(userData.is_2fa_enabled) {
+              navigate('/verify-user')
+            } else {
+              navigate('/home');
+            }
+          } catch (error) {
+            console.error('Error generating OTP:', error);
+            message.error('Failed to generate OTP. Please try again.');
           }
         } else {
           navigate('/home');
@@ -62,7 +67,17 @@ const LoginPage = () => {
         message.success('Logged in successfully!');
       } catch (error) {
         console.error('Login failed:', error);
-        message.error('Login failed. Please check your credentials.');
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            message.error(`Login failed: ${error.response.data.message || 'Unknown error'}`);
+          } else if (error.request) {
+            message.error('No response received from the server. Please check your internet connection.');
+          } else {
+            message.error(`Error: ${error.message}`);
+          }
+        } else {
+          message.error('An unexpected error occurred. Please try again.');
+        }
       }
     };
 
