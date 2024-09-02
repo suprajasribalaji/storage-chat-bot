@@ -8,7 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { deleteUser } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { Profile } from "../../utils/utils";
-import axios from "axios";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { requestExportFiles } from "../../redux/slices/user/api";
 
 type AccountSettingsContentModalProps = {
     profile: Profile;
@@ -23,6 +24,7 @@ const AccountSettingsContentModal = (props: AccountSettingsContentModalProps) =>
     const [currentPlan, setCurrentPlan] = useState<string>('');
     const [is2FAEnable, setIs2FAEnable] = useState<boolean>(false);
     const [loading, setLoading] = useState(false);
+    const dispatch = useAppDispatch();
     
     const navigate = useNavigate();
 
@@ -85,49 +87,37 @@ const AccountSettingsContentModal = (props: AccountSettingsContentModalProps) =>
     };
 
 
-const handleExportButton = async () => {
-  setLoading(true);
-  try {
-    if (fileDownloadURL.length === 0 || fileNames.length === 0) {
-      message.warning('No files available to export.');
-      return;
-    }
-
-    const response = await axios({
-      method: 'post',
-      url: 'http://localhost:5001/export-files',
-      data: {
-        fileDownloadURLs: fileDownloadURL,
-        fileNames: fileNames,
-      },
-      responseType: 'blob',
-      withCredentials: true,
-    });
-
-    const blob = new Blob([response.data], { type: 'application/zip' });
+    const handleExportButton = async () => {
+        setLoading(true);
+        try {
+            if (fileDownloadURL.length === 0 || fileNames.length === 0) {
+                message.warning('No files available to export.');
+                return;
+            }
     
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = url;
-    a.download = 'warehouse_files.zip';
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-
-    message.success('Files exported successfully. Check your downloads.');
-  } catch (error) {
-    console.error("Error during export process:", error);
-    if (axios.isAxiosError(error)) {
-      const errorMessage = error.response ? error.response.data.error : error.message;
-      message.error(`An error occurred during the export process: ${errorMessage}`);
-    } else {
-      message.error('An error occurred during the export process.');
-    }
-  } finally {
-    setLoading(false);
-  }
-};
+            const exportFileResponse = await dispatch(requestExportFiles({ fileDownloadURL, fileNames }));
+            
+            if (!exportFileResponse.payload) throw new Error('No data returned from the export API.');
+    
+            const blob = new Blob([exportFileResponse.payload], { type: 'application/zip' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'warehouse_files.zip';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+    
+            message.success('Files exported successfully. Check your downloads.');
+        } catch (error) {
+            console.error("Error during export process:", error);
+            message.error('An error occurred during the export process.');
+        } finally {
+            setLoading(false);
+        }
+    };
+    
 
     const handle2FAEnableButton = async () => {
         try {

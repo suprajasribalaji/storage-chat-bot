@@ -5,7 +5,11 @@ export enum Actions {
     requestUserLogin = 'login/requestUserLogin',
     requestUserLoginByGoogle = 'login/requestUserLoginByGoogle',
     requestUserLoginByGithub = 'login/requestUserLoginByGithub',
-    requestGenerateAndSendOTP = 'login/requestGenerateAndSendOTP',
     requestUserLogout = 'logout/requestUserLogout',
-    requestResetPassword = 'reset-password/requestResetPassword',
+    requestResetPassword = 'api/requestResetPassword',
+    requestGenerateAndSendOTP = 'api/requestGenerateAndSendOTP',
+    requestOTPVerification = 'api/requestOTPVerification',
+    requestExportFiles = 'api/requestExportFiles',
+    requestPlanSubscription = 'api/requestPlanSubscription',
+    requestPaymentVerification = 'api/requestPaymentVerification'
 }

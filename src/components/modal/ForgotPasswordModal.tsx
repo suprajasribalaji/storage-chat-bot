@@ -3,9 +3,10 @@ import { Modal, Button, Input, Form, notification } from 'antd';
 import type { FormProps } from 'antd';
 import styled from 'styled-components';
 import { colors } from '../../assets/themes/color';
-import axios from 'axios';
 import { FieldType } from '../../utils/utils';
 import { getEmailValidationRules } from '../../helpers/helpers';
+import { useAppDispatch } from '../../hooks/useAppDispatch';
+import { requestResetPassword } from '../../redux/slices/user/api';
 
 type RetrieveCredentialsModalProps = {
     isModalOpen: boolean;
@@ -14,14 +15,14 @@ type RetrieveCredentialsModalProps = {
 
 const RetrieveCredentialsModal = ( props: RetrieveCredentialsModalProps ) => {
     const { isModalOpen, setIsModalOpen } = props;
+    const dispatch = useAppDispatch();
     
     const handleSendEmail: FormProps<FieldType>['onFinish'] = async (value) => {
         const { email } = value;
         try {
-            const resetPasswordLink = await axios.post('http://localhost:5001/reset-password', { email: email });
-            const emailTriggerForResetPassword = await axios.post('http://localhost:5001/send-reset-password-link', { to: email, link: resetPasswordLink});
-            console.log('response: ', emailTriggerForResetPassword);
-            if(emailTriggerForResetPassword.status === 202) {
+            const emailTriggerForResetPasswordResponse = await dispatch(requestResetPassword({ email }));
+            console.log('response: ', emailTriggerForResetPasswordResponse);
+            if(emailTriggerForResetPasswordResponse.payload) {
                 setIsModalOpen(false);
                 notification.success({
                     message: 'Success',
@@ -34,7 +35,7 @@ const RetrieveCredentialsModal = ( props: RetrieveCredentialsModalProps ) => {
                 description: 'Failed to send email!',
                 placement: 'topRight',
             });
-            console.log(emailTriggerForResetPassword.status + ": " + emailTriggerForResetPassword.statusText);
+            console.log(emailTriggerForResetPasswordResponse.type + " : " + emailTriggerForResetPasswordResponse.payload);
             }
         } catch (error) {
             notification.error({

@@ -1,10 +1,11 @@
 import { Button, message } from "antd";
 import styled from "styled-components";
 import { colors } from "../../assets/themes/color";
-import axios from "axios";
-import { collection, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth, database } from "../../config/firebase.config";
 import { useEffect, useState } from "react";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { requestPaymentVerification, requestPlanSubscription } from "../../redux/slices/user/api";
 
 type SubscriptionSettingsContentModalProps = {
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -17,7 +18,7 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
     const [nickName, setNickName] = useState<string>('');
     const [currentPlan, setCurrentPlan] = useState<string>('');
     const [planValidity, setPlanValidity] = useState<Date | null>();
-
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         const fetchUserPlan = async () => {
@@ -47,9 +48,9 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
 
     const handleSubscription = async (subscribeTo: string) => {
         try {
-            const response = await axios.post('http://localhost:5002/subscribe', { plan: subscribeTo });
-            const { key, orderId, amount, currency, description, prefill, notes, theme } = response.data;
-    
+            const response = await dispatch(requestPlanSubscription({ plan: subscribeTo }));
+            const { key, orderId, amount, currency, description, prefill, notes, theme } = response.payload;
+
             var options = {
                 key: key,
                 amount: amount,
@@ -59,18 +60,11 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
                 order_id: orderId,
                 handler: async function(paymentResponse: any) {
                     try {
-                        const verificationResponse = await axios.post('http://localhost:5002/verify-payment', paymentResponse);
-                        const { paymentMethod, amount } = verificationResponse.data.paymentDetails;
-                        if (verificationResponse.data.success) {
-                            console.log(`Payment successful for ${subscribeTo}:`, paymentResponse);
-                            await handleProfileUpdation(subscribeTo);                            
-                            const sendInvoiceResponse = await axios.post('http://localhost:5002/send-subscription-invoice', 
-                                { subscribedTo: subscribeTo, orderId: paymentResponse.razorpay_order_id, paymentId: paymentResponse.razorpay_payment_id, fullName, nickName, email: auth.currentUser?.email, amount, validity: 28, paymentMethod });
-                            console.log('invoice response::: ', sendInvoiceResponse);
+                        const verificationResponse = await dispatch(requestPaymentVerification({ fullName, nickName, subscribeTo, paymentResponse }));                        
+                        if (verificationResponse.payload) {
                             setIsModalOpen(false);
                             setSelectedKey('1');
                             message.success('Invoice send successfully!');
-                            message.success(`${subscribeTo} Subscription Payment ID: ${paymentResponse.razorpay_payment_id}`);
                         } else {
                             message.error('Payment verification failed / Send invoice failed.');
                         }
@@ -93,27 +87,6 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
         }
     };
 
-    const handleProfileUpdation = async (subscribeTo: string) => {
-        try {
-            const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
-            const querySnapshot = await getDocs(userQuery);
-            if (!querySnapshot.empty) {
-                const userDoc = querySnapshot.docs[0];
-                const userRef = userDoc.ref; 
-                await updateDoc(userRef, {
-                    plan: subscribeTo,
-                    subscribed_at: Date.now()
-                });
-                message.success('Profile updated successfully!');                
-            } else {
-                message.error('User not found');
-                console.log("No user found with that email.");
-            }
-        } catch (error) {
-            console.error('Error while doing profile updation', error);
-        }
-    };
-    
     const isSubscriptionExpired = () => {
         if (!planValidity || !(planValidity instanceof Date)) return false;
         const expirationDate = new Date(planValidity.getTime() + 2 * 60 * 1000);

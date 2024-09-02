@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { Button, message, Typography } from "antd";
-import axios from "axios";
 import { auth } from "../config/firebase.config";
 import { colors } from "../assets/themes/color";
+import { useAppDispatch } from "../hooks/useAppDispatch";
+import { requestOTPVerification } from "../redux/slices/user/api";
 
 const OTPVerificationPage = () => {
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -12,13 +13,13 @@ const OTPVerificationPage = () => {
     const [errorIndex, setErrorIndex] = useState<number | null>(null);
     const inputRefs = useRef<HTMLInputElement[]>([]);
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const { value } = e.target;
         const newOtp = [...otp];
         newOtp[index] = value.slice(0, 1);
         setOtp(newOtp);
-
         if (value && index < 5) {
             inputRefs.current[index + 1]?.focus();
         }
@@ -34,14 +35,12 @@ const OTPVerificationPage = () => {
         setIsSubmitting(true);
         try {
             const otpString = otp.join("");
-            console.log('otp:: ', otpString);
-            
-            const response = await axios.post('http://localhost:5002/verify-otp', { email: auth.currentUser?.email, otp: otpString });
-            if (response.data.success) {
+            const otpVerficationResponse = await dispatch(requestOTPVerification({ email: auth.currentUser?.email, otp: otpString }));            
+            if (otpVerficationResponse.payload) {
                 navigate('/home');
             } else {
-                message.error(response.data.message);
-                setErrorIndex(response.data.errorIndex);
+                message.error(otpVerficationResponse.payload);
+                setErrorIndex(otpVerficationResponse.payload);
                 setOtp(["", "", "", "", "", ""]);
             }
         } catch (error) {

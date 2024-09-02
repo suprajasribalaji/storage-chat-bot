@@ -9,12 +9,13 @@ import { useState } from "react";
 import ForgotPasswordModal from "../components/modal/ForgotPasswordModal";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../hooks/useAppDispatch";
-import { requestGenerateAndSendOTP, requestUserLogin, requestUserLoginByGithub, requestUserLoginByGoogle } from "../redux/slices/user/login";
+import { requestUserLogin, requestUserLoginByGithub, requestUserLoginByGoogle } from "../redux/slices/user/login";
 import { getEmailValidationRules, getPasswordValidationRules } from "../helpers/helpers";
 import { FieldType } from "../utils/utils";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth, database } from "../config/firebase.config";
 import axios from "axios";
+import { requestGenerateAndSendOTP } from "../redux/slices/user/api";
 
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
   console.log('Failed on finish:', errorInfo);
@@ -48,7 +49,6 @@ const LoginPage = () => {
         
         if (!querySnapshot.empty && userData.is_2fa_enabled) {
           try {
-            // const response = await axios.post('http://localhost:5002/generate-send-otp', { email: userData.email, nickName: userData.nick_name });
             const generateAndSendOTPResponse = await dispatch(requestGenerateAndSendOTP({ email: userData.email, nickName: userData.nick_name }));
             console.log('otp generate and send: ', generateAndSendOTPResponse);
             
@@ -213,8 +213,7 @@ const LoginPage = () => {
     )
 }
 
-
-export default LoginPage
+export default LoginPage;
 
 const StyledLoginPage = styled.div`
   width: 100%;
@@ -296,7 +295,6 @@ export const StyledPasswordInput = styled(Input.Password)`
     color: ${colors.charcoalBlack};
   }
 `;
-
 
 const RememberForgotContainer = styled.div`
   width: 98%;

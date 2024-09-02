@@ -15,15 +15,11 @@ if (!SENDGRID_API_KEY) {
 sendgrid.setApiKey(SENDGRID_API_KEY);
 
 const auth = admin.auth();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT  || 3001;
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-
-app.get('/test', (req, res) => {
-    res.status(200).send('success');
-});
 
 app.post('/reset-password', async (req, res) => {
     try {

@@ -4,20 +4,14 @@ import { auth, githubAuthProvider, googleAuthProvider } from '../../../config/fi
 import { setCurrentUser } from '../auth/auth';
 import { addNewUser } from './signup';
 import { Actions } from '../../actions/actionPayload';
-import { OnRequestGenerateAndSendOTP, RequestUserCredentialsPayload } from './userPayload';
-import axios from 'axios';
+import { RequestUserCredentialsPayload } from './userPayload';
 
 const handleUserLogin = async (userCredential: any, provider: string | null, thunkAPI: any) => {
   const user = userCredential.user;
-  if (!user) return thunkAPI.rejectWithValue("User not found");
-
   const profilePicture = user.photoURL;
+  if (provider) await addNewUser({ uid: user.uid, mail: user.email, provider });
+  if (!user) return thunkAPI.rejectWithValue("User not found");
   thunkAPI.dispatch(setCurrentUser({ uid: user.uid, email: user.email, profilePictureURL: profilePicture, user: user }));
-
-  if (provider) {
-    await addNewUser({ uid: user.uid, mail: user.email, provider });
-  }
-
   return { uid: user.uid, email: user.email, profilePictureURL: profilePicture, user: user };
 };
 
@@ -57,26 +51,12 @@ export const requestUserLoginByGithub = createAsyncThunk(
   }
 );
 
-export const requestGenerateAndSendOTP = createAsyncThunk<any, OnRequestGenerateAndSendOTP>(
-  Actions.requestGenerateAndSendOTP,
-  async (data, thunkAPI) => {
-    try {
-      const { email, nickName } = data;
-      const response = await axios.post('http://localhost:5002/generate-send-otp', { email: email, nickName: nickName });
-      return response;
-    } catch (error: any) {
-      thunkAPI.rejectWithValue(error.message || 'Generate and Send OTP failed');
-    }
-  }
-);
-
 const loginSlice = createSlice({
   name: 'login',
   initialState: {
     currentUser: null,
     status: 'idle',
     error: null,
-    paymentDetails:{}
   },
   reducers: {
     logout: (state) => {
@@ -87,54 +67,39 @@ const loginSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(requestUserLogin.pending, (state) => {
-        state.status = 'loading';
+        state.status = 'pending';
       })
       .addCase(requestUserLogin.fulfilled, (state: any, action) => {
         state.currentUser = action.payload;
-        state.status = 'succeeded';
+        state.status = 'fulfilled';
         state.error = null;
       })
       .addCase(requestUserLogin.rejected, (state: any, action) => {
-        state.status = 'failed';
+        state.status = 'rejected';
         state.error = action.payload;
       })
-
       .addCase(requestUserLoginByGoogle.pending, (state) => {
-        state.status = 'loading';
+        state.status = 'pending';
       })
       .addCase(requestUserLoginByGoogle.fulfilled, (state, action) => {
         state.currentUser = action.payload;
-        state.status = 'succeeded';
+        state.status = 'fulfilled';
         state.error = null;
       })
       .addCase(requestUserLoginByGoogle.rejected, (state: any, action) => {
-        state.status = 'failed';
+        state.status = 'rejected';
         state.error = action.payload;
       })
-
       .addCase(requestUserLoginByGithub.pending, (state) => {
-        state.status = 'loading';
+        state.status = 'pending';
       })
       .addCase(requestUserLoginByGithub.fulfilled, (state, action) => {
         state.currentUser = action.payload;
-        state.status = 'succeeded';
+        state.status = 'fulfilled';
         state.error = null;
       })
       .addCase(requestUserLoginByGithub.rejected, (state: any, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      })      
-
-      .addCase(requestGenerateAndSendOTP.pending,(state:any)=>{
-        state.status = 'loading';
-      })
-      .addCase(requestGenerateAndSendOTP.fulfilled,(state:any, action:any)=>{
-        state.status = 'succeeded';
-        state.otpDetails = action.payload
-        state.error = null;
-      })
-      .addCase(requestGenerateAndSendOTP.rejected,(state:any, action)=>{
-        state.status = 'failed';
+        state.status = 'rejected';
         state.error = action.payload;
       });
   },

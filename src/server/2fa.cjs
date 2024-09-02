@@ -14,7 +14,7 @@ if (!SENDGRID_API_KEY) {
 
 sendgrid.setApiKey(SENDGRID_API_KEY);
 
-const PORT = process.env.MFA_PORT;
+const PORT = process.env.MFA_PORT  || 3003;
 const app = express();
 
 app.use(express.json());

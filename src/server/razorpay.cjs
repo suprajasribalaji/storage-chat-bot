@@ -10,8 +10,6 @@ const SENDGRID_API_KEY = process.env.REACT_SENDGRID_API_KEY;
 const SENDGRID_ELITE_TEMPLATE_ID = process.env.REACT_SENDGRID_ELITE_SUBSCRIBED_TEMPLATE_ID;
 const SENDGRID_DELUXE_TEMPLATE_ID = process.env.REACT_SENDGRID_DELUXE_SUBSCRIBED_TEMPLATE_ID;
 
-console.log(SENDGRID_ELITE_TEMPLATE_ID, " : ", SENDGRID_DELUXE_TEMPLATE_ID);
-
 if (!SENDGRID_API_KEY) {
     console.error('SENDGRID_API_KEY is not defined.');
     process.exit(1);
@@ -20,9 +18,7 @@ if (!SENDGRID_API_KEY) {
 sendgrid.setApiKey(SENDGRID_API_KEY);
 
 const app = express();
-const PORT = process.env.RAZORPAY_PORT || 3000;
-
-console.log(process.env.KEY_ID, process.env.KEY_SECRET);
+const PORT = process.env.RAZORPAY_PORT || 3004;
 
 app.use(cors({ origin: 'http://localhost:5000' }));
 app.use(bodyParser.json());
