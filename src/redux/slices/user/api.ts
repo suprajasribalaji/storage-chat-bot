@@ -14,33 +14,41 @@ import { auth, database } from "../../../config/firebase.config";
 
 const handleGetResetPasswordLink = async (email: string, thunkAPI: any) => {
   if (!email) return thunkAPI.rejectWithValue("Email is not given");
-  const resetPasswordLink = await axios.post('http://localhost:5001/reset-password', { email: email });
-  return resetPasswordLink;
+  try {
+    const response = await axios.post('http://localhost:5001/reset-password', { email });
+    return response.data;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to get reset password link');
+  }
 };
 
 const handleSetResetPasswordLink = async (email: string, resetPasswordLink: string, thunkAPI: any) => {
   if (!email) return thunkAPI.rejectWithValue("Email is not given");
   if (!resetPasswordLink) return thunkAPI.rejectWithValue("Reset Password Link is not found");
-  const emailTriggerForResetPassword = await axios.post('http://localhost:5001/send-reset-password-link', { to: email, link: resetPasswordLink});
-  return emailTriggerForResetPassword;
+  try {
+    const response = await axios.post('http://localhost:5001/send-reset-password-link', { to: email, link: resetPasswordLink });
+    return response.data;
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to send reset password link');
+  }
 };
 
 const handleProfileUpdation = async (subscribeTo: string) => {
   try {
-      const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
-      const querySnapshot = await getDocs(userQuery);
-      if (!querySnapshot.empty) {
-          const userDoc = querySnapshot.docs[0];
-          const userRef = userDoc.ref; 
-          await updateDoc(userRef, {
-              plan: subscribeTo,
-              subscribed_at: Date.now()
-          });             
-      } else {
-          console.log("No user found with that email.");
-      }
+    const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
+    const querySnapshot = await getDocs(userQuery);
+    if (!querySnapshot.empty) {
+        const userDoc = querySnapshot.docs[0];
+        const userRef = userDoc.ref; 
+        await updateDoc(userRef, {
+            plan: subscribeTo,
+            subscribed_at: Date.now()
+        });             
+    } else {
+        console.log("No user found with that email.");
+    }
   } catch (error) {
-      console.error('Error while doing profile updation', error);
+    console.error('Error while doing profile updation', error);
   }
 };
 
@@ -79,7 +87,7 @@ export const requestExportFiles = createAsyncThunk<any, OnRequestExportFiles>(
             
       return response.data;
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.message || 'File Export failed');
+      return thunkAPI.rejectWithValue(error.response?.data?.message || 'File Export failed');
     }
   }
 );
@@ -92,7 +100,7 @@ export const requestGenerateAndSendOTP = createAsyncThunk<any, OnRequestGenerate
         const response = await axios.post('http://localhost:5003/generate-send-otp', { email: email, nickName: nickName });
         return response;
       } catch (error: any) {
-        thunkAPI.rejectWithValue(error.message || 'Generate and Send OTP failed');
+        return thunkAPI.rejectWithValue(error.response?.data?.message || 'Generate and Send OTP failed');
       }
     }
 );
@@ -105,7 +113,7 @@ export const requestOTPVerification = createAsyncThunk<any, OnRequestOTPVerifica
       const response = await axios.post('http://localhost:5003/verify-otp', { email: email, otp: otp });
       return response;
     } catch (error: any) {
-      thunkAPI.rejectWithValue(error.message || 'OTP Verification failed');
+      return thunkAPI.rejectWithValue(error.response?.data?.message || 'OTP Verification failed');
     }
   }
 );
@@ -118,7 +126,7 @@ export const requestPlanSubscription = createAsyncThunk<any, OnRequestPlanSubscr
       const response = await axios.post('http://localhost:5004/subscribe', { plan });      
       return response.data;
     } catch (error: any) {
-      thunkAPI.rejectWithValue(error.message || 'Plan subscription failed');
+      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Plan subscription failed');
     }
   }
 );
@@ -133,13 +141,22 @@ export const requestPaymentVerification = createAsyncThunk<any, OnRequestPayment
       if (verificationResponse.status === 200) {
           console.log(`Payment successful for ${subscribeTo} : `, paymentResponse);
           await handleProfileUpdation(subscribeTo);                            
-          const sendInvoiceResponse = await axios.post('http://localhost:5004/send-subscription-invoice', 
-            { subscribedTo: subscribeTo, orderId: paymentResponse.razorpay_order_id, paymentId: paymentResponse.razorpay_payment_id, fullName, nickName, email: auth.currentUser?.email, amount: amount/100, validity: 28, paymentMethod });
+          const sendInvoiceResponse = await axios.post('http://localhost:5004/send-subscription-invoice', {
+            subscribedTo: subscribeTo,
+            orderId: paymentResponse.razorpay_order_id,
+            paymentId: paymentResponse.razorpay_payment_id,
+            fullName,
+            nickName,
+            email: auth.currentUser?.email,
+            amount: amount/100,
+            validity: 28,
+            paymentMethod 
+          });
           console.log('invoice response::: ', sendInvoiceResponse);
           return sendInvoiceResponse.data;
       }
     } catch (error: any) {
-      thunkAPI.rejectWithValue(error.message || 'Payment verification failed');
+      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Payment verification failed');
     }
   }
 );

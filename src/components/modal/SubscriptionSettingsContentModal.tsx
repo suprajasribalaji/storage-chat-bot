@@ -1,9 +1,9 @@
+import { useEffect, useState } from "react";
 import { Button, message } from "antd";
 import styled from "styled-components";
-import { colors } from "../../assets/themes/color";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import { colors } from "../../assets/themes/color";
 import { auth, database } from "../../config/firebase.config";
-import { useEffect, useState } from "react";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { requestPaymentVerification, requestPlanSubscription } from "../../redux/slices/user/api";
 
@@ -18,6 +18,7 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
     const [nickName, setNickName] = useState<string>('');
     const [currentPlan, setCurrentPlan] = useState<string>('');
     const [planValidity, setPlanValidity] = useState<Date | null>();
+    const [loading, setLoading] = useState<boolean>(false);
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -31,32 +32,28 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
                     setCurrentPlan(userData.plan);
                     setFullName(userData.full_name);
                     setNickName(userData.nick_name);
-                    if (userData.subscribed_at && userData.subscribed_at.toDate) {
-                        setPlanValidity(userData.subscribed_at.toDate());
-                    } else {
-                        setPlanValidity(null);
-                    }
+                    setPlanValidity(userData.subscribed_at.toDate() || null);
                 }
             } catch (error) {
                 console.error("Error fetching user plan: ", error);
             }
         };
         isSubscriptionExpired();
-
         fetchUserPlan();        
     }, []);
 
     const handleSubscription = async (subscribeTo: string) => {
+        setLoading(true);
         try {
             const response = await dispatch(requestPlanSubscription({ plan: subscribeTo }));
             const { key, orderId, amount, currency, description, prefill, notes, theme } = response.payload;
 
             var options = {
-                key: key,
-                amount: amount,
-                currency: currency,
+                key,
+                amount,
+                currency,
                 name: 'WareHouse',
-                description: description,
+                description,
                 order_id: orderId,
                 handler: async function(paymentResponse: any) {
                     try {
@@ -73,25 +70,25 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
                         message.error('Payment verification failed.');
                     }
                 },
-                prefill: prefill,
-                notes: notes,
-                theme: theme,
+                prefill,
+                notes,
+                theme,
             };
     
-            let payment = new window.Razorpay(options);
+            const payment = new window.Razorpay(options);
             payment.open();
             message.success('Subscription process initiated.');
         } catch (error) {
             message.error('Subscription failed. Please try again.');
             console.error('Error during subscription: ', error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const isSubscriptionExpired = () => {
-        if (!planValidity || !(planValidity instanceof Date)) return false;
-        const expirationDate = new Date(planValidity.getTime() + 2 * 60 * 1000);
-        console.log('ed -->  ', expirationDate);
-        
+        if (!planValidity) return false;
+        const expirationDate = new Date(planValidity.getTime() + 2 * 60 * 1000);     
         return Date.now() > expirationDate.getTime();
     };
 
@@ -101,7 +98,7 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
                 <PlanDetails>
                     <Plan>
                         <ButtonWrapper>
-                            <StyledButton onClick={() => handleSubscription('Elite')} disabled={currentPlan === 'Elite' && !isSubscriptionExpired()}>Welcome to Elite</StyledButton>
+                            <StyledButton onClick={() => handleSubscription('Elite')} disabled={loading || (currentPlan === 'Elite' && !isSubscriptionExpired())}>Welcome to Elite</StyledButton>
                         </ButtonWrapper>
                         <FeaturesList>
                             <FeatureItem>Up to 10x more space to store the files</FeatureItem>
@@ -111,7 +108,7 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
                     </Plan>
                     <Plan>
                         <ButtonWrapper>
-                            <StyledButton onClick={() => handleSubscription('Deluxe')} disabled={currentPlan === 'Deluxe' && !isSubscriptionExpired()}>Welcome to Deluxe</StyledButton>
+                            <StyledButton onClick={() => handleSubscription('Deluxe')} disabled={loading || (currentPlan === 'Deluxe' && !isSubscriptionExpired())}>Welcome to Deluxe</StyledButton>
                         </ButtonWrapper>
                         <FeaturesList>
                             <FeatureItem>Up to 20x more space to store the files</FeatureItem>

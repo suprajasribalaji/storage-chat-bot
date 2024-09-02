@@ -18,6 +18,6 @@ const SpinContainer = styled.div`
 `;
 
 const StyledLoadingIcon = styled(LoadingOutlined)`
-  font-size: 24px;
+  font-size: 10%;
   color: #1890ff;
 `;

@@ -1,9 +1,9 @@
 import { Button, message } from 'antd';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import styled from 'styled-components';
+import { collection, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { colors } from '../../assets/themes/color';
 import { auth, database } from '../../config/firebase.config';
-import { collection, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import { Profile } from '../../utils/utils';
 
 type ProfileSettingsContentModalProps = {
@@ -15,7 +15,7 @@ const ProfileSettingsContentModal = ( props: ProfileSettingsContentModalProps ) 
     const { profile, setProfile } = props;
     const [isChanged, setIsChanged] = useState<boolean>(false);
     
-    const handleChange = (e: any) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setIsChanged(true);
         setProfile({
@@ -33,20 +33,20 @@ const ProfileSettingsContentModal = ( props: ProfileSettingsContentModalProps ) 
             setIsChanged(false);
             const userQuery = query(collection(database, "Users"), where("email", "==", profile.email));
             const querySnapshot = await getDocs(userQuery);
-            if (!querySnapshot.empty) {
-                const userDoc = querySnapshot.docs[0];
-                const userRef = userDoc.ref; 
-                await updateDoc(userRef, {
-                    full_name: profile.full_name,
-                    nick_name: profile.nick_name,
-                });
-                message.success('Profile updated successfully!');                
-            } else {
+            if (querySnapshot.empty) {
                 message.error('User not found');
                 console.log("No user found with that email.");
+                return;
             }
+            const userDoc = querySnapshot.docs[0];
+            const userRef = userDoc.ref; 
+            await updateDoc(userRef, {
+                full_name: profile.full_name,
+                nick_name: profile.nick_name,
+            });
+            message.success('Profile updated successfully!');                
         } catch (error) {
-            console.log(error);
+            console.error('Error updating profile:', error);
             setIsChanged(false);
         }
     };

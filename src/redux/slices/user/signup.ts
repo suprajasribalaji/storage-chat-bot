@@ -19,7 +19,8 @@ export const requestUserSignup = createAsyncThunk(
 
       const provider = 'EmailAndPassword', uid = user.uid, mail = user.email;;
       
-      await addNewUser({uid, mail, provider});
+      const addUserResult = await addNewUser({ uid, mail, provider });
+      if (addUserResult === 1) return thunkAPI.rejectWithValue("User already exists");
       
       return { uid: user.uid, email: user.email, profilePictureURL: user.photoURL, user: user };
     } catch (error: any) {
@@ -48,8 +49,10 @@ export const addNewUser = async ({ uid, mail, provider }: AddNewUserPayload) => 
     });
 
     console.log("User added to Firestore successfully");
+    return 0;
   } catch (error) {
     console.error("Error adding user data to Firestore: ", error);
+    throw new Error("Error adding user data to Firestore");
   }
 };
 
@@ -57,21 +60,27 @@ const signupSlice = createSlice({
   name: 'signup',
   initialState: {
     isLoading: false,
+    currentUser: null,
+    status: 'idle',
+    error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(requestUserSignup.pending, (state) => {
+        state.status = 'pending';
         state.isLoading = true;
       })
       .addCase(requestUserSignup.fulfilled, (state: any, action) => {
         state.currentUser = action.payload;
-        state.status = 'succeeded';
+        state.status = 'fulfilled';
         state.error = null;
+        state.isLoading = false;
       })
       .addCase(requestUserSignup.rejected, (state: any, action) => {
-        state.status = 'failed';
+        state.status = 'rejected';
         state.error = action.payload;
+        state.isLoading = false;
       });
   },
 });

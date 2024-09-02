@@ -17,12 +17,21 @@ server.on('connection', (ws) => {
       });
     } catch (error) {
       console.error('Error parsing message:', error);
+      ws.send(JSON.stringify({ error: 'Invalid message format' }));
     }
   });
 
-  ws.on('close', () => {
-    console.log('Client disconnected');
+  ws.on('close', (code, reason) => {
+    console.log(`Client disconnected: ${code} - ${reason}`);
   });
+
+  ws.on('error', (error) => {
+    console.error('WebSocket error:', error);
+  });
+});
+
+server.on('error', (error) => {
+  console.error('Server error:', error);
 });
 
 console.log(`WebSocket server is running on ws://localhost:${PORT}`);

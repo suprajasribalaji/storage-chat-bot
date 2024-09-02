@@ -15,7 +15,7 @@ import { requestUserLogout } from "../redux/slices/user/logout";
 import ContentBeforeStartingChatComponent from "../components/ContentBeforeStartingChat";
 import { auth, database } from "../config/firebase.config";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { RespondedMessage } from "../utils/utils";
+import { formatTimestamp, normalizeString, RespondedMessage } from "../utils/utils";
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -41,7 +41,7 @@ const HomePage = () => {
     }
   }, [responseMessages]);
 
-  useEffect(() => {
+  const connectWebSocket = () => {
     webSocket.current = new WebSocket('ws://localhost:8080');
     
     webSocket.current.onopen = () => {
@@ -58,10 +58,17 @@ const HomePage = () => {
       }
     };
 
+    webSocket.current.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
     webSocket.current.onclose = () => {
       console.log('Disconnected from WebSocket server');
     };
-    
+  };
+
+  useEffect(() => {
+    connectWebSocket();
     return () => {
       if (webSocket.current) {
         webSocket.current.close();
@@ -70,13 +77,18 @@ const HomePage = () => {
   }, []);
 
   const handleMenuItems = async (e: { key: string }) => {
-    if (e.key === '1') {
-      setIsProfileModalOpen(true);
+    try {
+      if (e.key === '1') {
+        setIsProfileModalOpen(true);
+      }
+      if (e.key === '2') {
+        await dispatch(requestUserLogout());
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error('Error handling menu item:', error);
+      message.error('An error occurred. Please try again.');
     }
-    if (e.key === '2') {
-      await dispatch(requestUserLogout());
-      navigate('/login');
-    };
   };
 
   const items: MenuItem[] = [
@@ -107,10 +119,6 @@ const HomePage = () => {
       e.preventDefault();
       handleSendButton();
     }
-  };
-
-  const normalizeString = (str: string) => {
-    return str.toLowerCase().replace(/[^a-z0-9]/g, '');
   };
 
   const retrieveFileFromDataBase = async (requestedFileName: string, requestedTime: number) => {
@@ -152,6 +160,7 @@ const HomePage = () => {
       }
     } catch (error) {
       console.error('Error retrieving file:', error);
+      message.error('Failed to retrieve file. Please try again.');
     }
   };
 
@@ -173,10 +182,6 @@ const HomePage = () => {
 
   const handleUploadButton = () => {
     setIsUploadFileModalOpen(true);
-  };
-
-  const formatTimestamp = (timestamp: number) => {
-    return new Date(timestamp).toLocaleTimeString();
   };
 
   return (

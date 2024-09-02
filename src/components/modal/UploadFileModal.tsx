@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Modal, message, Upload, Spin, Button, Progress } from "antd";
-import { LoadingOutlined, InboxOutlined } from '@ant-design/icons';
+import { InboxOutlined } from '@ant-design/icons';
 import styled from "styled-components";
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { auth, database, storage } from '../../config/firebase.config';
 import { colors } from "../../assets/themes/color";
 import { addDoc, collection } from "firebase/firestore";
+import { StyledLoadingOutlined } from "./ProfileSettingsModal";
 
 const { Dragger } = Upload;
 
@@ -18,10 +19,9 @@ const UploadFileModal = (prop: UploadFileModalProps) => {
     const { isModalOpen, setIsModalOpen } = prop;
     const [fileList, setFileList] = useState<any[]>([]);
     const [uploading, setUploading] = useState(false);
-    const [spinning, setSpinning] = useState(false);
-    const [percent, setPercent] = useState(0);
+    const [percent, setPercent] = useState<number>(0);
 
-    const customSpinIcon = <LoadingOutlined style={{ fontSize: 18 }} spin />;
+    const customSpinIcon = <StyledLoadingOutlined spin />;
 
     const props = {
         name: 'file',
@@ -44,9 +44,7 @@ const UploadFileModal = (prop: UploadFileModalProps) => {
             const email = auth.currentUser?.email;
             const uid = auth.currentUser?.uid;
     
-            if (!email || !uid) {
-                throw new Error("User is not authenticated");
-            }
+            if (!email || !uid) throw new Error("User is not authenticated");
     
             const fileRef = await addDoc(collection(database, "Files"), {
                 user_id: uid,
@@ -58,8 +56,8 @@ const UploadFileModal = (prop: UploadFileModalProps) => {
                 }
             });
             console.log(fileRef.id, ' ------->>> Database added successfully');
-        } catch (error) {
-            console.log("Error adding file details:", error);
+        } catch (error: any) {
+            console.error("Error adding file details:", error);
         }
     };
 
@@ -70,7 +68,6 @@ const UploadFileModal = (prop: UploadFileModalProps) => {
         }
 
         setUploading(true);
-        setSpinning(true);
         setPercent(0);
         let completedUploads = 0;
 
@@ -89,7 +86,6 @@ const UploadFileModal = (prop: UploadFileModalProps) => {
                     message.error(`${file.name} file upload failed.`);
                     console.error('Upload failed:', error);
                     setUploading(false);
-                    setSpinning(false);
                 },
                 () => {
                     getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
@@ -100,7 +96,6 @@ const UploadFileModal = (prop: UploadFileModalProps) => {
 
                         if (completedUploads === fileList.length) {
                             setUploading(false);
-                            setSpinning(false);
                             setIsModalOpen(false);
                             setFileList([]);                            
                         }
@@ -137,9 +132,9 @@ const UploadFileModal = (prop: UploadFileModalProps) => {
                     key="upload"
                     onClick={handleUpload}
                     disabled={uploading}
-                    icon={uploading ? <Spin spinning={spinning} indicator={customSpinIcon} /> : undefined}
+                    icon={uploading ? <Spin spinning={uploading} indicator={customSpinIcon} /> : undefined}
                 >
-                    {uploading ? 'Uploading...' : 'Upload'}
+                    {uploading ? 'Uploading' : 'Upload'}
                 </UploadButton>
             ]}
         >
@@ -156,7 +151,7 @@ const UploadFileModal = (prop: UploadFileModalProps) => {
                         </p>
                     </Dragger>
                 </FileDragger>
-                {spinning && <Progress percent={percent} />}
+                {uploading && <Progress percent={percent} />}
           
         </StyledModal>
     );

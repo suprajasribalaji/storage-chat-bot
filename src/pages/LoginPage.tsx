@@ -10,12 +10,12 @@ import ForgotPasswordModal from "../components/modal/ForgotPasswordModal";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { requestUserLogin, requestUserLoginByGithub, requestUserLoginByGoogle } from "../redux/slices/user/login";
-import { getEmailValidationRules, getPasswordValidationRules } from "../helpers/helpers";
 import { FieldType } from "../utils/utils";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth, database } from "../config/firebase.config";
 import axios from "axios";
 import { requestGenerateAndSendOTP } from "../redux/slices/user/api";
+import { getEmailValidationRules, getPasswordValidationRules } from "../utils/validation";
 
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
   console.log('Failed on finish:', errorInfo);
@@ -31,6 +31,14 @@ const LoginPage = () => {
       setIsModalOpen(true);
     }
 
+    const fetchUserDetails = async () => {
+      const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
+      const querySnapshot = await getDocs(userQuery);
+      const userDoc = querySnapshot.docs[0];
+      const userData = userDoc.data();
+      return userData;
+    }
+
     const handleLoginButton: FormProps<FieldType>['onFinish'] = async (values) => {
       console.log('Success:', values);
       const { email, password, remember } = values;
@@ -41,18 +49,14 @@ const LoginPage = () => {
         }
         const response = await dispatch(requestUserLogin({email, password})).unwrap();
         console.log('in login page: =======-----<<<<< ', response);
-       
-        const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
-        const querySnapshot = await getDocs(userQuery);
-        const userDoc = querySnapshot.docs[0];
-          const userData = userDoc.data();
-        
-        if (!querySnapshot.empty && userData.is_2fa_enabled) {
-          try {
-            const generateAndSendOTPResponse = await dispatch(requestGenerateAndSendOTP({ email: userData.email, nickName: userData.nick_name }));
-            console.log('otp generate and send: ', generateAndSendOTPResponse);
             
+        const userData = await fetchUserDetails();
+
+        if (userData.is_2fa_enabled) {
+          try {
             if(userData.is_2fa_enabled) {
+              const generateAndSendOTPResponse = await dispatch(requestGenerateAndSendOTP({ email: userData.email, nickName: userData.nick_name }));
+            console.log('otp generate and send: ', generateAndSendOTPResponse);
               navigate('/verify-user')
             } else {
               navigate('/home');
@@ -91,18 +95,25 @@ const LoginPage = () => {
 
     const handleLoginByProvider = async (provider: string) => {
       try {
-        if(provider==='google') {
-          await dispatch(requestUserLoginByGoogle()).then(() => {
-            navigate('/home');
-            message.success('Logged in successfully!');
-          }).catch((error) => console.log('error at login:google', error))
-        } else if(provider==='github') {
-          await dispatch(requestUserLoginByGithub()).then(() => {
-            navigate('/home');
-            message.success('Logged in successfully!');
-          }).catch((error) => console.log('error at login:google', error))
+        if(provider==='google') await dispatch(requestUserLoginByGoogle());
+        else if(provider==='github') await dispatch(requestUserLoginByGithub());
+        const userData = await fetchUserDetails();
+        if (userData.is_2fa_enabled) {
+          try {
+            if(userData.is_2fa_enabled) {
+              const generateAndSendOTPResponse = await dispatch(requestGenerateAndSendOTP({ email: userData.email, nickName: userData.nick_name }));
+              console.log('otp generate and send: ', generateAndSendOTPResponse);
+              navigate('/verify-user')
+            } else {
+              navigate('/home');
+            }
+          } catch (error) {
+            console.error('Error generating OTP:', error);
+            message.error('Failed to generate OTP. Please try again.');
+          }
+        } else {
+          navigate('/home');
         }
-        
         message.success('Logged in successfully!');
       } catch (error) {
         console.error('Login failed:', error);

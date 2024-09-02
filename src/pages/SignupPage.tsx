@@ -1,37 +1,38 @@
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import BackgroundImage from "../assets/images/SignupPageBackground.jpg";
-import { colors } from "../assets/themes/color";
 import Title from "antd/es/typography/Title";
 import type { FormProps } from 'antd';
 import { Button, Divider, Form, message } from 'antd';
 import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
-import { requestUserLoginByGithub, requestUserLoginByGoogle } from "../redux/slices/user/login";
+import BackgroundImage from "../assets/images/SignupPageBackground.jpg";
+import { colors } from "../assets/themes/color";
 import { useAppDispatch } from "../hooks/useAppDispatch";
+import { requestUserLoginByGithub, requestUserLoginByGoogle } from "../redux/slices/user/login";
 import { requestUserSignup } from "../redux/slices/user/signup";
-import { FieldType } from "../utils/utils";
-import { getEmailValidationRules, getPasswordValidationRules } from "../helpers/helpers";
 import { CenteringTheDiv, StyledGithubButton, StyledGoogleButton, StyledInput, StyledPasswordInput } from "./LoginPage";
+import { FieldType } from "../utils/utils";
+import { getEmailValidationRules, getPasswordValidationRules } from "../utils/validation";
 
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
     console.log('Failed:', errorInfo);
+    message.error('Form submission failed. Please check the fields and try again.');
 };
 
 const SignupPage = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
-    const handleSignupButton: FormProps<FieldType>['onFinish'] = async (values) => {
+    const handleSignupButton: FormProps<FieldType>['onFinish'] = async (values: FieldType) => {
         console.log('Success:', values);
         const { email, password } = values;
         try {
             const response = await dispatch(requestUserSignup({email, password})).unwrap();
             navigate('/home');
             console.log(response, "this is the response ====>")
-            message.success('Logged in successfully!');
+            message.success('Signed up successfully!!');
         } catch (error) {
-            console.error('Login failed:', error);
-            message.error('Login failed. Please check your credentials.');
+            console.error('Signup failed:', error);
+            message.error('Signup failed. Please check your credentials.');
         }
     };
     
@@ -42,7 +43,7 @@ const SignupPage = () => {
             if(provider==='github') response = await dispatch(requestUserLoginByGithub());
             navigate('/home');
             console.log(response, " : provider respose ----------");
-            message.success('Logged in using gmail successfully!');
+            message.success(`Logged in using ${provider} successfully!`);
         } catch (error) {
             console.error('Login failed:', error);
             message.error('Login failed. Please check your credentials.');

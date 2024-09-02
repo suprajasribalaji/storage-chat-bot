@@ -36,7 +36,10 @@ app.post('/reset-password', async (req, res) => {
 app.post('/send-reset-password-link', async (req, res) => {
     console.log('Received request:', req.body);
     try {
-        const { to, link } = req.body;        
+        const { to, link } = req.body; 
+        if (!to || !link) {
+            return res.status(400).json({ error: 'To and link are required' });
+        }       
         const message = {
             to,
             from: {
@@ -46,7 +49,7 @@ app.post('/send-reset-password-link', async (req, res) => {
             templateId: SENDGRID_TEMPLATE_ID,
             dynamic_template_data: {
                 email: to,
-                link: link.data,
+                link: link,
             }
         };
         const response = await sendgrid.send(message);

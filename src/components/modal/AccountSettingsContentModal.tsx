@@ -25,7 +25,6 @@ const AccountSettingsContentModal = (props: AccountSettingsContentModalProps) =>
     const [is2FAEnable, setIs2FAEnable] = useState<boolean>(false);
     const [loading, setLoading] = useState(false);
     const dispatch = useAppDispatch();
-    
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -35,23 +34,23 @@ const AccountSettingsContentModal = (props: AccountSettingsContentModalProps) =>
     }, [user_id]);
 
     useEffect(() => {
-        const fetchUserPlan = async () => {
-            try {
-                const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
-                const querySnapshot = await getDocs(userQuery);
-                if (!querySnapshot.empty) {
-                    const userDoc = querySnapshot.docs[0];
-                    const userData = userDoc.data();
-                    setCurrentPlan(userData.plan);
-                    setIs2FAEnable(userData.is_2fa_enabled); 
-                }
-            } catch (error) {
-                console.error("Error fetching user plan: ", error);
-            }
-        };
-
         fetchUserPlan();
     }, []);
+
+    const fetchUserPlan = async () => {
+        try {
+            const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
+            const querySnapshot = await getDocs(userQuery);
+            if (!querySnapshot.empty) {
+                const userDoc = querySnapshot.docs[0];
+                const userData = userDoc.data();
+                setCurrentPlan(userData.plan);
+                setIs2FAEnable(userData.is_2fa_enabled); 
+            }
+        } catch (error) {
+            console.error("Error fetching user plan: ", error);
+        }
+    };
 
     const fetchDataOfCurrentUser = async (user_id: string | undefined) => {
         try {
@@ -85,7 +84,6 @@ const AccountSettingsContentModal = (props: AccountSettingsContentModalProps) =>
             console.error("Error fetching user data:", error);
         }
     };
-
 
     const handleExportButton = async () => {
         setLoading(true);

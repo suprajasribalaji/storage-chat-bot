@@ -3,6 +3,12 @@ export interface RequestUserCredentialsPayload {
     password: string;
 };
 
+export interface RequestUserLoginPayload {
+    userCredential: any;
+    provider: string | null;
+    thunkAPI: any;
+};
+
 export interface AddNewUserPayload {
     uid: string;
     mail: string | null;

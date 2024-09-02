@@ -25,6 +25,9 @@ const otpStore = {};
 app.post('/generate-send-otp', async (req, res) => {
   try {
     const { email: rawEmail, nickName } = req.body;
+    if (!rawEmail || !nickName) {
+      return res.status(400).json({ success: false, message: 'Email and nickName are required' });
+    }
     const email = rawEmail.toLowerCase();
     const secret = speakeasy.generateSecret();
     const otp = speakeasy.totp({
@@ -34,9 +37,7 @@ app.post('/generate-send-otp', async (req, res) => {
       digits: 6,
     });
     const expiration = Date.now() + 10 * 60 * 1000;
-
     otpStore[email] = { otp: otp, secret: secret.base32, expiration: expiration };
-    
     const message = {
         to: email,
         from: {
@@ -49,11 +50,7 @@ app.post('/generate-send-otp', async (req, res) => {
             nickName: nickName,
         }
     };
-
-    console.log('OTP generated and stored:', otpStore[email]); 
-
     await sendgrid.send(message);
-    console.log('OTP sent:', message); 
     res.status(200).json({ success: true, message: 'OTP generated successfully' });
   } catch (error) {
     console.error('Error generating OTP:', error);
@@ -64,23 +61,19 @@ app.post('/generate-send-otp', async (req, res) => {
 app.post('/verify-otp', (req, res) => {
   try {
     const { email: rawEmail, otp } = req.body;
+    if (!rawEmail || !otp) {
+      return res.status(400).json({ success: false, message: 'Email and OTP are required' });
+    }
     const email = rawEmail.toLowerCase();
-    console.log('Verification request:', { email, otp });
-
-    const otpData = otpStore[email];
-    console.log('Stored OTP data:', otpData);
-    
+    const otpData = otpStore[email];    
     if (!otpData) {
       return res.status(400).json({ success: false, message: 'No OTP found for this email' });
     }
-
     const { secret, expiration } = otpData;
-
     if (Date.now() > expiration) {
       delete otpStore[email];
       return res.status(400).json({ success: false, message: 'OTP has expired' });
     }
-
     const isValid = speakeasy.totp.verify({
       secret,
       encoding: 'base32',
@@ -88,10 +81,7 @@ app.post('/verify-otp', (req, res) => {
       algorithm: 'sha512',
       digits: 6,
       window: 1,
-    });
-
-    console.log('OTP verification result:', isValid);
-    
+    });    
     if (isValid) {
       delete otpStore[email];
       res.status(200).json({ success: true, message: 'OTP verified successfully' });

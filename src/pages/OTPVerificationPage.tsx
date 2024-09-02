@@ -6,6 +6,7 @@ import { auth } from "../config/firebase.config";
 import { colors } from "../assets/themes/color";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { requestOTPVerification } from "../redux/slices/user/api";
+import { CenterDiv } from "./AccessPage";
 
 const OTPVerificationPage = () => {
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -34,17 +35,21 @@ const OTPVerificationPage = () => {
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
+            const email = auth.currentUser?.email;
             const otpString = otp.join("");
-            const otpVerficationResponse = await dispatch(requestOTPVerification({ email: auth.currentUser?.email, otp: otpString }));            
-            if (otpVerficationResponse.payload) {
+            if (!email || !otpString) throw new Error("User email or OTP not found");
+            
+            const otpVerificationResponse = await dispatch(requestOTPVerification({ email, otp: otpString }));
+            
+            if (otpVerificationResponse.payload) {
                 navigate('/home');
             } else {
-                message.error(otpVerficationResponse.payload);
-                setErrorIndex(otpVerficationResponse.payload);
-                setOtp(["", "", "", "", "", ""]);
+                throw new Error(otpVerificationResponse.payload || "OTP verification failed");
             }
-        } catch (error) {
-            message.error('Error verifying OTP');
+        } catch (error: any) {
+            message.error(error.message || 'Error verifying OTP');
+            setErrorIndex(null);
+            setOtp(["", "", "", "", "", ""]);
         } finally {
             setIsSubmitting(false);
         }
@@ -92,11 +97,8 @@ const OTPVerificationPage = () => {
 
 export default OTPVerificationPage;
 
-const OTPVerification = styled.div`
-    display: flex;
+const OTPVerification = styled(CenterDiv)`
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
     height: 100vh;
     width: 100%;
     background-color: ${colors.silverGray};

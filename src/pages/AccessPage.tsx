@@ -6,16 +6,15 @@ import { LoginOutlined } from "@ant-design/icons"
 import { colors } from "../assets/themes/color"
 import { useNavigate } from "react-router-dom"
 
-// change this to loginPage
 const AccessPage = () => {
     const navigate = useNavigate();
     
-    const handleGetStartedButton = () => {
-        navigate('/login');
-    };
-
-    const handleJoinNowButton = () => {
-        navigate('/signup');
+    const handleNavigation = (path: string) => {
+        try {
+            navigate(path);
+        } catch (error) {
+            console.error("Navigation error:", error);
+        }
     };
 
     return (
@@ -30,14 +29,14 @@ const AccessPage = () => {
                             <StyledSubtitle>Safeguard and organized for clutter free spaces</StyledSubtitle>
                         </AccessPageSubtitle>
                         <StyledGetStartedButton>
-                            <StyledGSButton onClick={handleGetStartedButton} icon={<LoginOutlined />}>Get Started</StyledGSButton>
+                            <StyledGSButton onClick={() => handleNavigation('/login')} icon={<LoginOutlined />}>Get Started</StyledGSButton>
                         </StyledGetStartedButton>
                         <JoinNow>
                             <NewToOurPlatform>
                                 New to our platform?
                             </NewToOurPlatform>
                             <JoinNowButtonDiv>
-                                <StyledJoinNowButton onClick={handleJoinNowButton} type="link">Join Now</StyledJoinNowButton>
+                                <StyledJoinNowButton onClick={() => handleNavigation('/signup')} type="link">Join Now</StyledJoinNowButton>
                             </JoinNowButtonDiv>
                         </JoinNow>
                     </AccessPageContent>
@@ -47,7 +46,7 @@ const AccessPage = () => {
     )
 }
 
-export default AccessPage
+export default AccessPage;
 
 const StyledAccessPage = styled.div`
     width: 100%;
@@ -55,34 +54,34 @@ const StyledAccessPage = styled.div`
     font-family: "Poppins", sans-serif;
 `;
 
-const StyledDiv= styled.div`
+export const CenterDiv= styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
 `;
 
-const AccessPageBackground1 = styled(StyledDiv)`
+const AccessPageBackground1 = styled(CenterDiv)`
     background-image: url(${BackgroundImage});
     background-size: cover;
     background-position: center;
     height: 100vh;
 `;
 
-const AccessPageBackground2 = styled(StyledDiv)`
+const AccessPageBackground2 = styled(CenterDiv)`
     width: 30%;
     height: 72vh;
     border-radius: 1em;
     background-color: ${colors.lightGray};
 `;
 
-const AccessPageContent = styled(StyledDiv)`
+const AccessPageContent = styled(CenterDiv)`
     flex-direction: column;
     text-align: center;
     width: 100%;
 `;
 
-const AccessPageTitle = styled(StyledDiv)`
-    width: 16em;
+const AccessPageTitle = styled(CenterDiv)`
+    width: 80%;
 `;
 
 const StyledTitle = styled(Title)`
@@ -101,7 +100,7 @@ const StyledSubtitle = styled.div`
     color: ${colors.ashGray};
 `;
 
-const StyledGetStartedButton = styled(StyledDiv)`
+const StyledGetStartedButton = styled(CenterDiv)`
     margin-top: 1.6em;
 `;
 
@@ -123,7 +122,7 @@ const StyledGSButton = styled(StyledButton)`
     }
 `;
 
-const JoinNow = styled(StyledDiv)`
+const JoinNow = styled(CenterDiv)`
     font-size: 0.92em;
     margin-top: 0.8em;
 `;

@@ -31,3 +31,11 @@ export interface RespondedMessage {
     responded_at?: number;
     noFileFound?: boolean;
 }
+
+export const normalizeString = (str: string) => {
+    return str.toLowerCase().replace(/[^a-z0-9]/g, '');
+};
+
+export const formatTimestamp = (timestamp: number) => {
+    return new Date(timestamp).toLocaleTimeString();
+};

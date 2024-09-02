@@ -4,15 +4,19 @@ import { auth, githubAuthProvider, googleAuthProvider } from '../../../config/fi
 import { setCurrentUser } from '../auth/auth';
 import { addNewUser } from './signup';
 import { Actions } from '../../actions/actionPayload';
-import { RequestUserCredentialsPayload } from './userPayload';
+import { RequestUserCredentialsPayload, RequestUserLoginPayload } from './userPayload';
 
-const handleUserLogin = async (userCredential: any, provider: string | null, thunkAPI: any) => {
-  const user = userCredential.user;
-  const profilePicture = user.photoURL;
-  if (provider) await addNewUser({ uid: user.uid, mail: user.email, provider });
-  if (!user) return thunkAPI.rejectWithValue("User not found");
-  thunkAPI.dispatch(setCurrentUser({ uid: user.uid, email: user.email, profilePictureURL: profilePicture, user: user }));
-  return { uid: user.uid, email: user.email, profilePictureURL: profilePicture, user: user };
+const handleUserLogin = async ({userCredential, provider, thunkAPI}: RequestUserLoginPayload) => {
+  try {
+    const user = userCredential.user;
+    const profilePicture = user.photoURL;
+    if (!user) return thunkAPI.rejectWithValue("User not found");
+    if (provider) await addNewUser({ uid: user.uid, mail: user.email, provider });
+    thunkAPI.dispatch(setCurrentUser({ uid: user.uid, email: user.email, profilePictureURL: profilePicture, user: user }));
+    return { uid: user.uid, email: user.email, profilePictureURL: profilePicture, user: user };
+  } catch (error: any) {
+    return thunkAPI.rejectWithValue(error.message || "Login handling failed");
+  }
 };
 
 export const requestUserLogin = createAsyncThunk(
@@ -20,7 +24,7 @@ export const requestUserLogin = createAsyncThunk(
   async ({ email, password }: RequestUserCredentialsPayload, thunkAPI) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      return await handleUserLogin(userCredential, null, thunkAPI);
+      return await handleUserLogin({ userCredential, provider: null, thunkAPI });
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message || 'Login failed');
     }
@@ -32,7 +36,7 @@ export const requestUserLoginByGoogle = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const userCredential = await signInWithPopup(auth, googleAuthProvider);
-      return await handleUserLogin(userCredential, 'Google', thunkAPI);
+      return await handleUserLogin({ userCredential, provider: 'Google', thunkAPI });
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message || 'Login with Google failed');
     }
@@ -44,7 +48,7 @@ export const requestUserLoginByGithub = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const userCredential = await signInWithPopup(auth, githubAuthProvider);
-      return await handleUserLogin(userCredential, 'Github', thunkAPI);
+      return await handleUserLogin({ userCredential, provider: 'Github', thunkAPI });
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message || 'Login with GitHub failed');
     }

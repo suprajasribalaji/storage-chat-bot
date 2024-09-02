@@ -20,20 +20,26 @@ const LogoutSlice = createSlice({
   name: 'logout',
   initialState: {
     isLoading: false,
+    currentUser: null,
+    status: 'idle',
+    error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(requestUserLogout.pending, (state) => {
         state.isLoading = true;
+        state.status = 'pending';
       })
       .addCase(requestUserLogout.fulfilled, (state: any, action) => {
+        state.isLoading = false;
         state.currentUser = action.payload;
-        state.status = 'succeeded';
+        state.status = 'fulfilled';
         state.error = null;
       })
       .addCase(requestUserLogout.rejected, (state: any, action) => {
-        state.status = 'failed';
+        state.isLoading = false;
+        state.status = 'rejected';
         state.error = action.payload;
       });
   },

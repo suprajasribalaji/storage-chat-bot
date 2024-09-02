@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Modal, Button, Input, Form, notification } from 'antd';
 import type { FormProps } from 'antd';
 import styled from 'styled-components';
 import { colors } from '../../assets/themes/color';
 import { FieldType } from '../../utils/utils';
-import { getEmailValidationRules } from '../../helpers/helpers';
 import { useAppDispatch } from '../../hooks/useAppDispatch';
 import { requestResetPassword } from '../../redux/slices/user/api';
+import { getEmailValidationRules } from '../../utils/validation';
 
 type RetrieveCredentialsModalProps = {
     isModalOpen: boolean;
@@ -17,35 +17,28 @@ const RetrieveCredentialsModal = ( props: RetrieveCredentialsModalProps ) => {
     const { isModalOpen, setIsModalOpen } = props;
     const dispatch = useAppDispatch();
     
-    const handleSendEmail: FormProps<FieldType>['onFinish'] = async (value) => {
+    const handleSendEmail: FormProps<FieldType>['onFinish'] = useCallback(async (value: any) => {
         const { email } = value;
         try {
-            const emailTriggerForResetPasswordResponse = await dispatch(requestResetPassword({ email }));
-            console.log('response: ', emailTriggerForResetPasswordResponse);
-            if(emailTriggerForResetPasswordResponse.payload) {
+            const response = await dispatch(requestResetPassword({ email }));
+            if (response.payload) {
                 setIsModalOpen(false);
                 notification.success({
                     message: 'Success',
                     description: 'Email Sent Successfully!',
                     placement: 'topRight',
                 });
-            } else { 
-                notification.error({
-                message: 'Error',
-                description: 'Failed to send email!',
-                placement: 'topRight',
-            });
-            console.log(emailTriggerForResetPasswordResponse.type + " : " + emailTriggerForResetPasswordResponse.payload);
+            } else {
+                throw new Error('Failed to send email');
             }
-        } catch (error) {
+        } catch (error: any) {
             notification.error({
                 message: 'Error',
-                description: 'An error occurred while sending the email.',
+                description: error.message || 'An error occurred while sending the email.',
                 placement: 'topRight',
             });
-            console.log(error);
         }
-    };
+    }, [dispatch, setIsModalOpen]);
 
     return (
         <StyledModal
@@ -62,17 +55,16 @@ const RetrieveCredentialsModal = ( props: RetrieveCredentialsModalProps ) => {
                     onFinish={handleSendEmail}
                 >
                     <FlexContainer>
-                        <Form.Item
+                        <StyledFormItem
                             name="email"
                             rules={getEmailValidationRules()}
-                            style={{ flex: 1 }}
+                            
                         >
                             <StyledInput placeholder='Enter your registered email' />
-                        </Form.Item>
-                        <Form.Item style={{ marginLeft: '8px' }}> 
-                            {/* no inline css no px only rem */}
+                        </StyledFormItem>
+                        <StyledFormItem>
                             <StyledButton htmlType='submit'>Send</StyledButton>
-                        </Form.Item>
+                        </StyledFormItem>
                     </FlexContainer>
                 </Form>
             </RetrieveCredentials>
@@ -136,9 +128,13 @@ const FlexContainer = styled.div`
     justify-content: space-between;
 `;
 
+const StyledFormItem = styled(Form.Item)`
+    flex: 1;
+`;
+
 const StyledInput = styled(Input)`
     border: none;
-    width: 164%;
+    width: 240%;
 `;
 
 const StyledButton = styled(Button)`
@@ -146,7 +142,7 @@ const StyledButton = styled(Button)`
     background-color: ${colors.wineRed};
     color: ${colors.white};
     white-space: nowrap;
-    margin-left: 200%;
+    margin-left: 150%;
 
     &&&:hover {
         background-color: ${colors.white};

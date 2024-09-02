@@ -4,13 +4,18 @@ import { useEffect, useState } from "react";
 import { auth, database } from "../config/firebase.config";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { User } from "../utils/utils";
+import { StyledLoadingOutlined } from "./modal/ProfileSettingsModal";
 
 const ContentBeforeStartingChatComponent = () => {
     const user_id = auth.currentUser?.uid;
     const [currentUser, setCurrentUser] = useState<User | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!user_id) throw new Error('User not found! Please ensure you are logged in!');
+        if (!user_id) {
+            setError('User not found! Please ensure you are logged in!');
+            return;
+        }
 
         const getCurrentUserName = () => {
             try {
@@ -21,7 +26,7 @@ const ContentBeforeStartingChatComponent = () => {
 
                 const unsubscribe = onSnapshot(userQuery, (querySnapshot) => {
                     if (querySnapshot.empty) {
-                        console.error("No user found!");
+                        setError("No user found!");
                         return;
                     }
 
@@ -29,12 +34,16 @@ const ContentBeforeStartingChatComponent = () => {
                         const userData = doc.data() as User;
                         setCurrentUser(userData);
                     });
+                }, (error) => {
+                    console.error('Error fetching name from database:', error);
+                    setError('Error fetching name from database');
                 });
 
                 return unsubscribe;
 
             } catch (error) {
                 console.error('Error fetching name from database:', error);
+                setError('Error fetching name from database');
             }
         };
 
@@ -49,13 +58,13 @@ const ContentBeforeStartingChatComponent = () => {
     return (
         <ContentBeforeStartingChat>
             <Content>
-                {
-                    currentUser?.nick_name ? 
-                    <>WareHouse family welcomes you, {currentUser?.nick_name}!</> :
-                    currentUser?.full_name ?
-                    <>WareHouse family welcomes you, {currentUser?.full_name}!</> :
-                    <>WareHouse family welcomes you, {currentUser?.email}!</>
-                }
+                {error ? (
+                    <>{error}</>
+                ) : currentUser ? (
+                    <>WareHouse family welcomes you, {currentUser.nick_name || currentUser.full_name || currentUser.email}!</>
+                ) : (
+                    <StyledLoadingOutlined spin />
+                )}
             </Content>
         </ContentBeforeStartingChat>
     );

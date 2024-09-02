@@ -66,6 +66,7 @@ app.post('/subscribe', async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Something went wrong.',
+            error: error.message,
         });
     }
 });
@@ -94,7 +95,11 @@ app.post('/verify-payment', async (req, res) => {
             });
         } catch (error) {
             console.error('Error fetching payment details:', error);
-            res.status(500).json({ success: false, message: 'Error fetching payment details' });
+            res.status(500).json({ 
+                success: false,
+                message: 'Error fetching payment details',
+                error: error.message
+            });
         }
     } else {
         res.status(400).json({ 

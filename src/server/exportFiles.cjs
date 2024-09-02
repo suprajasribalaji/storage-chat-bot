@@ -17,28 +17,27 @@ app.use(cors({
 app.use(bodyParser.json());
 
 app.post('/export-files', async (req, res) => {
-  console.log(req.body);
-  
-  if (!req.body) {
+  if (!req.body  || !Array.isArray(req.body.fileDownloadURLs) || !Array.isArray(req.body.fileNames)) {
     return res.status(400).json({ error: 'Invalid request data' });
   }
-
   const { fileDownloadURLs, fileNames } = req.body;
-
-  console.log(fileDownloadURLs, ' ... ', fileNames);
-  
   const zip = archiver('zip');
   const zipStream = new stream.PassThrough();
   zip.pipe(zipStream);
 
   try {
     for (let i = 0; i < fileDownloadURLs.length; i++) {
-      const response = await axios({
-        method: 'get',
-        url: fileDownloadURLs[i],
-        responseType: 'stream'
-      });
-      zip.append(response.data, { name: fileNames[i] });
+      try {
+        const response = await axios({
+          method: 'get',
+          url: fileDownloadURLs[i],
+          responseType: 'stream'
+        });
+        zip.append(response.data, { name: fileNames[i] });
+      } catch (fileError) {
+        console.error(`Error downloading file ${fileNames[i]}:`, fileError);
+        return res.status(500).json({ error: `Error downloading file ${fileNames[i]}` });
+      }
     }
 
     await zip.finalize();
