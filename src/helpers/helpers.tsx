@@ -1,11 +1,32 @@
-import { emailPattern, passwordPattern } from "../utils/regexPattern";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { auth, database } from "../config/firebase.config";
 
-export const getEmailValidationRules = () => [
-  { required: true, message: 'Please input your email!' },
-  { pattern: emailPattern, message: 'Please enter a valid email address!' },
-];
+export const fetchCurrentUserDetails = async () => {
+  try {
+    const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
+    const querySnapshot = await getDocs(userQuery);
+    if (!querySnapshot.empty) {
+      const userDoc = querySnapshot.docs[0];
+      const userData = userDoc.data();
+      return userData;
+    }
+    return;
+  } catch (error: any) {
+    console.error('Error at fetching user details: ', error);
+  }
+};
 
-export const getPasswordValidationRules = () => [
-  { required: true, message: 'Please input your password!' },
-  { pattern: passwordPattern, message: 'Password must be min 8 and max 16 valid characters! Includes at least one uppercase letter, one lowercase letter, one digit, and one special character' },
-];
+export const fetchCurrentUserReferrence= async () => {
+  try {
+    const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
+    const querySnapshot = await getDocs(userQuery);
+    if (!querySnapshot.empty) {
+      const userDoc = querySnapshot.docs[0];
+      const userRef = userDoc.ref;
+      return userRef;
+    }
+    return;
+  } catch (error: any) {
+    console.error('Error at fetching user details: ', error);
+  }
+};

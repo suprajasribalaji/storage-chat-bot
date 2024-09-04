@@ -6,15 +6,12 @@ import { FaUserLarge } from "react-icons/fa6";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { RxUpdate } from "react-icons/rx";
 import styled from 'styled-components';
-import { collection, getDocs, query, where } from "firebase/firestore";
-
-import { auth, database } from '../../config/firebase.config';
 import { colors } from '../../assets/themes/color';
 import { Profile } from '../../utils/utils';
-
 import ProfileSetttingsContentModal from './ProfileSetttingsContentModal';
 import AccountSettingsContentModal from './AccountSettingsContentModal';
 import SubscriptionSettingsContentModal from './SubscriptionSettingsContentModal';
+import { fetchCurrentUserDetails } from '../../helpers/helpers';
 
 const StyledProfileSettingsModal = styled(Modal)`
     width: 56% !important;
@@ -120,16 +117,12 @@ const ProfileSettingsModal = (props: ProfileSettingsModalProps) => {
         setLoading(true);
         setError(null);
         try {
-            const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
-            const querySnapshot = await getDocs(userQuery);
-            if (!querySnapshot.empty) {
-                querySnapshot.forEach((doc) => {
-                    const userData = doc.data() as Profile;
-                    setProfile({
-                        full_name: userData.full_name || '',
-                        nick_name: userData.nick_name || '',
-                        email: userData.email || '',
-                    });
+            const userData = await fetchCurrentUserDetails();
+            if (userData) {
+                setProfile({
+                    full_name: userData.full_name || '',
+                    nick_name: userData.nick_name || '',
+                    email: userData.email || '',
                 });
             } else {
                 console.log("No user found with that email.");

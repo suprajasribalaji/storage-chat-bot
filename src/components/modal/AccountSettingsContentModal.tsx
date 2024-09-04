@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { Profile } from "../../utils/utils";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { requestExportFiles } from "../../redux/slices/user/api";
+import { fetchCurrentUserDetails, fetchCurrentUserReferrence } from "../../helpers/helpers";
 
 type AccountSettingsContentModalProps = {
     profile: Profile;
@@ -17,7 +18,7 @@ type AccountSettingsContentModalProps = {
 };
 
 const AccountSettingsContentModal = (props: AccountSettingsContentModalProps) => {
-    const { profile, setSelectedKey } = props;
+    const { setSelectedKey } = props;
     const user_id = auth.currentUser?.uid;
     const [fileDownloadURL, setFileDownloadURL] = useState<string[]>([]);
     const [fileNames, setFileNames] = useState<string[]>([]);
@@ -34,19 +35,17 @@ const AccountSettingsContentModal = (props: AccountSettingsContentModalProps) =>
     }, [user_id]);
 
     useEffect(() => {
-        fetchUserPlan();
+        fetchCurrentUserPlan();
     }, []);
 
-    const fetchUserPlan = async () => {
+    const fetchCurrentUserPlan = async () => {
         try {
-            const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
-            const querySnapshot = await getDocs(userQuery);
-            if (!querySnapshot.empty) {
-                const userDoc = querySnapshot.docs[0];
-                const userData = userDoc.data();
+            const userData = await fetchCurrentUserDetails();
+            if(userData) {
                 setCurrentPlan(userData.plan);
                 setIs2FAEnable(userData.is_2fa_enabled); 
             }
+            return;
         } catch (error) {
             console.error("Error fetching user plan: ", error);
         }
@@ -116,15 +115,11 @@ const AccountSettingsContentModal = (props: AccountSettingsContentModalProps) =>
         }
     };
     
-
     const handle2FAEnableButton = async () => {
         try {
             if (!user_id) throw new Error('User not logged in');
-            const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
-            const querySnapshot = await getDocs(userQuery);
-            if (!querySnapshot.empty) {
-                const userDoc = querySnapshot.docs[0];
-                const userRef = userDoc.ref; 
+            const userRef = await fetchCurrentUserReferrence();
+            if (userRef) {
                 await updateDoc(userRef, {
                     is_2fa_enabled: true,
                 });      
@@ -142,15 +137,9 @@ const AccountSettingsContentModal = (props: AccountSettingsContentModalProps) =>
 
     const handleDeleteButton = async () => {
         try {
-            const userQuery = query(collection(database, "Users"), where("email", "==", profile.email));
-            const querySnapshot = await getDocs(userQuery);
-
-            if (!querySnapshot.empty) {
-                const userDoc = querySnapshot.docs[0];
-                const userRef = userDoc.ref;
-                
+            const userRef = await fetchCurrentUserReferrence();
+            if (userRef) {
                 await deleteDoc(userRef);
-
                 const user = auth.currentUser;
                 if (user) {
                     await deleteUser(user);

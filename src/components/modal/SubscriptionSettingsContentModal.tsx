@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { Button, message } from "antd";
 import styled from "styled-components";
-import { collection, getDocs, query, where } from "firebase/firestore";
 import { colors } from "../../assets/themes/color";
-import { auth, database } from "../../config/firebase.config";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { requestPaymentVerification, requestPlanSubscription } from "../../redux/slices/user/api";
+import { fetchCurrentUserDetails } from "../../helpers/helpers";
 
 type SubscriptionSettingsContentModalProps = {
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -24,15 +23,15 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
     useEffect(() => {
         const fetchUserPlan = async () => {
             try {
-                const userQuery = query(collection(database, "Users"), where("email", "==", auth.currentUser?.email));
-                const querySnapshot = await getDocs(userQuery);
-                if (!querySnapshot.empty) {
-                    const userDoc = querySnapshot.docs[0];
-                    const userData = userDoc.data();
+                const userData = await fetchCurrentUserDetails();
+                if(userData){
                     setCurrentPlan(userData.plan);
                     setFullName(userData.full_name);
                     setNickName(userData.nick_name);
                     setPlanValidity(userData.subscribed_at.toDate() || null);
+                } else {
+                    message.error('User not found');
+                    console.error('User not found');
                 }
             } catch (error) {
                 console.error("Error fetching user plan: ", error);

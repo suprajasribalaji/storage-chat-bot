@@ -1,10 +1,11 @@
 import { Button, message } from 'antd';
 import { ChangeEvent, useState } from 'react';
 import styled from 'styled-components';
-import { collection, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { updateDoc } from 'firebase/firestore';
 import { colors } from '../../assets/themes/color';
-import { auth, database } from '../../config/firebase.config';
+import { auth } from '../../config/firebase.config';
 import { Profile } from '../../utils/utils';
+import { fetchCurrentUserReferrence } from '../../helpers/helpers';
 
 type ProfileSettingsContentModalProps = {
     profile: Profile;
@@ -31,15 +32,12 @@ const ProfileSettingsContentModal = ( props: ProfileSettingsContentModalProps ) 
         }
         try {
             setIsChanged(false);
-            const userQuery = query(collection(database, "Users"), where("email", "==", profile.email));
-            const querySnapshot = await getDocs(userQuery);
-            if (querySnapshot.empty) {
+            const userRef = await fetchCurrentUserReferrence();
+            if(!userRef){
                 message.error('User not found');
                 console.log("No user found with that email.");
                 return;
             }
-            const userDoc = querySnapshot.docs[0];
-            const userRef = userDoc.ref; 
             await updateDoc(userRef, {
                 full_name: profile.full_name,
                 nick_name: profile.nick_name,

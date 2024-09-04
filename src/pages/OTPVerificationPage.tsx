@@ -43,6 +43,7 @@ const OTPVerificationPage = () => {
             
             if (otpVerificationResponse.payload) {
                 navigate('/home');
+                message.success("OTP verified successfully, Logged in successfully!");
             } else {
                 throw new Error(otpVerificationResponse.payload || "OTP verification failed");
             }
