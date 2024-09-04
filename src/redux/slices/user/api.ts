@@ -97,7 +97,7 @@ export const requestGenerateAndSendOTP = createAsyncThunk<any, OnRequestGenerate
     async (data, thunkAPI) => {
       try {
         const { email, nickName } = data;
-        const response = await axios.post('http://localhost:5003/generate-send-otp', { email: email, nickName: nickName });
+        const response = await axios.post('http://localhost:5001/generate-send-otp', { email: email, nickName: nickName });
         return response;
       } catch (error: any) {
         return thunkAPI.rejectWithValue(error.response?.data?.message || 'Generate and Send OTP failed');
@@ -110,7 +110,7 @@ export const requestOTPVerification = createAsyncThunk<any, OnRequestOTPVerifica
   async (data, thunkAPI) => {
     try {
       const { email, otp } = data;
-      const response = await axios.post('http://localhost:5003/verify-otp', { email: email, otp: otp });
+      const response = await axios.post('http://localhost:5001/verify-otp', { email: email, otp: otp });
       return response;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || 'OTP Verification failed');
@@ -123,7 +123,7 @@ export const requestPlanSubscription = createAsyncThunk<any, OnRequestPlanSubscr
   async (data, thunkAPI) => {
     try {
       const { plan } = data;
-      const response = await axios.post('http://localhost:5004/subscribe', { plan });      
+      const response = await axios.post('http://localhost:5001/subscribe', { plan });      
       return response.data;
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || 'Plan subscription failed');
@@ -136,12 +136,12 @@ export const requestPaymentVerification = createAsyncThunk<any, OnRequestPayment
   async (data, thunkAPI) => {
     try {
       const { fullName, nickName, subscribeTo, paymentResponse } = data;
-      const verificationResponse = await axios.post('http://localhost:5004/verify-payment', paymentResponse);
+      const verificationResponse = await axios.post('http://localhost:5001/verify-payment', paymentResponse);
       const { paymentMethod, amount } = verificationResponse.data.paymentDetails;
       if (verificationResponse.status === 200) {
           console.log(`Payment successful for ${subscribeTo} : `, paymentResponse);
           await handleProfileUpdation(subscribeTo);                            
-          const sendInvoiceResponse = await axios.post('http://localhost:5004/send-subscription-invoice', {
+          const sendInvoiceResponse = await axios.post('http://localhost:5001/send-subscription-invoice', {
             subscribedTo: subscribeTo,
             orderId: paymentResponse.razorpay_order_id,
             paymentId: paymentResponse.razorpay_payment_id,
