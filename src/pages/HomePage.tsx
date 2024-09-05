@@ -29,7 +29,7 @@ const HomePage = () => {
   const [input, setInput] = useState<string>('');
   const webSocket = useRef<WebSocket | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const profilePictureURL = auth.currentUser?.photoURL || ProfilePicture;  
+  const profilePictureURL = auth.currentUser?.photoURL || ProfilePicture;
 
   useEffect(() => {
     setProfilePicture(profilePictureURL);

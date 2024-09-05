@@ -24,7 +24,7 @@ export const requestUserLogin = createAsyncThunk(
   async ({ email, password }: RequestUserCredentialsPayload, thunkAPI) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      return await handleUserLogin({ userCredential, provider: null, thunkAPI });
+      return await handleUserLogin({ userCredential, provider: null, thunkAPI});
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message || 'Login failed');
     }
@@ -36,7 +36,7 @@ export const requestUserLoginByGoogle = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const userCredential = await signInWithPopup(auth, googleAuthProvider);
-      return await handleUserLogin({ userCredential, provider: 'Google', thunkAPI });
+      return await handleUserLogin({ userCredential, provider: 'Google', thunkAPI});
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.message || 'Login with Google failed');
     }

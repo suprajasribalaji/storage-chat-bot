@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import styled from "styled-components";
-import { Button, Checkbox, Divider, Form, Input, message } from 'antd';
+import { Button, Divider, Form, Input, message } from 'antd';
 import type { FormProps } from 'antd';
 import { GoogleOutlined, GithubOutlined } from "@ant-design/icons";
 import Title from "antd/es/typography/Title";
@@ -35,10 +35,13 @@ const LoginPage = () => {
     const handleNavigation = async () => {
       try {
         const userData = await fetchCurrentUserDetails();
+        console.log(' ---->>> ', userData);
+        
         if(!userData) {
           console.error('User not found');
           return;
         }
+        
         if (userData.is_2fa_enabled) {
           await handleGenerateAndSendOTP(userData);
         } else {
@@ -61,7 +64,6 @@ const LoginPage = () => {
         navigate('/login');
       }
     }
-
 
     const handleLoginButton: FormProps<FieldType>['onFinish'] = async (values) => {
       console.log('Success:', values);
@@ -136,8 +138,8 @@ const LoginPage = () => {
                       name="login-form"
                       layout="vertical"
                       initialValues={{
-                        email: localStorage.getItem('email') || '',
-                        password: localStorage.getItem('password') || '',
+                        email: '',
+                        password: '',
                         remember: false,
                       }}
                       autoComplete="off"
@@ -168,13 +170,7 @@ const LoginPage = () => {
                         name="remember"
                         valuePropName="checked"
                       >
-                        <RememberForgotContainer>
-                          <SaveCredentialsCheckboxContainer>
-                            <StyledCheckbox />
-                            <SaveCredentials>
-                              Save Credentials
-                            </SaveCredentials>
-                          </SaveCredentialsCheckboxContainer>                        
+                        <RememberForgotContainer>                       
                           <RememberForgotPasswordButton type="link" onClick={handleForgotPassword}>Forgot Password?</RememberForgotPasswordButton>
                         </RememberForgotContainer>
                       </Form.Item>
@@ -309,44 +305,6 @@ const RememberForgotContainer = styled.div`
   align-items: center;
   margin-top: -5%;
   margin-left: 2%;
-`;
-
-const SaveCredentialsCheckboxContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const StyledCheckbox = styled(Checkbox)`
-  .ant-checkbox-inner {
-    border-color: ${colors.black};
-    background-color: ${colors.white};
-  }
-
-  .ant-checkbox-checked .ant-checkbox-inner {
-    border-color: ${colors.raisinBlack};
-    background-color: ${colors.white};
-  }
-
-  .ant-checkbox-checked .ant-checkbox-inner::after {
-    border-color: ${colors.raisinBlack};
-  }
-
-  &&&:hover .ant-checkbox-inner,
-  &&&:focus .ant-checkbox-inner {
-    border-color: ${colors.black};
-    background-color: ${colors.white};
-  }
-
-  &&&:hover .ant-checkbox-checked .ant-checkbox-inner,
-  &&&:focus .ant-checkbox-checked .ant-checkbox-inner {
-    border-color: ${colors.raisinBlack};
-    background-color: ${colors.white};
-  }
-`;
-
-const SaveCredentials = styled.div`
-  color: ${colors.charcoalBlack};
-  margin-left: 0.5em;
 `;
 
 const RememberForgotPasswordButton = styled(Button)`

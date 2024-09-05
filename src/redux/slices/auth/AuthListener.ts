@@ -8,9 +8,9 @@ export const ListenToAuthChanges = createAsyncThunk(
   async (_, { dispatch }) => {
     const auth = getAuth();
     return new Promise<() => void>((resolve) => {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        if (user) {       
-          dispatch(setCurrentUser({ uid: user.uid, email: user.email , profilePictureURL: user.photoURL, user: user}));
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (user) {    
+          dispatch(setCurrentUser({ uid: user.uid, email: user.email , profilePictureURL: user.photoURL, user: user }));
         } else {
           dispatch(setCurrentUser(null));
         }
