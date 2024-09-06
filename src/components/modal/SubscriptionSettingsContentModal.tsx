@@ -1,23 +1,35 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, message } from "antd";
 import styled from "styled-components";
 import { colors } from "../../assets/themes/color";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { requestPaymentVerification, requestPlanSubscription } from "../../redux/slices/user/api";
 import { fetchCurrentUserDetails } from "../../helpers/helpers";
+import { addDoc, collection } from "firebase/firestore";
+import { database } from "../../config/firebase.config";
 
 type SubscriptionSettingsContentModalProps = {
-    setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
-    setSelectedKey: React.Dispatch<React.SetStateAction<string>>
+    setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    setSelectedKey: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModalProps) => {
-    const { setIsModalOpen, setSelectedKey } = props;
+interface PaymentVerificationPayload {
+    amount: number;
+    name: string;
+    email: string;
+    order_id: string;
+    payment_id: string;
+    payment_method: string;
+    subscribedTo: string;
+    created_at: string | Date;
+}
+
+const SubscriptionSettingsContentModal: React.FC<SubscriptionSettingsContentModalProps> = ({ setIsModalOpen, setSelectedKey }) => {
     const [fullName, setFullName] = useState<string>('');
     const [nickName, setNickName] = useState<string>('');
     const [currentPlan, setCurrentPlan] = useState<string>('');
-    const [planValidity, setPlanValidity] = useState<Date | null>();
     const [loading, setLoading] = useState<boolean>(false);
+    const [processingSubscription, setProcessingSubscription] = useState<boolean>(false);
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -28,7 +40,6 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
                     setCurrentPlan(userData.plan);
                     setFullName(userData.full_name);
                     setNickName(userData.nick_name);
-                    setPlanValidity(userData.subscribed_at.toDate() || null);
                 } else {
                     message.error('User not found');
                     console.error('User not found');
@@ -37,17 +48,18 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
                 console.error("Error fetching user plan: ", error);
             }
         };
-        isSubscriptionExpired();
-        fetchUserPlan();        
+    
+        fetchUserPlan();
     }, []);
 
     const handleSubscription = async (subscribeTo: string) => {
         setLoading(true);
+        setProcessingSubscription(true);
         try {
             const response = await dispatch(requestPlanSubscription({ plan: subscribeTo }));
             const { key, orderId, amount, currency, description, prefill, notes, theme } = response.payload;
-
-            var options = {
+    
+            const options = {
                 key,
                 amount,
                 currency,
@@ -56,25 +68,80 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
                 order_id: orderId,
                 handler: async function(paymentResponse: any) {
                     try {
-                        const verificationResponse = await dispatch(requestPaymentVerification({ fullName, nickName, subscribeTo, paymentResponse }));                        
-                        if (verificationResponse.payload) {
-                            setIsModalOpen(false);
-                            setSelectedKey('1');
-                            message.success('Invoice send successfully!');
+                        console.log('Payment Response:', paymentResponse);
+                        const verificationResponse = await dispatch(requestPaymentVerification({ fullName, nickName, subscribeTo, paymentResponse }));
+                        console.log('Verification Response:', verificationResponse);
+    
+                        if (verificationResponse.meta.requestStatus === 'fulfilled') {
+                            const payload = verificationResponse.payload as PaymentVerificationPayload;
+                            console.log('Payload:', payload);
+    
+                            const {
+                                amount,
+                                name,
+                                email,
+                                order_id,
+                                payment_id,
+                                payment_method,
+                                subscribedTo,
+                                created_at
+                            } = payload;
+    
+                            if (payload) {
+                                try {
+                                    const transactionRef = await addDoc(collection(database, "Transaction"), {
+                                        email,
+                                        full_name: name,
+                                        order_id,
+                                        payment_id,
+                                        payment_method,
+                                        plan: subscribedTo,
+                                        amount,
+                                        created_at
+                                    });
+    
+                                    console.log(transactionRef.id, 'Updated in database and invoice sent successfully');
+                                    setIsModalOpen(false);
+                                    setSelectedKey('1');
+                                    message.success('Invoice sent successfully!');
+                                } catch (error) {
+                                    console.error('Error adding document: ', error);
+                                    message.error('Failed to save transaction data.');
+                                }
+                            } else {
+                                console.error('Missing data:', {
+                                    amount,
+                                    name,
+                                    email,
+                                    order_id,
+                                    payment_id,
+                                    payment_method,
+                                    subscribeTo,
+                                    created_at
+                                });
+                                throw new Error('Incomplete payment verification data.');
+                            }
                         } else {
                             message.error('Payment verification failed / Send invoice failed.');
                         }
                     } catch (error) {
                         console.error('Error while processing the payment: ', error);
-                        message.error('Payment verification failed.');
+                        if (error instanceof Error) {
+                            message.error(`Payment verification failed: ${error.message}`);
+                        } else {
+                            message.error('Payment verification failed due to an unknown error.');
+                        }
+                    } finally {
+                        setProcessingSubscription(false);
                     }
+
                 },
                 prefill,
                 notes,
                 theme,
             };
     
-            const payment = new window.Razorpay(options);
+            const payment = new (window as any).Razorpay(options);
             payment.open();
             message.success('Subscription process initiated.');
         } catch (error) {
@@ -84,20 +151,14 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
             setLoading(false);
         }
     };
-
-    const isSubscriptionExpired = () => {
-        if (!planValidity) return false;
-        const expirationDate = new Date(planValidity.getTime() + 2 * 60 * 1000);     
-        return Date.now() > expirationDate.getTime();
-    };
-
+    
     return (
         <SubscriptionSettingsContent>
             <PlanSection>
                 <PlanDetails>
                     <Plan>
                         <ButtonWrapper>
-                            <StyledButton onClick={() => handleSubscription('Elite')} disabled={loading || (currentPlan === 'Elite' && !isSubscriptionExpired())}>Welcome to Elite</StyledButton>
+                            <StyledButton onClick={() => handleSubscription('Elite')} loading={processingSubscription} disabled={loading || (currentPlan === 'Elite')}>Welcome to Elite</StyledButton>
                         </ButtonWrapper>
                         <FeaturesList>
                             <FeatureItem>Up to 10x more space to store the files</FeatureItem>
@@ -107,7 +168,7 @@ const SubscriptionSettingsContentModal = (props: SubscriptionSettingsContentModa
                     </Plan>
                     <Plan>
                         <ButtonWrapper>
-                            <StyledButton onClick={() => handleSubscription('Deluxe')} disabled={loading || (currentPlan === 'Deluxe' && !isSubscriptionExpired())}>Welcome to Deluxe</StyledButton>
+                            <StyledButton onClick={() => handleSubscription('Deluxe')} loading={processingSubscription} disabled={loading || (currentPlan === 'Deluxe')}>Welcome to Deluxe</StyledButton>
                         </ButtonWrapper>
                         <FeaturesList>
                             <FeatureItem>Up to 20x more space to store the files</FeatureItem>

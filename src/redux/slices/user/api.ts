@@ -152,8 +152,20 @@ export const requestPaymentVerification = createAsyncThunk<any, OnRequestPayment
             validity: 28,
             paymentMethod 
           });
-          console.log('invoice response::: ', sendInvoiceResponse);
-          return sendInvoiceResponse.data;
+          console.log('invoice response::: ', sendInvoiceResponse); 
+
+          const response = {
+            subscribedTo: subscribeTo,
+            order_id: paymentResponse.razorpay_order_id,
+            payment_id: paymentResponse.razorpay_payment_id,
+            email: auth.currentUser?.email,
+            payment_method: paymentMethod,
+            amount: amount/100,
+            name: fullName,
+            created_at: Date.now()
+          }
+                   
+          return response;
       }
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response?.data?.message || 'Payment verification failed');
