@@ -21,7 +21,7 @@ const RetrieveCredentialsModal = ( props: RetrieveCredentialsModalProps ) => {
         const { email } = value;
         try {
             const response = await dispatch(requestResetPassword({ email }));
-            if (response.payload) {
+            if (response.meta.requestStatus === 'fulfilled') {
                 setIsModalOpen(false);
                 notification.success({
                     message: 'Success',

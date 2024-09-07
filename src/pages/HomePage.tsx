@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Input, Menu, Dropdown, message } from "antd";
+import { Button, Input, Menu, Dropdown, message, Skeleton } from "antd";
 import { IoMdSettings } from "react-icons/io";
 import { AiOutlineLogout } from "react-icons/ai";
 import { CloudUploadOutlined, SendOutlined, ArrowDownOutlined } from '@ant-design/icons';
@@ -27,6 +27,7 @@ const HomePage = () => {
   const [profilePicture, setProfilePicture] = useState<string | null>('');
   const [responseMessages, setResponseMessages] = useState<RespondedMessage[]>([]);
   const [input, setInput] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true); // New loading state
   const webSocket = useRef<WebSocket | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const profilePictureURL = auth.currentUser?.photoURL || ProfilePicture;
@@ -40,6 +41,16 @@ const HomePage = () => {
       contentRef.current.scrollTop = contentRef.current.scrollHeight;
     }
   }, [responseMessages]);
+
+  useEffect(() => {
+    connectWebSocket();
+    setLoading(false); // Set loading to false after WebSocket connection
+    return () => {
+      if (webSocket.current) {
+        webSocket.current.close();
+      }
+    };
+  }, []);
 
   const connectWebSocket = () => {
     webSocket.current = new WebSocket('ws://localhost:8080');
@@ -66,15 +77,6 @@ const HomePage = () => {
       console.log('Disconnected from WebSocket server');
     };
   };
-
-  useEffect(() => {
-    connectWebSocket();
-    return () => {
-      if (webSocket.current) {
-        webSocket.current.close();
-      }
-    };
-  }, []);
 
   const handleMenuItems = async (e: { key: string }) => {
     try {
@@ -196,48 +198,50 @@ const HomePage = () => {
           </CircleButton>
         </Dropdown>
       </HomePageNavBar>
-      {responseMessages.length > 0 ? (
-        <Content hasContent={true} ref={contentRef}>
-          {responseMessages.map((msg, index) => (
-            <MessageContainer key={index}>
-              {msg.type === 'request' ? (
-                <RequestMessage>
-                  <RequestContent>{msg.content}</RequestContent>
-                  <RequestTime>{formatTimestamp(msg.timestamp)}</RequestTime>
-                </RequestMessage>
-              ) : (
-                <ResponseMessage>
-                  <ResponseContent>
-                    <FileName>{msg.file_name}</FileName>
-                    {!msg.noFileFound && msg.downloadable_url && (
-                      <DownloadButton 
-                        icon={<ArrowDownOutlined />}
-                        onClick={() => window.open(msg.downloadable_url, '_blank')}
-                      />
-                    )}
-                  </ResponseContent>
-                  <ResponseTime>{formatTimestamp(msg.responded_at || msg.timestamp)}</ResponseTime>
-                </ResponseMessage>
-              )}
-            </MessageContainer>
-          ))}
-        </Content>
-      ) : (
-        <ContentBeforeStartingChatComponent />
-      )}
-      <HomePageContent>
-        <ChatBoxInput>
-          <StyledChatInput 
-            placeholder="Are you looking to retrieve some data?" 
-            value={input}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-            autoSize={{ minRows: 1, maxRows: 6 }}
-          />
-          <UploadButton icon={<UploadIcon />} onClick={handleUploadButton}/>
-          <SendButton icon={<SendIcon />} onClick={handleSendButton}/>
-        </ChatBoxInput>
-      </HomePageContent>
+      <Skeleton loading={loading} active>
+        {responseMessages.length > 0 ? (
+          <Content hasContent={true} ref={contentRef}>
+            {responseMessages.map((msg, index) => (
+              <MessageContainer key={index}>
+                {msg.type === 'request' ? (
+                  <RequestMessage>
+                    <RequestContent>{msg.content}</RequestContent>
+                    <RequestTime>{formatTimestamp(msg.timestamp)}</RequestTime>
+                  </RequestMessage>
+                ) : (
+                  <ResponseMessage>
+                    <ResponseContent>
+                      <FileName>{msg.file_name}</FileName>
+                      {!msg.noFileFound && msg.downloadable_url && (
+                        <DownloadButton 
+                          icon={<ArrowDownOutlined />}
+                          onClick={() => window.open(msg.downloadable_url, '_blank')}
+                        />
+                      )}
+                    </ResponseContent>
+                    <ResponseTime>{formatTimestamp(msg.responded_at || msg.timestamp)}</ResponseTime>
+                  </ResponseMessage>
+                )}
+              </MessageContainer>
+            ))}
+          </Content>
+        ) : (
+          <ContentBeforeStartingChatComponent />
+        )}
+        <HomePageContent>
+          <ChatBoxInput>
+            <StyledChatInput 
+              placeholder="Are you looking to retrieve some data?" 
+              value={input}
+              onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
+              autoSize={{ minRows: 1, maxRows: 6 }}
+            />
+            <UploadButton icon={<UploadIcon />} onClick={handleUploadButton}/>
+            <SendButton icon={<SendIcon />} onClick={handleSendButton}/>
+          </ChatBoxInput>
+        </HomePageContent>
+      </Skeleton>
       <ProfileSettingsModal
         isModalOpen={isProfileModalOpen}
         setIsModalOpen={setIsProfileModalOpen}

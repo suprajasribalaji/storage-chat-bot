@@ -1,5 +1,6 @@
 require('dotenv').config({ path: '../../.env' });
 const express = require('express');
+const expressWaf = require('express-waf');
 const { body, validationResult } = require('express-validator');
 const cors = require('cors');
 const os = require('os');
@@ -37,6 +38,94 @@ const auth = admin.auth();
 const PORT = process.env.PORT || 3003;
 const app = express();
 
+export const wafOptions = {
+  blockMode: true,
+  rules: [
+    {
+      type: 'sql-injection',
+      action: 'block',
+    },
+    {
+      type: 'xss',
+      action: 'block',
+    },
+    {
+      type: 'csrf',
+      action: 'block',
+    },
+    {
+      type: 'directory-traversal',
+      action: 'block',
+    },
+    {
+      type: 'local-file-inclusion',
+      action: 'block',
+    },
+    {
+      type: 'remote-file-inclusion',
+      action: 'block',
+    },
+    {
+      type: 'command-injection',
+      action: 'block',
+    },
+    {
+      type: 'code-injection',
+      action: 'block',
+    },
+    {
+      type: 'http-header-injection',
+      action: 'block',
+    },
+    {
+      type: 'http-method-override',
+      action: 'block',
+    },
+    {
+      type: 'http-protocol-violation',
+      action: 'block',
+    },
+    {
+      type: 'http-response-splitting',
+      action: 'block',
+    },
+    {
+      type: 'http-request-smuggling',
+      action: 'block',
+    },
+    {
+      type: 'http-request-flooding',
+      action: 'block',
+    },
+    {
+      type: 'brute-force',
+      action: 'block',
+    },
+    {
+      type: 'rate-limiting',
+      action: 'block',
+    },
+    {
+      type: 'user-agent-blocking',
+      action: 'block',
+    },
+    {
+      type: 'ip-blocking',
+      action: 'block',
+    },
+    {
+      type: 'geo-blocking',
+      action: 'block',
+    },
+    {
+      type: 'bot-detection',
+      action: 'block',
+    },
+  ],
+};
+
+app.use(expressWaf(wafOptions));
+
 app.use(helmet());
 app.use(
   helmet.contentSecurityPolicy({
@@ -73,10 +162,25 @@ const rateLimiter = rateLimit({
 
 app.use(cors({ origin: 'http://localhost:5000' }));
 app.use(bodyParser.json());
-app.use(cookieParser());
+
 app.use(rateLimiter);
 
-const csrfProtection = csurf({ cookie: true });
+// const csrfProtection = csurf({ cookie: true });
+// app.use(cookieParser());
+// app.use(csrfProtection);
+
+// app.use((req, res, next) => {
+//   res.cookie('csrfToken', req.csrfToken());
+//   next();
+// });
+
+// app.use((err, req, res, next) => {
+//   if (err.code !== 'EBADCSRFTOKEN') return next(err);
+//   res.status(403).json({ 
+//     success: false, 
+//     message: 'CSRF token validation failed'
+//   });
+// });
 
 const getSystemLoad = () => {
   const loadAverage = os.loadavg();
@@ -108,16 +212,8 @@ const verificationLimiter = rateLimit({
   message: 'Too many OTP verification attempts, please try again later.',
 });
 
-app.use((err, req, res, next) => {
-  if (err.code !== 'EBADCSRFTOKEN') return next(err);
-  res.status(403).json({ 
-    success: false, 
-    message: 'CSRF token validation failed'
-  });
-});
-
 app.post('/reset-password', [
-  body('email').isEmail().withMessage('Invalid email address'),
+  body('email').isEmail().withMessage('Invalid email address').normalizeEmail(),
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -136,7 +232,7 @@ app.post('/reset-password', [
 });
 
 app.post('/send-reset-password-link', [
-  body('to').isEmail().withMessage('Invalid email address'),
+  body('to').isEmail().withMessage('Invalid email address').normalizeEmail(),
   body('link').isURL().withMessage('Invalid link'),
 ], async (req, res) => {
   const errors = validationResult(req);
@@ -169,8 +265,8 @@ app.post('/send-reset-password-link', [
 });
 
 app.post('/generate-send-otp', [
-  body('email').isEmail().withMessage('Invalid email address'),
-  body('nickName').notEmpty().withMessage('Nickname is required'),
+  body('email').isEmail().withMessage('Invalid email address').normalizeEmail(),
+  body('nickName').notEmpty().withMessage('Nickname is required').trim().escape(),
 ], otpLimiter, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -210,8 +306,8 @@ app.post('/generate-send-otp', [
 });
 
 app.post('/verify-otp', [
-  body('email').isEmail().withMessage('Invalid email address'),
-  body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits'),
+  body('email').isEmail().withMessage('Invalid email address').normalizeEmail(),
+  body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits').trim().escape(),
 ], verificationLimiter, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -251,7 +347,7 @@ app.post('/verify-otp', [
 });
 
 app.post('/subscribe', [
-  body('plan').isIn(['Elite', 'Deluxe']).withMessage('Invalid plan type'),
+  body('plan').isIn(['Elite', 'Deluxe']).withMessage('Invalid plan type').trim().escape(),
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -301,9 +397,9 @@ app.post('/subscribe', [
 });
 
 app.post('/verify-payment', [
-  body('razorpay_order_id').notEmpty().withMessage('Order ID is required'),
-  body('razorpay_payment_id').notEmpty().withMessage('Payment ID is required'),
-  body('razorpay_signature').notEmpty().withMessage('Signature is required'),
+  body('razorpay_order_id').notEmpty().withMessage('Order ID is required').trim().escape(),
+  body('razorpay_payment_id').notEmpty().withMessage('Payment ID is required').trim().escape(),
+  body('razorpay_signature').notEmpty().withMessage('Signature is required').trim().escape(),
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -348,14 +444,14 @@ app.post('/verify-payment', [
 });
 
 app.post('/send-subscription-invoice', [
-  body('subscribedTo').isIn(['Elite', 'Deluxe']).withMessage('Invalid subscription plan'),
-  body('orderId').notEmpty().withMessage('Order ID is required'),
-  body('fullName').notEmpty().withMessage('Full name is required'),
-  body('nickName').notEmpty().withMessage('Nickname is required'),
-  body('email').isEmail().withMessage('Invalid email address'),
-  body('amount').isNumeric().withMessage('Amount must be a number'),
-  body('validity').notEmpty().withMessage('Validity is required'),
-  body('paymentMethod').notEmpty().withMessage('Payment method is required'),
+  body('subscribedTo').isIn(['Elite', 'Deluxe']).withMessage('Invalid subscription plan').trim().escape(),
+  body('orderId').notEmpty().withMessage('Order ID is required').trim().escape(),
+  body('fullName').notEmpty().withMessage('Full name is required').trim().escape(),
+  body('nickName').notEmpty().withMessage('Nickname is required').trim().escape(),
+  body('email').isEmail().withMessage('Invalid email address').normalizeEmail(),
+  body('amount').isNumeric().withMessage('Amount must be a number').toFloat(),
+  body('validity').notEmpty().withMessage('Validity is required').trim().escape(),
+  body('paymentMethod').notEmpty().withMessage('Payment method is required').trim().escape(),
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

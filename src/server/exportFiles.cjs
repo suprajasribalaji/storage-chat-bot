@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../../.env' });
+import { wafOptions } from './sendgrid.cjs';
 
 const express = require('express');
 const axios = require('axios');
@@ -7,6 +7,8 @@ const stream = require('stream');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const Joi = require('joi');
+const waf = require('express-waf');
 
 const PORT = process.env.EXPORT_FILE_PORT  || 3002;
 
@@ -16,8 +18,16 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 
+app.use(expressWaf(wafOptions));
+
+const schema = Joi.object({
+  fileDownloadURLs: Joi.array().items(Joi.string().uri()).required(),
+  fileNames: Joi.array().items(Joi.string()).required()
+});
+
 app.post('/export-files', async (req, res) => {
-  if (!req.body  || !Array.isArray(req.body.fileDownloadURLs) || !Array.isArray(req.body.fileNames)) {
+  const { error } = schema.validate(req.body);
+  if (error) {
     return res.status(400).json({ error: 'Invalid request data' });
   }
   const { fileDownloadURLs, fileNames } = req.body;

@@ -1,4 +1,4 @@
-import { Button, message, Popconfirm, Spin } from "antd";
+import { Button, message, Popconfirm, Spin, Skeleton } from "antd";
 import { LoadingOutlined } from '@ant-design/icons';
 import styled, { createGlobalStyle } from "styled-components";
 import { colors } from "../../assets/themes/color";
@@ -25,17 +25,18 @@ const AccountSettingsContentModal = (props: AccountSettingsContentModalProps) =>
     const [currentPlan, setCurrentPlan] = useState<string>('');
     const [is2FAEnable, setIs2FAEnable] = useState<boolean>(false);
     const [loading, setLoading] = useState(false);
+    const [dataLoading, setDataLoading] = useState(true); // New state for data loading
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
         if (user_id) {
-            fetchDataOfCurrentUser(user_id);
+            fetchDataOfCurrentUser(user_id).finally(() => setDataLoading(false)); // Update loading state
         }
     }, [user_id]);
 
     useEffect(() => {
-        fetchCurrentUserPlan();
+        fetchCurrentUserPlan().finally(() => setDataLoading(false)); // Update loading state
     }, []);
 
     const fetchCurrentUserPlan = async () => {
@@ -164,35 +165,37 @@ const AccountSettingsContentModal = (props: AccountSettingsContentModalProps) =>
     const customSpinIcon = <LoadingOutlined style={{ fontSize: 18 }} spin />;
 
     return (
-        <AccountSettingsContent>
-            <SettingsItem>
-                <Label>Two-factor authentication</Label>
-                <StyledEnableExportButton onClick={handle2FAEnableButton} disabled={is2FAEnable}>{is2FAEnable ? 'Enabled' : 'Enable'}</StyledEnableExportButton>
-            </SettingsItem>
-            <SettingsItem>
-                <Label>Export data</Label>
-                <StyledEnableExportButton onClick={handleExportButton} disabled={loading} icon={loading ? <Spin spinning={loading} indicator={customSpinIcon} /> : undefined}>{loading ? 'Exporting' : 'Export'}</StyledEnableExportButton>
-            </SettingsItem>
-            <SettingsItem>
-                <Label>Current Plan : {currentPlan}</Label>
-                <StyledEnableExportButton onClick={handleSubscriptionUpdate}>Update</StyledEnableExportButton>
-            </SettingsItem>
-            <SettingsItem>
-                <Label>Delete your account</Label>
-                <Popconfirm
-                    title="Delete Account"
-                    description="Make sure you exported all data before deleting account. Once you deleted then can't backup stored data."
-                    okText="Yes"
-                    cancelText="No"
-                    onConfirm={handleDeleteButton}
-                    okButtonProps={{ className: 'custom-yes-button' }}
-                    cancelButtonProps={{ className: 'custom-no-button' }}
-                >
-                    <StyledDeleteButton>Delete</StyledDeleteButton>
-                </Popconfirm>
-            </SettingsItem>
-            <GlobalStyle />
-        </AccountSettingsContent>
+        <Skeleton loading={dataLoading} active>
+            <AccountSettingsContent>
+                <SettingsItem>
+                    <Label>Two-factor authentication</Label>
+                    <StyledEnableExportButton onClick={handle2FAEnableButton} disabled={is2FAEnable}>{is2FAEnable ? 'Enabled' : 'Enable'}</StyledEnableExportButton>
+                </SettingsItem>
+                <SettingsItem>
+                    <Label>Export data</Label>
+                    <StyledEnableExportButton onClick={handleExportButton} disabled={loading} icon={loading ? <Spin spinning={loading} indicator={customSpinIcon} /> : undefined}>{loading ? 'Exporting' : 'Export'}</StyledEnableExportButton>
+                </SettingsItem>
+                <SettingsItem>
+                    <Label>Current Plan : {currentPlan}</Label>
+                    <StyledEnableExportButton onClick={handleSubscriptionUpdate}>Update</StyledEnableExportButton>
+                </SettingsItem>
+                <SettingsItem>
+                    <Label>Delete your account</Label>
+                    <Popconfirm
+                        title="Delete Account"
+                        description="Make sure you exported all data before deleting account. Once you deleted then can't backup stored data."
+                        okText="Yes"
+                        cancelText="No"
+                        onConfirm={handleDeleteButton}
+                        okButtonProps={{ className: 'custom-yes-button' }}
+                        cancelButtonProps={{ className: 'custom-no-button' }}
+                    >
+                        <StyledDeleteButton>Delete</StyledDeleteButton>
+                    </Popconfirm>
+                </SettingsItem>
+                <GlobalStyle />
+            </AccountSettingsContent>
+        </Skeleton>
     );
 };
 

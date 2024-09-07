@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Menu, Modal, Spin } from 'antd';
+import { Menu, Modal, Spin, Skeleton } from 'antd'; // Import Skeleton
 import type { MenuProps } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { FaUserLarge } from "react-icons/fa6";
@@ -168,24 +168,26 @@ const ProfileSettingsModal = (props: ProfileSettingsModalProps) => {
                     </ProfileSettingsModalContentMenu>
                     <ProfileSettingsModalContentDetails>
                         {error && <div>{error}</div>}
-                        {selectedKey === '1' && 
-                            <ProfileSetttingsContentModal 
-                                profile={profile}
-                                setProfile={setProfile} 
-                            />
-                        }
-                        {selectedKey === '2' && 
-                            <AccountSettingsContentModal
-                                profile={profile}
-                                setSelectedKey={setSelectedKey}
-                            />
-                        }
-                        {selectedKey === '3' && 
-                            <SubscriptionSettingsContentModal
-                                setIsModalOpen={setIsModalOpen}
-                                setSelectedKey={setSelectedKey}
-                            />
-                        }
+                        <Skeleton loading={loading} active>
+                            {selectedKey === '1' && 
+                                <ProfileSetttingsContentModal 
+                                    profile={profile}
+                                    setProfile={setProfile} 
+                                />
+                            }
+                            {selectedKey === '2' && 
+                                <AccountSettingsContentModal
+                                    profile={profile}
+                                    setSelectedKey={setSelectedKey}
+                                />
+                            }
+                            {selectedKey === '3' && 
+                                <SubscriptionSettingsContentModal
+                                    setIsModalOpen={setIsModalOpen}
+                                    setSelectedKey={setSelectedKey}
+                                />
+                            }
+                        </Skeleton>
                     </ProfileSettingsModalContentDetails>
                 </ProfileSettingsModalContent>
             </Spin>

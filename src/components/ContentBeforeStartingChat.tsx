@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { auth, database } from "../config/firebase.config";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { User } from "../utils/utils";
-import { StyledLoadingOutlined } from "./modal/ProfileSettingsModal";
+import { Skeleton } from "antd";
 
 const ContentBeforeStartingChatComponent = () => {
     const user_id = auth.currentUser?.uid;
@@ -63,7 +63,7 @@ const ContentBeforeStartingChatComponent = () => {
                 ) : currentUser ? (
                     <>WareHouse family welcomes you, {currentUser.nick_name || currentUser.full_name || currentUser.email}!</>
                 ) : (
-                    <StyledLoadingOutlined spin />
+                    <Skeleton active />
                 )}
             </Content>
         </ContentBeforeStartingChat>

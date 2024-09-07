@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, message } from "antd";
+import { Button, message, Skeleton } from "antd";
 import styled from "styled-components";
 import { colors } from "../../assets/themes/color";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
@@ -30,6 +30,7 @@ const SubscriptionSettingsContentModal: React.FC<SubscriptionSettingsContentModa
     const [currentPlan, setCurrentPlan] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [processingSubscription, setProcessingSubscription] = useState<boolean>(false);
+    const [dataLoading, setDataLoading] = useState<boolean>(true); // New state for data loading
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -46,6 +47,8 @@ const SubscriptionSettingsContentModal: React.FC<SubscriptionSettingsContentModa
                 }
             } catch (error) {
                 console.error("Error fetching user plan: ", error);
+            } finally {
+                setDataLoading(false); // Set data loading to false after fetching data
             }
         };
     
@@ -154,31 +157,33 @@ const SubscriptionSettingsContentModal: React.FC<SubscriptionSettingsContentModa
     
     return (
         <SubscriptionSettingsContent>
-            <PlanSection>
-                <PlanDetails>
-                    <Plan>
-                        <ButtonWrapper>
-                            <StyledButton onClick={() => handleSubscription('Elite')} loading={processingSubscription} disabled={loading || (currentPlan === 'Elite')}>Welcome to Elite</StyledButton>
-                        </ButtonWrapper>
-                        <FeaturesList>
-                            <FeatureItem>Up to 10x more space to store the files</FeatureItem>
-                            <FeatureItem>Store files by user choice</FeatureItem>
-                            <FeatureItem>Subscription Duration: 28 days</FeatureItem>
-                        </FeaturesList>
-                    </Plan>
-                    <Plan>
-                        <ButtonWrapper>
-                            <StyledButton onClick={() => handleSubscription('Deluxe')} loading={processingSubscription} disabled={loading || (currentPlan === 'Deluxe')}>Welcome to Deluxe</StyledButton>
-                        </ButtonWrapper>
-                        <FeaturesList>
-                            <FeatureItem>Up to 20x more space to store the files</FeatureItem>
-                            <FeatureItem>Store files by user choice</FeatureItem>
-                            <FeatureItem>Schedule the file upload and retrieval of files</FeatureItem>
-                            <FeatureItem>Subscription Duration: 28 days</FeatureItem>
-                        </FeaturesList>
-                    </Plan>
-                </PlanDetails>
-            </PlanSection>
+            <Skeleton active loading={dataLoading}> {/* Wrap content with Skeleton */}
+                <PlanSection>
+                    <PlanDetails>
+                        <Plan>
+                            <ButtonWrapper>
+                                <StyledButton onClick={() => handleSubscription('Elite')} loading={processingSubscription} disabled={loading || (currentPlan === 'Elite')}>Welcome to Elite</StyledButton>
+                            </ButtonWrapper>
+                            <FeaturesList>
+                                <FeatureItem>Up to 10x more space to store the files</FeatureItem>
+                                <FeatureItem>Store files by user choice</FeatureItem>
+                                <FeatureItem>Subscription Duration: 28 days</FeatureItem>
+                            </FeaturesList>
+                        </Plan>
+                        <Plan>
+                            <ButtonWrapper>
+                                <StyledButton onClick={() => handleSubscription('Deluxe')} loading={processingSubscription} disabled={loading || (currentPlan === 'Deluxe')}>Welcome to Deluxe</StyledButton>
+                            </ButtonWrapper>
+                            <FeaturesList>
+                                <FeatureItem>Up to 20x more space to store the files</FeatureItem>
+                                <FeatureItem>Store files by user choice</FeatureItem>
+                                <FeatureItem>Schedule the file upload and retrieval of files</FeatureItem>
+                                <FeatureItem>Subscription Duration: 28 days</FeatureItem>
+                            </FeaturesList>
+                        </Plan>
+                    </PlanDetails>
+                </PlanSection>
+            </Skeleton>
         </SubscriptionSettingsContent>
     );
 }
