@@ -38,7 +38,7 @@ const auth = admin.auth();
 const PORT = process.env.PORT || 3001;
 const app = express();
 
-export const wafOptions = {
+const wafOptions = {
   blockMode: true,
   rules: [
     {

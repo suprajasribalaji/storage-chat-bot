@@ -1,5 +1,3 @@
-import { wafOptions } from './sendgrid.cjs';
-
 const express = require('express');
 const axios = require('axios');
 const archiver = require('archiver');
@@ -8,7 +6,7 @@ const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const Joi = require('joi');
-const waf = require('express-waf');
+const expressWaf = require('express-waf');
 
 const PORT = process.env.EXPORT_FILE_PORT  || 3002;
 
@@ -17,6 +15,92 @@ app.use(cors({
   credentials: true
 }));
 app.use(bodyParser.json());
+
+const wafOptions = {
+  blockMode: true,
+  rules: [
+    {
+      type: 'sql-injection',
+      action: 'block',
+    },
+    {
+      type: 'xss',
+      action: 'block',
+    },
+    {
+      type: 'csrf',
+      action: 'block',
+    },
+    {
+      type: 'directory-traversal',
+      action: 'block',
+    },
+    {
+      type: 'local-file-inclusion',
+      action: 'block',
+    },
+    {
+      type: 'remote-file-inclusion',
+      action: 'block',
+    },
+    {
+      type: 'command-injection',
+      action: 'block',
+    },
+    {
+      type: 'code-injection',
+      action: 'block',
+    },
+    {
+      type: 'http-header-injection',
+      action: 'block',
+    },
+    {
+      type: 'http-method-override',
+      action: 'block',
+    },
+    {
+      type: 'http-protocol-violation',
+      action: 'block',
+    },
+    {
+      type: 'http-response-splitting',
+      action: 'block',
+    },
+    {
+      type: 'http-request-smuggling',
+      action: 'block',
+    },
+    {
+      type: 'http-request-flooding',
+      action: 'block',
+    },
+    {
+      type: 'brute-force',
+      action: 'block',
+    },
+    {
+      type: 'rate-limiting',
+      action: 'block',
+    },
+    {
+      type: 'user-agent-blocking',
+      action: 'block',
+    },
+    {
+      type: 'ip-blocking',
+      action: 'block',
+    },
+    {
+      type: 'geo-blocking',
+      action: 'block',
+    },
+    {
+      type: 'bot-detection',
+      action: 'block',
+    },
+  ],
+};
 
 app.use(expressWaf(wafOptions));
 
