@@ -26,6 +26,7 @@
     "firebase": "^10.12.4",
     "firebase-admin": "^12.4.0",
     "helmet": "^7.1.0",
+    "node-cron": "^3.0.3",
     "os": "^0.1.2",
     "razorpay": "^2.9.4",
     "react": "^18.3.1",

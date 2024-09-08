@@ -31,17 +31,20 @@ export const fetchCurrentUserReferrence = async () => {
   }
 };
 
-export const fetchTransactionReferrence = async () => {
+export const fetchPlanValidity = async () => {
   try {
-    const transactionQuery = query(collection(database, "Transaction"));
-    const querySnapshot = await getDocs(transactionQuery);
-    if (!querySnapshot.empty) {
-      const transactionDoc = querySnapshot.docs[0];
-      const transactionRef = transactionDoc.ref;
-      return transactionRef;
-    }
-    return;
+    const user = await fetchCurrentUserDetails();
+    let isPlanValid = true;
+    if(user) {
+      const subscribedAt = new Date(user.subscribed_at);
+      const currentTime = new Date().getTime();
+      const isDay28 = (28 * 24 * 60 * 60 * 1000) - currentTime;
+      if (subscribedAt.getTime() < isDay28) {
+        isPlanValid = false;
+      }
+    } 
+    return isPlanValid;
   } catch (error: any) {
-    console.error('Error at fetching transaction details: ', error);
+    console.error('Error at fetching plan validity: ', error);
   }
 }

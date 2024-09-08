@@ -16,6 +16,7 @@ import ContentBeforeStartingChatComponent from "../components/ContentBeforeStart
 import { auth, database } from "../config/firebase.config";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { formatTimestamp, normalizeString, RespondedMessage } from "../utils/utils";
+import { fetchPlanValidity } from "../helpers/helpers";
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -27,10 +28,27 @@ const HomePage = () => {
   const [profilePicture, setProfilePicture] = useState<string | null>('');
   const [responseMessages, setResponseMessages] = useState<RespondedMessage[]>([]);
   const [input, setInput] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(true); // New loading state
+  const [loading, setLoading] = useState<boolean>(true);
   const webSocket = useRef<WebSocket | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const profilePictureURL = auth.currentUser?.photoURL || ProfilePicture;
+  const [isPlanValid, setIsPlanValid] = useState<boolean>(false);
+
+  useEffect(() => {
+    const checkPlanValidity = async () => {
+      const planValidity = await fetchPlanValidity();
+      planValidity ? setIsPlanValid(true) : setIsPlanValid(false);
+      console.log(planValidity, ' =========<< ');
+    };
+    
+    checkPlanValidity();
+
+    const intervalId = setInterval(checkPlanValidity, 60000);
+
+    console.log(isPlanValid, '------------<<<<<<<');
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   useEffect(() => {
     setProfilePicture(profilePictureURL);
@@ -44,7 +62,7 @@ const HomePage = () => {
 
   useEffect(() => {
     connectWebSocket();
-    setLoading(false); // Set loading to false after WebSocket connection
+    setLoading(false);
     return () => {
       if (webSocket.current) {
         webSocket.current.close();

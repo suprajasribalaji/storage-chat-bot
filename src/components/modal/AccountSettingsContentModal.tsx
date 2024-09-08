@@ -175,10 +175,10 @@ const AccountSettingsContentModal = (props: AccountSettingsContentModalProps) =>
                     <Label>Export data</Label>
                     <StyledEnableExportButton onClick={handleExportButton} disabled={loading} icon={loading ? <Spin spinning={loading} indicator={customSpinIcon} /> : undefined}>{loading ? 'Exporting' : 'Export'}</StyledEnableExportButton>
                 </SettingsItem>
-                <SettingsItem>
+                {/* <SettingsItem>
                     <Label>Current Plan : {currentPlan}</Label>
                     <StyledEnableExportButton onClick={handleSubscriptionUpdate}>Update</StyledEnableExportButton>
-                </SettingsItem>
+                </SettingsItem> */}
                 <SettingsItem>
                     <Label>Delete your account</Label>
                     <Popconfirm

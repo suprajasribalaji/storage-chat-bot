@@ -97,7 +97,7 @@ type ProfileSettingsModalProps = {
 const items: MenuItem[] = [
     { key: '1', icon: <FaUserLarge />, label: 'Profile' },
     { key: '2', icon: <StyledMdOutlineManageAccounts/>, label: 'Account' },
-    { key: '3', icon: <RxUpdate />, label: 'Subscription' },    
+    // { key: '3', icon: <RxUpdate />, label: 'Subscription' },    
 ];
 
 const ProfileSettingsModal = (props: ProfileSettingsModalProps) => {

@@ -35,7 +35,7 @@ if (!SENDGRID_API_KEY) {
 sendgrid.setApiKey(SENDGRID_API_KEY);
 
 const auth = admin.auth();
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT || 3001;
 const app = express();
 
 export const wafOptions = {
