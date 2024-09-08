@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Menu, Modal, Spin, Skeleton } from 'antd'; // Import Skeleton
+import { Menu, Modal, Spin, Skeleton } from 'antd';
 import type { MenuProps } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { FaUserLarge } from "react-icons/fa6";
 import { MdOutlineManageAccounts } from "react-icons/md";
-import { RxUpdate } from "react-icons/rx";
+// import { RxUpdate } from "react-icons/rx";
 import styled from 'styled-components';
 import { colors } from '../../assets/themes/color';
 import { Profile } from '../../utils/utils';

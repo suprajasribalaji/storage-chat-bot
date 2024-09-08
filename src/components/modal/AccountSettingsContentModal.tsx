@@ -18,7 +18,7 @@ type AccountSettingsContentModalProps = {
 };
 
 const AccountSettingsContentModal = (props: AccountSettingsContentModalProps) => {
-    const { setSelectedKey } = props;
+    const { profile } = props;
     const user_id = auth.currentUser?.uid;
     const [fileDownloadURL, setFileDownloadURL] = useState<string[]>([]);
     const [fileNames, setFileNames] = useState<string[]>([]);
@@ -29,6 +29,8 @@ const AccountSettingsContentModal = (props: AccountSettingsContentModalProps) =>
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
+    console.log(profile, ' : ', currentPlan);
+    
     useEffect(() => {
         if (user_id) {
             fetchDataOfCurrentUser(user_id).finally(() => setDataLoading(false)); // Update loading state
@@ -158,9 +160,9 @@ const AccountSettingsContentModal = (props: AccountSettingsContentModalProps) =>
         }
     };
 
-    const handleSubscriptionUpdate = () => {
-        setSelectedKey('3');
-    };
+    // const handleSubscriptionUpdate = () => {
+    //     setSelectedKey('3');
+    // };
 
     const customSpinIcon = <LoadingOutlined style={{ fontSize: 18 }} spin />;
 
