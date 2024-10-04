@@ -1,20 +1,30 @@
-import styled from "styled-components"
-import BackgroundImage from "../assets/images/AccessPageBackground.jpg"
-import Title from "antd/es/typography/Title"
-import { Button } from "antd"
-import { LoginOutlined } from "@ant-design/icons"
-import { colors } from "../assets/themes/color"
-import { useNavigate } from "react-router-dom"
+import styled from "styled-components";
+import BackgroundImage from "../assets/images/AccessPageBackground.jpg";
+import Title from "antd/es/typography/Title";
+import { Button } from "antd";
+import { LoginOutlined } from "@ant-design/icons";
+import { colors } from "../assets/themes/color";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const AccessPage = () => {
     const navigate = useNavigate();
     
-    const handleNavigation = (path: string) => {
-        try {
-            navigate(path);
-        } catch (error) {
-            console.error("Navigation error:", error);
-        }
+    // Separate loading states for each button
+    const [isGetStartedLoading, setIsGetStartedLoading] = useState<boolean>(false);
+    const [isJoinNowLoading, setIsJoinNowLoading] = useState<boolean>(false);
+
+    const handleNavigation = (path: string, setLoading: (loading: boolean) => void) => {
+        setLoading(true);
+        setTimeout(() => {
+            try {
+                navigate(path);
+            } catch (error) {
+                console.error("Navigation error:", error);
+            } finally {
+                setLoading(false);
+            }
+        }, 400);
     };
 
     return (
@@ -29,32 +39,43 @@ const AccessPage = () => {
                             <StyledSubtitle>Safeguard and organized for clutter free spaces</StyledSubtitle>
                         </AccessPageSubtitle>
                         <StyledGetStartedButton>
-                            <StyledGSButton onClick={() => handleNavigation('/login')} icon={<LoginOutlined />}>Get Started</StyledGSButton>
+                            <StyledGSButton 
+                                onClick={() => handleNavigation('/login', setIsGetStartedLoading)} 
+                                icon={<LoginOutlined />} 
+                                loading={isGetStartedLoading}>
+                                Get Started
+                            </StyledGSButton>
                         </StyledGetStartedButton>
                         <JoinNow>
                             <NewToOurPlatform>
                                 New to our platform?
                             </NewToOurPlatform>
                             <JoinNowButtonDiv>
-                                <StyledJoinNowButton onClick={() => handleNavigation('/signup')} type="link">Join Now</StyledJoinNowButton>
+                                <StyledJoinNowButton 
+                                    onClick={() => handleNavigation('/signup', setIsJoinNowLoading)} 
+                                    type="link" 
+                                    loading={isJoinNowLoading}>
+                                    Join Now
+                                </StyledJoinNowButton>
                             </JoinNowButtonDiv>
                         </JoinNow>
                     </AccessPageContent>
                 </AccessPageBackground2>
             </AccessPageBackground1>
         </StyledAccessPage>
-    )
-}
+    );
+};
 
 export default AccessPage;
 
+// Styled components remain the same
 const StyledAccessPage = styled.div`
     width: 100%;
     height: 100vh;
     font-family: "Poppins", sans-serif;
 `;
 
-export const CenterDiv= styled.div`
+export const CenterDiv = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
