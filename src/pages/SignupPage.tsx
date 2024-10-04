@@ -12,6 +12,7 @@ import { requestUserSignup } from "../redux/slices/user/signup";
 import { CenteringTheDiv, StyledGithubButton, StyledGoogleButton, StyledInput, StyledPasswordInput } from "./LoginPage";
 import { FieldType } from "../utils/utils";
 import { getEmailValidationRules, getPasswordValidationRules } from "../utils/validation";
+import { useState } from "react";
 
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
     console.log('Failed:', errorInfo);
@@ -22,9 +23,14 @@ const SignupPage = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
+    const [isSignupLoading, setIsSignupLoading] = useState<boolean>(false);
+    const [isGoogleProviderLoading, setIsGoogleProviderLoading] = useState<boolean>(false);
+    const [isGithubProviderLoading, setIsGithubProviderLoading] = useState<boolean>(false);
+
     const handleSignupButton: FormProps<FieldType>['onFinish'] = async (values: FieldType) => {
         console.log('Success:', values);
         const { email, password } = values;
+        setIsSignupLoading(true);
         try {
             const response = await dispatch(requestUserSignup({email, password})).unwrap();
             navigate('/home');
@@ -33,22 +39,26 @@ const SignupPage = () => {
         } catch (error) {
             console.error('Signup failed:', error);
             message.error('Signup failed. Please check your credentials.');
-        }
+        } finally {
+            setIsSignupLoading(false);
+          }
     };
-    
-    const handleLoginByProvider = async (provider: string) => {
+
+    const handleLoginByProvider = async (provider: string, setLoading: (loading: boolean) => void) => {
+        setLoading(true);
         try {
-            let response;
-            if(provider==='google') response = await dispatch(requestUserLoginByGoogle());
-            if(provider==='github') response = await dispatch(requestUserLoginByGithub());
-            navigate('/home');
-            console.log(response, " : provider respose ----------");
-            message.success(`Logged in using ${provider} successfully!`);
+          if(provider==='google') await dispatch(requestUserLoginByGoogle());
+          else if(provider==='github') await dispatch(requestUserLoginByGithub());
+          navigate('/home');
+          message.success('Logged in successfully!');
         } catch (error) {
-            console.error('Login failed:', error);
-            message.error('Login failed. Please check your credentials.');
+          console.error('Login failed:', error);
+          message.error('Login failed. Please check your credentials.');
+          navigate('/login');
+        } finally {
+          setLoading(false);
         }
-    };
+      };
 
     return (
         <StyledSigupPage>
@@ -110,7 +120,7 @@ const SignupPage = () => {
 
                             <Form.Item>
                                 <SignupButton>
-                                    <StyledSignupButton type="primary" htmlType="submit">
+                                    <StyledSignupButton type="primary" htmlType="submit" loading={isSignupLoading}>
                                         SIGN UP
                                     </StyledSignupButton>
                                 </SignupButton>
@@ -121,8 +131,8 @@ const SignupPage = () => {
                             </SignupPageDivider>
 
                             <SignupButtonGroups>
-                                <StyledGoogleSignupButton icon={<GoogleOutlined />} onClick={() => handleLoginByProvider('google')}/>
-                                <StyledGithubSignupButton icon={<GithubOutlined />} onClick={() => handleLoginByProvider('github')}/>
+                                <StyledGoogleSignupButton icon={<GoogleOutlined />} onClick={() => handleLoginByProvider('google', setIsGoogleProviderLoading)} loading={isGoogleProviderLoading}/>
+                                <StyledGithubSignupButton icon={<GithubOutlined />} onClick={() => handleLoginByProvider('github', setIsGithubProviderLoading)} loading={isGithubProviderLoading}/>
                             </SignupButtonGroups>
                         </StyledSignupPageForm>
                     </StyledForm>

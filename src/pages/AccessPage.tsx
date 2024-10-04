@@ -10,7 +10,6 @@ import { useState } from "react";
 const AccessPage = () => {
     const navigate = useNavigate();
     
-    // Separate loading states for each button
     const [isGetStartedLoading, setIsGetStartedLoading] = useState<boolean>(false);
     const [isJoinNowLoading, setIsJoinNowLoading] = useState<boolean>(false);
 
@@ -68,7 +67,6 @@ const AccessPage = () => {
 
 export default AccessPage;
 
-// Styled components remain the same
 const StyledAccessPage = styled.div`
     width: 100%;
     height: 100vh;
