@@ -26,7 +26,10 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [failedAttempts, setFailedAttempts] = useState<number>(0);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [isLoginloading, setIsLoginLoading] = useState<boolean>(false);
+    const [isSignupLoading, setIsSignupLoading] = useState<boolean>(false);
+    const [isGithubProviderLoading, setIsGithubProviderLoading] = useState<boolean>(false);
+    const [isGoogleProviderLoading, setIsGoogleProviderLoading] = useState<boolean>(false);
 
     const handleForgotPassword = () => {
       setIsModalOpen(true);
@@ -68,7 +71,7 @@ const LoginPage = () => {
     const handleLoginButton: FormProps<FieldType>['onFinish'] = async (values) => {
       console.log('Success:', values);
       const { email, password, remember } = values;
-      setLoading(true);
+      setIsLoginLoading(true);
       try {
         if(remember){
           localStorage.setItem('email', email);
@@ -102,11 +105,12 @@ const LoginPage = () => {
           message.error('Please input valid credentials!');
         }
       } finally {
-        setLoading(false);
+        setIsLoginLoading(false);
       }
     };
 
-    const handleLoginByProvider = async (provider: string) => {
+    const handleLoginByProvider = async (provider: string, setLoading: (loading: boolean) => void) => {
+      setLoading(true);
       try {
         if(provider==='google') await dispatch(requestUserLoginByGoogle());
         else if(provider==='github') await dispatch(requestUserLoginByGithub());
@@ -116,12 +120,23 @@ const LoginPage = () => {
         console.error('Login failed:', error);
         message.error('Login failed. Please check your credentials.');
         navigate('/login');
+      } finally {
+        setLoading(false);
       }
     };
 
     const handleSignupButtton = () => {
-      navigate("/signup")
-    };  
+      setIsSignupLoading(true);
+      setTimeout(() => {
+          try {
+            navigate("/signup");
+          } catch (error) {
+              console.error("Navigation error:", error);
+          } finally {
+              setIsSignupLoading(false);
+          }
+      }, 400);
+    };
 
     return (
       <StyledLoginPage>
@@ -185,7 +200,7 @@ const LoginPage = () => {
 
                       <Form.Item>
                         <LoginButton>
-                          <StyledLoginButton type="primary" htmlType="submit" loading={loading}>
+                          <StyledLoginButton type="primary" htmlType="submit" loading={isLoginloading}>
                             LOG IN
                           </StyledLoginButton>
                         </LoginButton>
@@ -196,8 +211,8 @@ const LoginPage = () => {
                       </StyledDivider>
 
                       <LoginButtonGroups>
-                        <StyledGoogleButton icon={<GoogleOutlined />} onClick={() => handleLoginByProvider('google')}/>
-                        <StyledGithubButton icon={<GithubOutlined />} onClick={() => handleLoginByProvider('github')}/>
+                        <StyledGoogleButton icon={<GoogleOutlined />} onClick={() => handleLoginByProvider('google', setIsGoogleProviderLoading)} loading={isGoogleProviderLoading}/>
+                        <StyledGithubButton icon={<GithubOutlined />} onClick={() => handleLoginByProvider('github', setIsGithubProviderLoading)} loading={isGithubProviderLoading}/>
                       </LoginButtonGroups>
 
                       <NewAccount>
@@ -205,7 +220,7 @@ const LoginPage = () => {
                           Create a new account.
                         </CreateNewAccount>
                         <SignupButton>
-                          <StyledSignupButton onClick={handleSignupButtton} type="link">Sign up</StyledSignupButton>
+                          <StyledSignupButton onClick={handleSignupButtton} type="link" loading={isSignupLoading}>Sign up</StyledSignupButton>
                         </SignupButton>
                       </NewAccount>
                   </LoginPageForm>
