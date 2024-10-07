@@ -115,6 +115,7 @@ const LoginPage = () => {
         if(provider==='google') await dispatch(requestUserLoginByGoogle());
         else if(provider==='github') await dispatch(requestUserLoginByGithub());
         await handleNavigation();
+        navigate('/home');
         message.success('Logged in successfully!');
       } catch (error) {
         console.error('Login failed:', error);
