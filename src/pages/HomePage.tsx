@@ -34,20 +34,18 @@ const HomePage = () => {
   const profilePictureURL = auth.currentUser?.photoURL || ProfilePicture;
   const [isPlanValid, setIsPlanValid] = useState<boolean>(false);
 
-  console.log(profilePictureURL);
-  
   useEffect(() => {
     const checkPlanValidity = async () => {
       const planValidity = await fetchPlanValidity();
       planValidity ? setIsPlanValid(true) : setIsPlanValid(false);
-      console.log(planValidity, 'plan validity');
+      console.log(planValidity, ' plan validity ');
     };
     
     checkPlanValidity();
 
     const intervalId = setInterval(checkPlanValidity, 60000);
 
-    console.log(isPlanValid, 'plan valid?');
+    console.log(isPlanValid, 'is valid');
 
     return () => clearInterval(intervalId);
   }, []);
@@ -213,7 +211,7 @@ const HomePage = () => {
         <Dropdown overlay={menu} trigger={['click']} placement="bottomRight">
           <CircleButton type="link">
             {
-              profilePictureURL && <StyledProfilePicture src={profilePictureURL} alt='Profile Picture'/>
+              profilePicture && <StyledProfilePicture src={profilePicture} alt='Profile Picture'/>
             }
           </CircleButton>
         </Dropdown>
