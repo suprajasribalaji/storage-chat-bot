@@ -74,7 +74,7 @@ export const requestExportFiles = createAsyncThunk<any, OnRequestExportFiles>(
       const { fileDownloadURL, fileNames } = data;
       const response = await axios({
         method: 'post',
-        url: 'http://localhost:5002/export-files',
+        url: 'https://warehousevault.netlify.app/export-files',
         data: {
           fileDownloadURLs: fileDownloadURL,
           fileNames: fileNames,

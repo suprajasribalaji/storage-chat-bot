@@ -15,7 +15,7 @@ const PORT = process.env.PORT_SECONDARY || 3002;
 app.use(helmet());
 
 app.use(cors({
-  origin: 'http://localhost:5000',
+  origin: ['http://localhost:5000', 'https://warehousevault.netlify.app'],
   credentials: true
 }));
 
