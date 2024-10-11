@@ -1,6 +1,6 @@
 require('dotenv').config({path: '../../.env'});
 const WebSocket = require('ws');
-const PORT = process.env.WEBSOCKET_PORT || 3000;
+const PORT = process.env.PORT_WEBSOCKET || 3000;
 const server = new WebSocket.Server({ port: PORT });
 
 function wafMiddleware(message) {

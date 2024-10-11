@@ -1,3 +1,5 @@
+require('dotenv').config({ path: '../../.env' });
+
 const express = require('express');
 const axios = require('axios');
 const archiver = require('archiver');
@@ -8,7 +10,7 @@ const bodyParser = require('body-parser');
 const Joi = require('joi');
 const helmet = require('helmet');
 
-const PORT = process.env.EXPORT_FILE_PORT  || 3002;
+const PORT = process.env.PORT_SECONDARY || 3002;
 
 app.use(helmet());
 

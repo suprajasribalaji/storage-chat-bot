@@ -1,16 +1,13 @@
 require('dotenv').config({ path: '../../.env' });
 const express = require('express');
-const expressWaf = require('express-waf');
 const { body, validationResult } = require('express-validator');
 const cors = require('cors');
 const os = require('os');
 const speakeasy = require('speakeasy');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
-const csurf = require('csurf');
 const rateLimit = require('express-rate-limit');
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
 const sendgrid = require('@sendgrid/mail');
 const helmet = require('helmet');
 
@@ -35,96 +32,8 @@ if (!SENDGRID_API_KEY) {
 sendgrid.setApiKey(SENDGRID_API_KEY);
 
 const auth = admin.auth();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT_MAIN || 3001;
 const app = express();
-
-const wafOptions = {
-  blockMode: true,
-  rules: [
-    {
-      type: 'sql-injection',
-      action: 'block',
-    },
-    {
-      type: 'xss',
-      action: 'block',
-    },
-    {
-      type: 'csrf',
-      action: 'block',
-    },
-    {
-      type: 'directory-traversal',
-      action: 'block',
-    },
-    {
-      type: 'local-file-inclusion',
-      action: 'block',
-    },
-    {
-      type: 'remote-file-inclusion',
-      action: 'block',
-    },
-    {
-      type: 'command-injection',
-      action: 'block',
-    },
-    {
-      type: 'code-injection',
-      action: 'block',
-    },
-    {
-      type: 'http-header-injection',
-      action: 'block',
-    },
-    {
-      type: 'http-method-override',
-      action: 'block',
-    },
-    {
-      type: 'http-protocol-violation',
-      action: 'block',
-    },
-    {
-      type: 'http-response-splitting',
-      action: 'block',
-    },
-    {
-      type: 'http-request-smuggling',
-      action: 'block',
-    },
-    {
-      type: 'http-request-flooding',
-      action: 'block',
-    },
-    {
-      type: 'brute-force',
-      action: 'block',
-    },
-    {
-      type: 'rate-limiting',
-      action: 'block',
-    },
-    {
-      type: 'user-agent-blocking',
-      action: 'block',
-    },
-    {
-      type: 'ip-blocking',
-      action: 'block',
-    },
-    {
-      type: 'geo-blocking',
-      action: 'block',
-    },
-    {
-      type: 'bot-detection',
-      action: 'block',
-    },
-  ],
-};
-
-app.use(expressWaf(wafOptions));
 
 app.use(helmet());
 app.use(
