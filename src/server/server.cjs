@@ -19,7 +19,7 @@ const WebSocket = require('ws');
 
 const app = express();
 
-const admin = require('../src/config/firebase-admin.config.ts');
+const admin = require('../config/firebase-admin.config.ts');
 
 const SENDGRID_API_KEY = process.env.REACT_SENDGRID_API_KEY;
 const SENDGRID_RESET_PASSWORD_TEMPLATE_ID = process.env.REACT_SENDGRID_RESET_PASSWORD_TEMPLATE_ID;
